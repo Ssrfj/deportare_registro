@@ -10,6 +10,7 @@ from utils.template_loader import (
     load_check_template_paper2_2,
     load_check_template_paper3
 )
+from utils.checklist_writer import copy_checklist_template_for_club
 
 def check_club_info(ws, club_master_dict):
     club_name = ws["A1"].value
@@ -100,11 +101,6 @@ def check_excel_contents_paper1(club_path, club_name, club_master_dict):
         # 名簿との照合チェック（A1, A3）
         issues += check_club_info(ws, club_master_dict)
 
-        # テンプレート読み込み
-        template = load_check_template_paper1()
-        if template:
-            issues += check_cells_with_template(ws, template, doc_name="登録基準確認用紙")
-
     except Exception as e:
         logging.exception(f"{club_name}: Excel内容の読み取り中にエラー")
         issues.append("❌ Excelファイルの読み取りに失敗しました。")
@@ -114,7 +110,6 @@ def check_excel_contents_paper1(club_path, club_name, club_master_dict):
 def check_excel_contents_paper2_1(club_path, club_name):
     issues = []
 
-    # 書類ファイルの探索（02-1で始まるファイル）
     pattern = os.path.join(club_path, "02-1_*基礎情報書類.xlsx")
     files = glob.glob(pattern)
 
@@ -127,13 +122,6 @@ def check_excel_contents_paper2_1(club_path, club_name):
         wb = load_workbook(file_path)
         ws = wb.active
 
-        # テンプレート読み込み
-        template = load_check_template_paper2_1("templates/check_paper2_1_template.xlsx")
-        print(f"🔍 {club_name}: 書類②-1 テンプレート件数 = {len(template)}")
-
-        if template:
-            issues += check_cells_with_template(ws, template, doc_name="基礎情報書類")
-
     except Exception as e:
         logging.exception(f"{club_name}: 書類②-1のExcel読み込みエラー")
         issues.append("❌ 書類②-1の読み取りに失敗しました。")
@@ -143,7 +131,6 @@ def check_excel_contents_paper2_1(club_path, club_name):
 def check_excel_contents_paper2_2(club_path, club_name):
     issues = []
 
-    # ファイル探索
     pattern = os.path.join(club_path, "02-2_*.xlsx")
     files = glob.glob(pattern)
 
@@ -156,13 +143,6 @@ def check_excel_contents_paper2_2(club_path, club_name):
         wb = load_workbook(file_path)
         ws = wb.active
 
-        # テンプレート読み込み
-        template = load_check_template_paper2_2("templates/check_paper2_2_template.xlsx")
-        print(f"🔍 {club_name}: 書類②-2 テンプレート件数 = {len(template)}")
-
-        if template:
-            issues += check_cells_with_template(ws, template, doc_name="活動・マネジャー書類")
-
     except Exception as e:
         logging.exception(f"{club_name}: 書類②-2のExcel読み込みエラー")
         issues.append("❌ 書類②-2の読み取りに失敗しました。")
@@ -172,7 +152,6 @@ def check_excel_contents_paper2_2(club_path, club_name):
 def check_excel_contents_paper3(club_path, club_name):
     issues = []
 
-    # 書類③（PDF）ファイル探索
     pattern = os.path.join(club_path, "03_*.pdf")
     files = glob.glob(pattern)
 
@@ -180,21 +159,7 @@ def check_excel_contents_paper3(club_path, club_name):
         issues.append("❗ 書類③『規約・会則・定款等』が見つかりません。")
         return issues
 
-    file_path = files[0]  # 現時点では最初のファイルのみ対象
-    try:
-        # PDFの自動処理はまだ行わないので、テンプレートを手作業チェック用に読み込む
-        from utils.template_loader import load_check_template_paper3
-        template = load_check_template_paper3()
-        print(f"🔍 {club_name}: 書類③ テンプレート件数 = {len(template)}")
-
-        # 現時点ではテンプレートに沿った自動チェックは未対応なので、確認項目名のみ出力
-        for item in template:
-            issues.append(f"[書類③チェック項目] {item['チェック項目']} → 要確認")
-
-    except Exception as e:
-        logging.exception(f"{club_name}: 書類③テンプレートの読み取り中にエラー")
-        issues.append("❌ 書類③のチェックテンプレート読み込みに失敗しました。")
-
+    # 自動チェック処理は現時点で行わない（テンプレート確認も削除）
     return issues
 
 def check_submissions(clubs, club_master):
@@ -215,6 +180,8 @@ def check_submissions(clubs, club_master):
                 else:
                     row[filename] = "×"
                     log_messages.append(f"❗ {filename} が見つかりません。")
+
+            copy_checklist_template_for_club(club_name)
 
             # Excelの中身チェック
             if row[REQUIRED_FILES["01"]] == "✔":

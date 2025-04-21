@@ -34,3 +34,149 @@
 2025-04-21 22:21:05,302 [INFO] club002_ひかりSC: チェック完了
 2025-04-21 22:21:05,302 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
 2025-04-21 22:21:05,303 [INFO] club003_さくらアリーナ: チェック完了
+2025-04-21 22:57:43,807 [INFO] 🔧 ログ設定を初期化しました。
+2025-04-21 22:57:43,808 [INFO] 📂 クラブフォルダ数: 3 件を検出しました。
+2025-04-21 22:57:43,824 [INFO] 🗂 クラブ名簿を読み込みました（3件）
+2025-04-21 22:57:43,826 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\01_check_paper1_registration_criteria_confirmation_formclub001_あさひスポーツクラブ_R6.xlsx
+2025-04-21 22:57:43,827 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\02-1_check_paper2_1_memberships_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-21 22:57:43,829 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\02-2_check_paper2_2_activities_leaders_and_administration_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-21 22:57:43,830 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\03_check_paper3_article_of_association_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-21 22:57:43,848 [ERROR] 書類②-1テンプレートの読み込みに失敗しました
+Traceback (most recent call last):
+  File "e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\utils\template_loader.py", line 15, in load_check_template_paper2_1
+    df = pd.read_excel(path)
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 495, in read_excel
+    io = ExcelFile(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1550, in __init__
+    ext = inspect_excel_format(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1402, in inspect_excel_format
+    with get_handle(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_1_template.xlsx'
+2025-04-21 22:57:43,854 [ERROR] 書類②-2テンプレートの読み込みに失敗しました
+Traceback (most recent call last):
+  File "e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\utils\template_loader.py", line 23, in load_check_template_paper2_2
+    df = pd.read_excel(path)
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 495, in read_excel
+    io = ExcelFile(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1550, in __init__
+    ext = inspect_excel_format(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1402, in inspect_excel_format
+    with get_handle(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_2_template.xlsx'
+2025-04-21 22:57:43,856 [INFO] club001_あさひスポーツクラブ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club001_あさひスポーツクラブ_log.txt
+2025-04-21 22:57:43,856 [INFO] club001_あさひスポーツクラブ: チェック完了
+2025-04-21 22:57:43,857 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\01_check_paper1_registration_criteria_confirmation_formclub002_ひかりSC_R6.xlsx
+2025-04-21 22:57:43,858 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\02-1_check_paper2_1_memberships_club002_ひかりSC_R6.xlsx
+2025-04-21 22:57:43,859 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\02-2_check_paper2_2_activities_leaders_and_administration_club002_ひかりSC_R6.xlsx
+2025-04-21 22:57:43,859 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\03_check_paper3_article_of_association_club002_ひかりSC_R6.xlsx
+2025-04-21 22:57:43,877 [ERROR] 書類②-1テンプレートの読み込みに失敗しました
+Traceback (most recent call last):
+  File "e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\utils\template_loader.py", line 15, in load_check_template_paper2_1
+    df = pd.read_excel(path)
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 495, in read_excel
+    io = ExcelFile(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1550, in __init__
+    ext = inspect_excel_format(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1402, in inspect_excel_format
+    with get_handle(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_1_template.xlsx'
+2025-04-21 22:57:43,883 [ERROR] 書類②-2テンプレートの読み込みに失敗しました
+Traceback (most recent call last):
+  File "e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\utils\template_loader.py", line 23, in load_check_template_paper2_2
+    df = pd.read_excel(path)
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 495, in read_excel
+    io = ExcelFile(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1550, in __init__
+    ext = inspect_excel_format(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1402, in inspect_excel_format
+    with get_handle(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_2_template.xlsx'
+2025-04-21 22:57:43,884 [INFO] club002_ひかりSC: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club002_ひかりSC_log.txt
+2025-04-21 22:57:43,885 [INFO] club002_ひかりSC: チェック完了
+2025-04-21 22:57:43,886 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\01_check_paper1_registration_criteria_confirmation_formclub003_さくらアリーナ_R6.xlsx
+2025-04-21 22:57:43,887 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\02-1_check_paper2_1_memberships_club003_さくらアリーナ_R6.xlsx
+2025-04-21 22:57:43,888 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\02-2_check_paper2_2_activities_leaders_and_administration_club003_さくらアリーナ_R6.xlsx
+2025-04-21 22:57:43,888 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\03_check_paper3_article_of_association_club003_さくらアリーナ_R6.xlsx
+2025-04-21 22:57:43,889 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
+2025-04-21 22:57:43,889 [INFO] club003_さくらアリーナ: チェック完了
+2025-04-21 22:58:37,378 [INFO] 🔧 ログ設定を初期化しました。
+2025-04-21 22:58:37,378 [INFO] 📂 クラブフォルダ数: 3 件を検出しました。
+2025-04-21 22:58:37,394 [INFO] 🗂 クラブ名簿を読み込みました（3件）
+2025-04-21 22:58:37,397 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\01_check_paper1_registration_criteria_confirmation_formclub001_あさひスポーツクラブ_R6.xlsx
+2025-04-21 22:58:37,397 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\02-1_check_paper2_1_memberships_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-21 22:58:37,398 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\02-2_check_paper2_2_activities_leaders_and_administration_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-21 22:58:37,398 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\03_check_paper3_article_of_association_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-21 22:58:37,417 [ERROR] 書類②-1テンプレートの読み込みに失敗しました
+Traceback (most recent call last):
+  File "e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\utils\template_loader.py", line 15, in load_check_template_paper2_1
+    df = pd.read_excel(path)
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 495, in read_excel
+    io = ExcelFile(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1550, in __init__
+    ext = inspect_excel_format(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1402, in inspect_excel_format
+    with get_handle(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_1_template.xlsx'
+2025-04-21 22:58:37,423 [ERROR] 書類②-2テンプレートの読み込みに失敗しました
+Traceback (most recent call last):
+  File "e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\utils\template_loader.py", line 23, in load_check_template_paper2_2
+    df = pd.read_excel(path)
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 495, in read_excel
+    io = ExcelFile(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1550, in __init__
+    ext = inspect_excel_format(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1402, in inspect_excel_format
+    with get_handle(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_2_template.xlsx'
+2025-04-21 22:58:37,425 [INFO] club001_あさひスポーツクラブ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club001_あさひスポーツクラブ_log.txt
+2025-04-21 22:58:37,425 [INFO] club001_あさひスポーツクラブ: チェック完了
+2025-04-21 22:58:37,426 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\01_check_paper1_registration_criteria_confirmation_formclub002_ひかりSC_R6.xlsx
+2025-04-21 22:58:37,428 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\02-1_check_paper2_1_memberships_club002_ひかりSC_R6.xlsx
+2025-04-21 22:58:37,428 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\02-2_check_paper2_2_activities_leaders_and_administration_club002_ひかりSC_R6.xlsx
+2025-04-21 22:58:37,429 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\03_check_paper3_article_of_association_club002_ひかりSC_R6.xlsx
+2025-04-21 22:58:37,448 [ERROR] 書類②-1テンプレートの読み込みに失敗しました
+Traceback (most recent call last):
+  File "e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\utils\template_loader.py", line 15, in load_check_template_paper2_1
+    df = pd.read_excel(path)
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 495, in read_excel
+    io = ExcelFile(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1550, in __init__
+    ext = inspect_excel_format(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1402, in inspect_excel_format
+    with get_handle(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_1_template.xlsx'
+2025-04-21 22:58:37,453 [ERROR] 書類②-2テンプレートの読み込みに失敗しました
+Traceback (most recent call last):
+  File "e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\utils\template_loader.py", line 23, in load_check_template_paper2_2
+    df = pd.read_excel(path)
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 495, in read_excel
+    io = ExcelFile(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1550, in __init__
+    ext = inspect_excel_format(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\excel\_base.py", line 1402, in inspect_excel_format
+    with get_handle(
+  File "C:\Users\ssrfj\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 882, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_2_template.xlsx'
+2025-04-21 22:58:37,455 [INFO] club002_ひかりSC: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club002_ひかりSC_log.txt
+2025-04-21 22:58:37,455 [INFO] club002_ひかりSC: チェック完了
+2025-04-21 22:58:37,456 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\01_check_paper1_registration_criteria_confirmation_formclub003_さくらアリーナ_R6.xlsx
+2025-04-21 22:58:37,457 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\02-1_check_paper2_1_memberships_club003_さくらアリーナ_R6.xlsx
+2025-04-21 22:58:37,458 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\02-2_check_paper2_2_activities_leaders_and_administration_club003_さくらアリーナ_R6.xlsx
+2025-04-21 22:58:37,459 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\03_check_paper3_article_of_association_club003_さくらアリーナ_R6.xlsx
+2025-04-21 22:58:37,459 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
+2025-04-21 22:58:37,459 [INFO] club003_さくらアリーナ: チェック完了
