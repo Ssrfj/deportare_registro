@@ -1,0 +1,36 @@
+2025-04-21 21:04:35,316 [INFO] 🔧 ログ設定を初期化しました。
+2025-04-21 21:04:35,317 [INFO] 📂 クラブフォルダ数: 3 件を検出しました。
+2025-04-21 21:04:35,332 [INFO] 🗂 クラブ名簿を読み込みました（3件）
+2025-04-21 21:04:35,360 [INFO] club001_あさひスポーツクラブ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club001_あさひスポーツクラブ_log.txt
+2025-04-21 21:04:35,360 [INFO] club001_あさひスポーツクラブ: チェック完了
+2025-04-21 21:04:35,385 [INFO] club002_ひかりSC: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club002_ひかりSC_log.txt
+2025-04-21 21:04:35,385 [INFO] club002_ひかりSC: チェック完了
+2025-04-21 21:04:35,386 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
+2025-04-21 21:04:35,386 [INFO] club003_さくらアリーナ: チェック完了
+2025-04-21 21:07:24,817 [INFO] 🔧 ログ設定を初期化しました。
+2025-04-21 21:07:24,818 [INFO] 📂 クラブフォルダ数: 3 件を検出しました。
+2025-04-21 21:07:24,834 [INFO] 🗂 クラブ名簿を読み込みました（3件）
+2025-04-21 21:07:24,871 [INFO] club001_あさひスポーツクラブ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club001_あさひスポーツクラブ_log.txt
+2025-04-21 21:07:24,872 [INFO] club001_あさひスポーツクラブ: チェック完了
+2025-04-21 21:07:24,907 [INFO] club002_ひかりSC: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club002_ひかりSC_log.txt
+2025-04-21 21:07:24,907 [INFO] club002_ひかりSC: チェック完了
+2025-04-21 21:07:24,908 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
+2025-04-21 21:07:24,908 [INFO] club003_さくらアリーナ: チェック完了
+2025-04-21 21:33:39,751 [INFO] 🔧 ログ設定を初期化しました。
+2025-04-21 21:33:39,751 [INFO] 📂 クラブフォルダ数: 3 件を検出しました。
+2025-04-21 21:33:39,768 [INFO] 🗂 クラブ名簿を読み込みました（3件）
+2025-04-21 21:33:39,809 [INFO] club001_あさひスポーツクラブ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club001_あさひスポーツクラブ_log.txt
+2025-04-21 21:33:39,810 [INFO] club001_あさひスポーツクラブ: チェック完了
+2025-04-21 21:33:39,846 [INFO] club002_ひかりSC: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club002_ひかりSC_log.txt
+2025-04-21 21:33:39,846 [INFO] club002_ひかりSC: チェック完了
+2025-04-21 21:33:39,847 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
+2025-04-21 21:33:39,847 [INFO] club003_さくらアリーナ: チェック完了
+2025-04-21 22:21:05,212 [INFO] 🔧 ログ設定を初期化しました。
+2025-04-21 22:21:05,213 [INFO] 📂 クラブフォルダ数: 3 件を検出しました。
+2025-04-21 22:21:05,229 [INFO] 🗂 クラブ名簿を読み込みました（3件）
+2025-04-21 22:21:05,266 [INFO] club001_あさひスポーツクラブ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club001_あさひスポーツクラブ_log.txt
+2025-04-21 22:21:05,266 [INFO] club001_あさひスポーツクラブ: チェック完了
+2025-04-21 22:21:05,301 [INFO] club002_ひかりSC: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club002_ひかりSC_log.txt
+2025-04-21 22:21:05,302 [INFO] club002_ひかりSC: チェック完了
+2025-04-21 22:21:05,302 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
+2025-04-21 22:21:05,303 [INFO] club003_さくらアリーナ: チェック完了
