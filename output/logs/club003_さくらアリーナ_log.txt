@@ -1,40 +1,16 @@
-【クラブ】club003_さくらアリーナ
+📌 提出状況ログ（クラブ名: club003_さくらアリーナ）
+========================================
+登録基準確認用紙.xlsx: ×
+基礎情報書類.xlsx: ×
+活動・マネジャー書類.xlsx: ×
+規約・会則・定款等.pdf: ×
+事業報告・決算.xlsx: ×
+議事録.pdf: ×
 
-▼ 書類01 の不備
-- No1 None : None
-- No2 None : None
-- No3 None : None
-- No4 None : None
-- No5 None : None
-- No6 None : None
-- No7 None : None
-- No8 None : None
-- No9 None : None
-- No10 None : None
-- No11 None : None
-- No12 None : None
-- No13 None : None
-- No14 None : None
-- No15 None : None
-- No16 None : None
-- No17 None : None
-- No18 None : None
-- No19 None : None
-- No20 None : None
-- No21 None : None
-- No22 None : None
-- No23 None : None
-- No24 None : None
-▼ 書類02-1 の不備
-- No1 None : None
-- No2 None : None
-- No3 None : None
-- No4 None : None
-- No5 None : None
-- No6 None : None
-▼ 書類02-2 の不備
-- No1 None : None
-- No2 None : None
-- No3 None : None
-- No4 None : None
-- No5 None : None
+📋 指摘事項:
+ - ❗ 登録基準確認用紙.xlsx が見つかりません。
+ - ❗ 基礎情報書類.xlsx が見つかりません。
+ - ❗ 活動・マネジャー書類.xlsx が見つかりません。
+ - ❗ 規約・会則・定款等.pdf が見つかりません。
+ - ❗ 事業報告・決算.xlsx が見つかりません。
+ - ❗ 議事録.pdf が見つかりません。

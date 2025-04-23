@@ -8,6 +8,12 @@ from config.paths import INPUT_DIR, SUMMARY_FILE
 import pandas as pd
 import os
 
+from utils.settings_loader import load_settings
+
+settings = load_settings()
+this_year = settings.get("this_year", "")
+prefecture_name = settings.get("prefecture_name", "")
+
 if __name__ == "__main__":
     setup_logging()
     clubs = scan_club_folders()

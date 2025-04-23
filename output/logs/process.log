@@ -180,3 +180,24 @@ FileNotFoundError: [Errno 2] No such file or directory: 'templates/check_paper2_
 2025-04-21 22:58:37,459 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\03_check_paper3_article_of_association_club003_さくらアリーナ_R6.xlsx
 2025-04-21 22:58:37,459 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
 2025-04-21 22:58:37,459 [INFO] club003_さくらアリーナ: チェック完了
+2025-04-23 23:55:35,196 [INFO] 🔧 ログ設定を初期化しました。
+2025-04-23 23:55:35,196 [INFO] 📂 クラブフォルダ数: 3 件を検出しました。
+2025-04-23 23:55:35,237 [INFO] 🗂 クラブ名簿を読み込みました（3件）
+2025-04-23 23:55:35,244 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\01_check_paper1_registration_criteria_confirmation_form_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-23 23:55:35,245 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\02-1_check_paper2_1_memberships_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-23 23:55:35,246 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\02-2_check_paper2_2_activities_leaders_and_administration_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-23 23:55:35,247 [INFO] club001_あさひスポーツクラブ: テンプレートをコピーしました → output/checklists\club001_あさひスポーツクラブ\03_check_paper3_article_of_association_club001_あさひスポーツクラブ_R6.xlsx
+2025-04-23 23:55:35,260 [INFO] club001_あさひスポーツクラブ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club001_あさひスポーツクラブ_log.txt
+2025-04-23 23:55:35,261 [INFO] club001_あさひスポーツクラブ: チェック完了
+2025-04-23 23:55:35,262 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\01_check_paper1_registration_criteria_confirmation_form_club002_ひかりSC_R6.xlsx
+2025-04-23 23:55:35,263 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\02-1_check_paper2_1_memberships_club002_ひかりSC_R6.xlsx
+2025-04-23 23:55:35,263 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\02-2_check_paper2_2_activities_leaders_and_administration_club002_ひかりSC_R6.xlsx
+2025-04-23 23:55:35,264 [INFO] club002_ひかりSC: テンプレートをコピーしました → output/checklists\club002_ひかりSC\03_check_paper3_article_of_association_club002_ひかりSC_R6.xlsx
+2025-04-23 23:55:35,277 [INFO] club002_ひかりSC: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club002_ひかりSC_log.txt
+2025-04-23 23:55:35,277 [INFO] club002_ひかりSC: チェック完了
+2025-04-23 23:55:35,278 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\01_check_paper1_registration_criteria_confirmation_form_club003_さくらアリーナ_R6.xlsx
+2025-04-23 23:55:35,280 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\02-1_check_paper2_1_memberships_club003_さくらアリーナ_R6.xlsx
+2025-04-23 23:55:35,280 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\02-2_check_paper2_2_activities_leaders_and_administration_club003_さくらアリーナ_R6.xlsx
+2025-04-23 23:55:35,281 [INFO] club003_さくらアリーナ: テンプレートをコピーしました → output/checklists\club003_さくらアリーナ\03_check_paper3_article_of_association_club003_さくらアリーナ_R6.xlsx
+2025-04-23 23:55:35,281 [INFO] club003_さくらアリーナ: ログファイルを出力しました → e:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\output\logs\club003_さくらアリーナ_log.txt
+2025-04-23 23:55:35,282 [INFO] club003_さくらアリーナ: チェック完了
