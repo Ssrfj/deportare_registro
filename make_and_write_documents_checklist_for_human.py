@@ -4,7 +4,7 @@ import pandas as pd
 from checklist_generator import (
     make_document1_checklist_for_human,
     make_document2_1_checklist_for_human,
-    # make_document2_2_checklist_for_human,
+    make_document2_2_checklist_for_human,
     # make_document3_checklist_for_human,
     # make_document4_checklist_for_human,
     # make_document5_plan_checklist_for_human,
