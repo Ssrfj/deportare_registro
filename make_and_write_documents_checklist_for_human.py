@@ -104,6 +104,10 @@ def make_documents_checklist_for_human(application_df, list_df):
         )
         # 書類2_1
         document2_1_checklist,document2_1_number_of_menbers,document2_1_number_of_annual_fee_members = make_document2_1_checklist_for_human(club_df, application_df)
+        os.makedirs(document2_1_checklist_for_human_folder_path, exist_ok=True)
+        # 書類2_1のフォルダが存在しない場合は作成
+        if not os.path.exists(document2_1_checklist_for_human_folder_path):
+            os.makedirs(document2_1_checklist_for_human_folder_path)
         # 書類2_1のチェックリストをExcelファイルとして保存(1つのExcelで、複数のシートに分けて出力)
         document2_1_checklist_for_human_file_name = f'{club_name}_document2_1_checklist_申請{apried_date_str}.xlsx'
         document2_1_checklist_for_human_file_path = os.path.join(document2_1_checklist_for_human_folder_path, document2_1_checklist_for_human_file_name)
@@ -116,6 +120,10 @@ def make_documents_checklist_for_human(application_df, list_df):
             pd.DataFrame(document2_1_number_of_annual_fee_members).to_excel(writer, sheet_name='年会費会員数', index=False)
         # 書類2_2
         document2_2_checklist, document2_2_discipline_and_coaches = make_document2_2_checklist_for_human(club_df, application_df)
+        os.makedirs(document2_2_checklist_for_human_folder_path, exist_ok=True)
+        # 書類2_2のフォルダが存在しない場合は作成
+        if not os.path.exists(document2_2_checklist_for_human_folder_path):
+            os.makedirs(document2_2_checklist_for_human_folder_path)
         # 書類2_2のチェックリストをExcelファイルとして保存(1つのExcelで、複数のシートに分けて出力)
         document2_2_checklist_for_human_file_name = f'{club_name}_document2_2_checklist_申請{apried_date_str}.xlsx'
         document2_2_checklist_for_human_file_path = os.path.join(document2_2_checklist_for_human_folder_path, document2_2_checklist_for_human_file_name)
@@ -126,6 +134,10 @@ def make_documents_checklist_for_human(application_df, list_df):
             pd.DataFrame(document2_2_discipline_and_coaches).to_excel(writer, sheet_name='競技種目_および_指導者', index=False)
         # 書類3
         document3_checklist = make_document3_checklist_for_human(club_df, application_df)
+        os.makedirs(document3_checklist_for_human_folder_path, exist_ok=True)
+        # 書類3のフォルダが存在しない場合は作成
+        if not os.path.exists(document3_checklist_for_human_folder_path):
+            os.makedirs(document3_checklist_for_human_folder_path)
         # 書類3のチェックリストをExcelファイルとして保存
         document3_checklist_for_human_file_name = f'{club_name}_document3_checklist_申請{apried_date_str}.xlsx'
         document3_checklist_for_human_file_path = os.path.join(document3_checklist_for_human_folder_path, document3_checklist_for_human_file_name)
@@ -134,6 +146,10 @@ def make_documents_checklist_for_human(application_df, list_df):
             index=False)
         # 書類4
         document4_checklist, document4_lists_checklist = make_document4_checklist_for_human(club_df, application_df)
+        os.makedirs(document4_checklist_for_human_folder_path, exist_ok=True)
+        # 書類4のフォルダが存在しない場合は作成
+        if not os.path.exists(document4_checklist_for_human_folder_path):
+            os.makedirs(document4_checklist_for_human_folder_path)
         # 書類4のチェックリストをExcelファイルとして保存(1つのExcelで、複数のシートに分けて出力)
         document4_checklist_for_human_file_name = f'{club_name}_document4_checklist_申請{apried_date_str}.xlsx'
         document4_checklist_for_human_file_path = os.path.join(document4_checklist_for_human_folder_path, document4_checklist_for_human_file_name)
