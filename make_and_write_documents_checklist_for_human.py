@@ -5,8 +5,8 @@ from checklist_generator import (
     make_document1_checklist_for_human,
     make_document2_1_checklist_for_human,
     make_document2_2_checklist_for_human,
-    # make_document3_checklist_for_human,
-    # make_document4_checklist_for_human,
+    make_document3_checklist_for_human,
+    make_document4_checklist_for_human,
     # make_document5_plan_checklist_for_human,
     # make_document5_budget_checklist_for_human,
     # make_document6_report_checklist_for_human,
@@ -115,7 +115,7 @@ def make_documents_checklist_for_human(application_df, list_df):
             # 年会費会員数のデータフレームをシートに書き込む
             pd.DataFrame(document2_1_number_of_annual_fee_members).to_excel(writer, sheet_name='年会費会員数', index=False)
         # 書類2_2
-        document2_2_checklist,document2_2_disciplines = make_document2_2_checklist_for_human(club_df, application_df)
+        document2_2_checklist, document2_2_discipline_and_coaches = make_document2_2_checklist_for_human(club_df, application_df)
         # 書類2_2のチェックリストをExcelファイルとして保存(1つのExcelで、複数のシートに分けて出力)
         document2_2_checklist_for_human_file_name = f'{club_name}_document2_2_checklist_申請{apried_date_str}.xlsx'
         document2_2_checklist_for_human_file_path = os.path.join(document2_2_checklist_for_human_folder_path, document2_2_checklist_for_human_file_name)
@@ -123,10 +123,30 @@ def make_documents_checklist_for_human(application_df, list_df):
             # チェックリストのデータフレームをシートに書き込む
             pd.DataFrame(document2_2_checklist).to_excel(writer, sheet_name='チェックリスト', index=False)
             # 競技種目のデータフレームをシートに書き込む
-            pd.DataFrame(document2_2_disciplines).to_excel(writer, sheet_name='競技種目', index=False)
+            pd.DataFrame(document2_2_discipline_and_coaches).to_excel(writer, sheet_name='競技種目_および_指導者', index=False)
         # 書類3
-        # make_document3_checklist_for_human()
-        # make_document4_checklist_for_human()
+        document3_checklist = make_document3_checklist_for_human(club_df, application_df)
+        # 書類3のチェックリストをExcelファイルとして保存
+        document3_checklist_for_human_file_name = f'{club_name}_document3_checklist_申請{apried_date_str}.xlsx'
+        document3_checklist_for_human_file_path = os.path.join(document3_checklist_for_human_folder_path, document3_checklist_for_human_file_name)
+        pd.DataFrame(document3_checklist).to_excel(
+            document3_checklist_for_human_file_path,
+            index=False)
+        # 書類4
+        document4_checklist, document4_lists_checklist = make_document4_checklist_for_human(club_df, application_df)
+        # 書類4のチェックリストをExcelファイルとして保存(1つのExcelで、複数のシートに分けて出力)
+        document4_checklist_for_human_file_name = f'{club_name}_document4_checklist_申請{apried_date_str}.xlsx'
+        document4_checklist_for_human_file_path = os.path.join(document4_checklist_for_human_folder_path, document4_checklist_for_human_file_name)
+        with pd.ExcelWriter(document4_checklist_for_human_file_path, engine='openpyxl') as writer:
+            # チェックリストのデータフレームをシートに書き込む
+            pd.DataFrame(document4_checklist).to_excel(writer, sheet_name='チェックリスト', index=False)
+            # リストのチェックリストのデータフレームをシートに書き込む(5つの同内容のリストをそれぞれのシートに分けて出力)
+            pd.DataFrame(document4_lists_checklist).to_excel(writer, sheet_name='リストチェック_1', index=False)
+            pd.DataFrame(document4_lists_checklist).to_excel(writer, sheet_name='リストチェック_2', index=False)
+            pd.DataFrame(document4_lists_checklist).to_excel(writer, sheet_name='リストチェック_3', index=False)
+            pd.DataFrame(document4_lists_checklist).to_excel(writer, sheet_name='リストチェック_4', index=False)
+            pd.DataFrame(document4_lists_checklist).to_excel(writer, sheet_name='リストチェック_5', index=False)
+
         # make_document5_plan_checklist_for_human()
         # make_document5_budget_checklist_for_human()
         # make_document6_report_checklist_for_human()

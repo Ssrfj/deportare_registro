@@ -260,6 +260,8 @@ def make_document2_2_checklist_for_human(club_df, checklist_create_df):
 
     for index, row in club_df.iterrows():
         club_name = row['クラブ名']
+        discipline_df = pd.read_csv('list_of_disciplines.csv')  # 競技種目のリストを読み込む
+        discipline = discipline_df['disciplines']
         # 申請日時はclub_dfにもあるが、checklist_create_df優先で取得
         if club_name in checklist_create_df['クラブ名'].values:
             application_date = checklist_create_df.loc[
@@ -267,21 +269,236 @@ def make_document2_2_checklist_for_human(club_df, checklist_create_df):
             ].iloc[0]
         else:
             application_date = row.get('申請日時', '不明')
+        # 競技種目数の取得  
+        # 種目のカラムを修正（'申請_種目_'を付記）
+        disciplines_columns = [f'申請_種目_{discipline}' for discipline in discipline]
+        extra_disciplines_column = row['申請_種目_その他_数(選択時必須)']
+        count_of_disciplines = 0
+        # 各種目カラムをループし、「定期的に行っている」が選択されているかを確認
+        for col in disciplines_columns:
+            if col in row and row[col] == '定期的に行っている':
+                count_of_disciplines += 1
+        count_of_disciplines += extra_disciplines_column in row and row[extra_disciplines_column] != '' and row[extra_disciplines_column] != '0'
+        # 競技種目数が0の場合は、'0'と記載
+        if count_of_disciplines == 0:
+            count_of_disciplines = '0'
+        else:
+            count_of_disciplines = str(count_of_disciplines)
+        
+        # 指導者数の取得(discipline_df['coach']が1のカラムに限定)
+        coaches_discipline = discipline_df[discipline_df['coach'] == 1]['disciplines'].tolist()
+        coaches_columns = [f'申請_指導者_{discipline}' for discipline in coaches_discipline]
+        count_of_coaches = 0
+        # 各指導者カラムをループし、「定期的に行っている」が選択されているかを確認
+        for col in coaches_columns:
+            if col in row and row[col] == '定期的に行っている':
+                count_of_coaches += 1
+        # 指導者数が0の場合は、'0'と記載
+        if count_of_coaches == 0:
+            count_of_coaches = '0'
+        else:
+            count_of_coaches = str(count_of_coaches)
+        
+        # クラブマネジャーの配置状況を取得
+        club_manager_columns = row['申請_マネジャー_配置状況']
+        club_manager_status = club_manager_columns
+
+        # マネジメント指導者資格の数
+        num_of_club_managers_as_manager = row['申請_マネジャー_マネ資格_数']
+        num_of_assistant_managers_as_manager = row['申請_マネジャー_アシスタント資格_数']
+        num_of_club_managers_as_staff = row['申請_事務局_マネ資格_数']
+        num_of_assistant_managers_as_staff = row['申請_事務局_アシマネ資格_数']
 
         checklist_row = {
             'クラブ名': club_name,
-            '申請_活動内容': row.get('申請_活動内容', ''),
-            'チェック項目_活動内容': '',
-            '申請_活動目的': row.get('申請_活動目的', ''),
-            'チェック項目_活動目的': '',
-            '申請_活動計画': row.get('申請_活動計画', ''),
-            'チェック項目_活動計画': '',
-            '申請_活動実績': row.get('申請_活動実績', ''),
-            'チェック項目_活動実績': '',
+            '活動種目数': count_of_disciplines,
+            'チェック項目_活動種目': '',
+            '指導者数': count_of_coaches,
+            'チェック項目_指導者': '',
+            'チェック項目_種目・指導者': '',
+            'クラブマネジャー': club_manager_status,
+            'チェック項目_クラブマネジャー配置': '',
+            'クラブマネジャー資格数（クラブマネジャー）': num_of_club_managers_as_manager,
+            'アシスタントマネジャー資格数（クラブマネジャー）': num_of_assistant_managers_as_manager,
+            'クラブマネジャー資格数（事務局）': num_of_club_managers_as_staff,
+            'アシスタントマネジャー資格数（事務局）': num_of_assistant_managers_as_staff,
+            'チェック項目_マネジメント指導者資格': '',
             '申請日時': application_date,
             '備考': ''
         }
 
         document2_2_checklist.append(checklist_row)
 
-    return document2_2_checklist
+        # 書類2_2の競技種目と指導者のリストを作成
+        # discipline_dfの読み込み
+        discipline_df = pd.read_csv('list_of_disciplines.csv')
+        disciplines = discipline_df['disciplines'].tolist()
+
+        # 種目ごとの実施有無・指導者有無の表を作成
+        document2_2_discipline_and_coaches = []
+
+        for discipline in disciplines:
+            row_dict = {}
+            row_dict['種目'] = discipline
+
+            # 実施有無
+            col_name = f'申請_種目_{discipline}'
+            if col_name in row:
+                # 例: '定期的に行っている' など
+                row_dict['実施有無'] = row[col_name]
+            else:
+                row_dict['実施有無'] = ''
+
+            # 指導者有無
+            coach_flag = discipline_df.loc[discipline_df['disciplines'] == discipline, 'coach'].values[0]
+            if coach_flag == 1:
+                # 指導者カラム名
+                coach_col = f'申請_指導者_{discipline}'
+                if coach_col in row:
+                    row_dict['指導者有無'] = row[coach_col]
+                else:
+                    row_dict['指導者有無'] = ''
+            else:
+                row_dict['指導者有無'] = '/'
+
+            document2_2_discipline_and_coaches.append(row_dict)
+
+        # 「その他」種目の追加
+        if '申請_種目_その他_数(選択時必須)' in row and row['申請_種目_その他_数(選択時必須)'] not in ['', '0', 0]:
+            # 自由記述の種目名（例: '申請_種目_その他_テキスト(選択時必須)'）
+            other_name = row.get('申請_種目_その他_テキスト(選択時必須)', 'その他')
+            row_dict = {
+                '種目': other_name,
+                '実施有無': row.get('申請_種目_その他_数(選択時必須)', ''),
+                '指導者有無': row.get('申請_指導者_その他', '')
+            }
+            document2_2_discipline_and_coaches.append(row_dict)
+
+    return document2_2_checklist, document2_2_discipline_and_coaches
+
+# 書類3に関するチェックリストを作成する関数(規約についてのチェックリスト)
+def make_document3_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類3に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document3_checklist = []
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            'チェック項目_組織の規約である': '',
+            'チェック項目_法人格': '',
+            'チェック項目_会員資格': '',
+            'チェック項目_規約の改廃意思決定機関': '',
+            'チェック項目_規約の改廃意思決定機関の議決権保有者': '',
+            'チェック項目_規約の改廃意思決定機関の定足数': '',
+            'チェック項目_規約の改廃意思決定機関の議決数': '',
+            'チェック項目_規約の改廃意思決定機関の議事録': '',
+            'チェック項目_事業計画の意思決定機関': '',
+            'チェック項目_事業計画の意思決定機関の議決権保有者': '',
+            'チェック項目_事業計画の意思決定機関の定足数': '',
+            'チェック項目_事業計画の意思決定機関の議決数': '',
+            'チェック項目_事業計画の意思決定機関の議事録': '',
+            'チェック項目_予算の意思決定機関': '',
+            'チェック項目_予算の意思決定機関の議決権保有者': '',
+            'チェック項目_予算の意思決定機関の定足数': '',
+            'チェック項目_予算の意思決定機関の議決数': '',
+            'チェック項目_予算の意思決定機関の議事録': '',
+            'チェック項目_事業報告の意思決定機関': '',
+            'チェック項目_事業報告の意思決定機関の議決権保有者': '',
+            'チェック項目_事業報告の意思決定機関の定足数': '',
+            'チェック項目_事業報告の意思決定機関の議決数': '',
+            'チェック項目_事業報告の意思決定機関の議事録': '',
+            'チェック項目_決算の意思決定機関': '',
+            'チェック項目_決算の意思決定機関の議決権保有者': '',
+            'チェック項目_決算の意思決定機関の定足数': '',
+            'チェック項目_決算の意思決定機関の議決数': '',
+            'チェック項目_決算の意思決定機関の議事録': '',
+            'チェック項目_役員資格・選任規程': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document3_checklist.append(checklist_row)
+
+    return document3_checklist
+
+# 書類4に関するチェックリストを作成する関数(議決権保有者名簿についてのチェックリスト)
+def make_document4_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類4に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document4_checklist = []
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        address = row['申請_区市町村名']
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            '区市町村名': address,
+            'チェック項目_議決権保有者名簿_1の構成員': '',
+            'チェック項目_議決権保有者名簿_1の記載人数': '',
+            'チェック項目_議決権保有者名簿_1の近隣住民数': '',
+            'チェック項目_議決権保有者名簿_1': '',
+            'チェック項目_議決権保有者名簿_2の構成員': '',
+            'チェック項目_議決権保有者名簿_2の記載人数': '',
+            'チェック項目_議決権保有者名簿_2の近隣住民数': '',
+            'チェック項目_議決権保有者名簿_2': '',
+            'チェック項目_議決権保有者名簿_3の構成員': '',
+            'チェック項目_議決権保有者名簿_3の記載人数': '',
+            'チェック項目_議決権保有者名簿_3の近隣住民数': '',
+            'チェック項目_議決権保有者名簿_3': '',
+            'チェック項目_議決権保有者名簿_4の構成員': '',
+            'チェック項目_議決権保有者名簿_4の記載人数': '',
+            'チェック項目_議決権保有者名簿_4の近隣住民数': '',
+            'チェック項目_議決権保有者名簿_4': '',
+            'チェック項目_議決権保有者名簿_5の構成員': '',
+            'チェック項目_議決権保有者名簿_5の記載人数': '',
+            'チェック項目_議決権保有者名簿_5の近隣住民数': '',
+            'チェック項目_議決権保有者名簿_5': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document4_checklist.append(checklist_row)
+
+    # 書類4のリスト1からリスト5のチェックリストを作成
+    document4_lists_checklist = []
+
+    # 隣接自治体リストの読み込み
+    municipalities_df = pd.read_csv('municipality.csv')
+
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        address = row['申請_区市町村名']
+
+        # チェックリスト本体（省略、既存のまま）
+
+        # 隣接自治体リスト作成
+        muni_row = municipalities_df[municipalities_df['市区町村'] == address]
+        # address自身＋隣接自治体をリスト化
+        adjacent_list = [address]
+        if not muni_row.empty:
+            for i in range(1, 10):
+                col = f'隣接市区町村{i}'
+                val = muni_row.iloc[0].get(col, '')
+                if pd.notna(val) and str(val).strip() != '':
+                    adjacent_list.append(str(val).strip())
+        # DataFrame形式で追加
+        for muni in adjacent_list:
+            document4_lists_checklist.append({'自治体名': muni, '数': ''})
+
+    return document4_checklist, document4_lists_checklist
