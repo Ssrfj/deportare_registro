@@ -502,3 +502,276 @@ def make_document4_checklist_for_human(club_df, checklist_create_df):
             document4_lists_checklist.append({'自治体名': muni, '数': ''})
 
     return document4_checklist, document4_lists_checklist
+
+# 書類5_事業計画に関するチェックリストを作成する関数(事業計画書についてのチェックリスト)
+def make_document5_plan_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類5_事業計画に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document5_plan_checklist = []    
+    # 書類5の競技種目ごとの事業計画書チェックリストを作成
+    document5_plan_checklist_discipline = []
+
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            'チェック項目_活動頻度': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document5_plan_checklist.append(checklist_row)
+
+        # discipline_dfの読み込み
+        discipline_df = pd.read_csv('list_of_disciplines.csv')
+        disciplines = discipline_df['disciplines'].tolist()
+
+        # 実施種目ごとのリスト（実施しているもののみ）
+        for discipline in disciplines:
+            col_name = f'申請_種目_{discipline}'
+            if col_name in row and row[col_name] == '実施している':
+                row_dict = {
+                    'クラブ名': club_name,
+                    '種目': discipline,
+                    '実施有無': row[col_name]
+                }
+                document5_plan_checklist_discipline.append(row_dict)
+
+        # 「その他」種目の追加（実施している場合のみ）
+        if '申請_種目_その他_数(選択時必須)' in row and row['申請_種目_その他_数(選択時必須)'] not in ['', '0', 0]:
+            other_name = row.get('申請_種目_その他_テキスト(選択時必須)', 'その他')
+            # 「実施している」かどうか判定（値が「実施している」または数値が1以上など、要件に応じて調整）
+            if row['申請_種目_その他_数(選択時必須)'] == '実施している' or str(row['申請_種目_その他_数(選択時必須)']).isdigit():
+                row_dict = {
+                    'クラブ名': club_name,
+                    '種目': other_name,
+                    '実施有無': row['申請_種目_その他_数(選択時必須)']
+                }
+                document5_plan_checklist_discipline.append(row_dict)
+
+    return document5_plan_checklist, document5_plan_checklist_discipline
+
+# 書類5_予算に関するチェックリストを作成する関数(予算書についてのチェックリスト)
+def make_document5_budget_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類5_予算に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document5_budget_checklist = []
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            'チェック項目_予算書': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document5_budget_checklist.append(checklist_row)
+    return document5_budget_checklist
+
+# 書類6_事業報告に関するチェックリストを作成する関数(事業報告書についてのチェックリスト)(事業計画とほぼ同じ)
+def make_document6_report_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類6_事業報告に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document6_report_checklist = []
+    # 書類6の競技種目ごとの事業報告書チェックリストを作成
+    document6_report_checklist_discipline = []
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            'チェック項目_活動頻度': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document6_report_checklist.append(checklist_row)
+        # discipline_dfの読み込み
+        discipline_df = pd.read_csv('list_of_disciplines.csv')
+        disciplines = discipline_df['disciplines'].tolist()
+        # 実施種目ごとのリスト（実施しているもののみ）
+        # 実施種目ごとのリスト（実施しているもののみ）
+        for discipline in disciplines:
+            col_name = f'申請_種目_{discipline}'
+            if col_name in row and row[col_name] == '実施している':
+                row_dict = {
+                    'クラブ名': club_name,
+                    '種目': discipline,
+                    '実施有無': row[col_name]
+                }
+                document6_report_checklist_discipline.append(row_dict)
+
+        # 「その他」種目の追加（実施している場合のみ）
+        if '申請_種目_その他_数(選択時必須)' in row and row['申請_種目_その他_数(選択時必須)'] not in ['', '0', 0]:
+            other_name = row.get('申請_種目_その他_テキスト(選択時必須)', 'その他')
+            # 「実施している」かどうか判定（値が「実施している」または数値が1以上など、要件に応じて調整）
+            if row['申請_種目_その他_数(選択時必須)'] == '実施している' or str(row['申請_種目_その他_数(選択時必須)']).isdigit():
+                row_dict = {
+                    'クラブ名': club_name,
+                    '種目': other_name,
+                    '実施有無': row['申請_種目_その他_数(選択時必須)']
+                }
+                document6_report_checklist_discipline.append(row_dict)
+    return document6_report_checklist, document6_report_checklist_discipline
+
+# 書類6_決算に関するチェックリストを作成する関数(決算書についてのチェックリスト)
+def make_document6_financial_statements_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類6_決算に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document6_financial_statements_checklist = []
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            'チェック項目_決算書': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document6_financial_statements_checklist.append(checklist_row)
+    return document6_financial_statements_checklist
+
+# 書類7に関するチェックリストを作成する関数
+def make_document7_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類7に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document7_checklist = []
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            'チェック項目_自己点検・評価シート': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document7_checklist.append(checklist_row)
+    return document7_checklist
+# 書類8に関するチェックリストを作成する関数
+def make_document8_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類8に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document8_checklist = []
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            'チェック項目_議事録_規約等_開催日時': '',
+            'チェック項目_議事録_規約等_開催場所': '',
+            'チェック項目_議事録_規約等_出席役員': '',
+            'チェック項目_議事録_規約等_出席議決権保有者数': '',
+            'チェック項目_議事録_規約等_議事': '',
+            'チェック項目_議事録_規約等_決議': '',
+            'チェック項目_議事録_規約等_署名等': '',
+            'チェック項目_議事録_規約等': '',
+            'チェック項目_議事録_事業計画_開催日時': '',
+            'チェック項目_議事録_事業計画_開催場所': '',
+            'チェック項目_議事録_事業計画_出席役員': '',
+            'チェック項目_議事録_事業計画_出席議決権保有者数': '',
+            'チェック項目_議事録_事業計画_議事': '',
+            'チェック項目_議事録_事業計画_決議': '',
+            'チェック項目_議事録_事業計画_署名等': '',
+            'チェック項目_議事録_事業計画': '',
+            'チェック項目_議事録_予算_開催日時': '',
+            'チェック項目_議事録_予算_開催場所': '',
+            'チェック項目_議事録_予算_出席役員': '',
+            'チェック項目_議事録_予算_出席議決権保有者数': '',
+            'チェック項目_議事録_予算_議事': '',
+            'チェック項目_議事録_予算_決議': '',
+            'チェック項目_議事録_予算_署名等': '',
+            'チェック項目_議事録_予算': '',
+            'チェック項目_議事録_事業報告_開催日時': '',
+            'チェック項目_議事録_事業報告_開催場所': '',
+            'チェック項目_議事録_事業報告_出席役員': '',
+            'チェック項目_議事録_事業報告_出席議決権保有者数': '',
+            'チェック項目_議事録_事業報告_議事': '',
+            'チェック項目_議事録_事業報告_決議': '',
+            'チェック項目_議事録_事業報告_署名等': '',
+            'チェック項目_議事録_事業報告': '',
+            'チェック項目_議事録_決算_開催日時': '',
+            'チェック項目_議事録_決算_開催場所': '',
+            'チェック項目_議事録_決算_出席役員': '',
+            'チェック項目_議事録_決算_出席議決権保有者数': '',
+            'チェック項目_議事録_決算_議事': '',
+            'チェック項目_議事録_決算_決議': '',
+            'チェック項目_議事録_決算_署名等': '',
+            'チェック項目_議事録_決算': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document8_checklist.append(checklist_row)
+
+    return document8_checklist
+
+# 書類9に関するチェックリストを作成する関数
+def make_document9_checklist_for_human(club_df, checklist_create_df):
+    """
+    書類9に関する人間がチェックするためのチェックリストを作成します。
+    """
+    document9_checklist = []
+    for index, row in club_df.iterrows():
+        club_name = row['クラブ名']
+        # 申請日時はclub_dfにもあるが、checklist_create_df優先
+        if club_name in checklist_create_df['クラブ名'].values:
+            application_date = checklist_create_df.loc[
+                checklist_create_df['クラブ名'] == club_name, '申請日時'
+            ].iloc[0]
+        else:
+            application_date = row.get('申請日時', '不明')
+        # チェックリストの行を作成
+        checklist_row = {
+            'クラブ名': club_name,
+            'チェック項目_自己説明・公表確認書': '',
+            '申請日時': application_date,
+            '備考': ''
+        }
+        document9_checklist.append(checklist_row)
+    return document9_checklist

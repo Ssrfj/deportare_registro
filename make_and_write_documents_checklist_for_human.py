@@ -7,13 +7,13 @@ from checklist_generator import (
     make_document2_2_checklist_for_human,
     make_document3_checklist_for_human,
     make_document4_checklist_for_human,
-    # make_document5_plan_checklist_for_human,
-    # make_document5_budget_checklist_for_human,
-    # make_document6_report_checklist_for_human,
-    # make_document6_settlement_checklist_for_human,
-    # make_document7_checklist_for_human,
-    # make_document8_checklist_for_human,
-    # make_document9_checklist_for_human
+    make_document5_plan_checklist_for_human,
+    make_document5_budget_checklist_for_human,
+    make_document6_report_checklist_for_human,
+    make_document6_financial_statements_checklist_for_human,
+    make_document7_checklist_for_human,
+    make_document8_checklist_for_human,
+    make_document9_checklist_for_human
 )
 from datetime import datetime, timezone, timedelta
 
@@ -27,7 +27,7 @@ type_of_documents = [
     'document_5_plan',
     'document_5_budget',
     'document_6_report',
-    'document_6_settlement',
+    'document_6_financial_statements',
     'document_7',
     'document_8',
     'document_9'
@@ -79,8 +79,8 @@ def make_documents_checklist_for_human(application_df, list_df):
         document5_budget_checklist_for_human_folder_path = os.path.join(club_folder_path, document5_budget_checklist_for_human_folder_name)
         document6_report_checklist_for_human_folder_name = 'document_6_report_checklist_for_human'
         document6_report_checklist_for_human_folder_path = os.path.join(club_folder_path, document6_report_checklist_for_human_folder_name)
-        document6_settlement_checklist_for_human_folder_name = 'document_6_settlement_checklist_for_human'
-        document6_settlement_checklist_for_human_folder_path = os.path.join(club_folder_path, document6_settlement_checklist_for_human_folder_name)
+        document6_financial_statements_checklist_for_human_folder_name = 'document_6_financial_statements_checklist_for_human'
+        document6_financial_statements_checklist_for_human_folder_path = os.path.join(club_folder_path, document6_financial_statements_checklist_for_human_folder_name)
         document7_checklist_for_human_folder_name = 'document_7_checklist_for_human'
         document7_checklist_for_human_folder_path = os.path.join(club_folder_path, document7_checklist_for_human_folder_name)
         document8_checklist_for_human_folder_name = 'document_8_checklist_for_human'
@@ -163,13 +163,94 @@ def make_documents_checklist_for_human(application_df, list_df):
             pd.DataFrame(document4_lists_checklist).to_excel(writer, sheet_name='リストチェック_4', index=False)
             pd.DataFrame(document4_lists_checklist).to_excel(writer, sheet_name='リストチェック_5', index=False)
 
-        # make_document5_plan_checklist_for_human()
-        # make_document5_budget_checklist_for_human()
-        # make_document6_report_checklist_for_human()
-        # make_document6_settlement_checklist_for_human()
-        # make_document7_checklist_for_human()
-        # make_document8_checklist_for_human()
-        # make_document9_checklist_for_human()       
+        # 書類5_事業計画
+        document5_plan_checklist, document5_plan_checklist_discipline = make_document5_plan_checklist_for_human(club_df, application_df)
+        os.makedirs(document5_plan_checklist_for_human_folder_path, exist_ok=True)
+        # 書類5_事業計画のフォルダが存在しない場合は作成
+        if not os.path.exists(document5_plan_checklist_for_human_folder_path):
+            os.makedirs(document5_plan_checklist_for_human_folder_path)
+        # 書類5_事業計画のチェックリストをExcelファイルとして保存(1つのExcelで、複数のシートに分けて出力)
+        document5_plan_checklist_for_human_file_name = f'{club_name}_document5_plan_checklist_申請{apried_date_str}.xlsx'
+        document5_plan_checklist_for_human_file_path = os.path.join(document5_plan_checklist_for_human_folder_path, document5_plan_checklist_for_human_file_name)
+        with pd.ExcelWriter(document5_plan_checklist_for_human_file_path, engine='openpyxl') as writer:
+            # チェックリストのデータフレームをシートに書き込む
+            pd.DataFrame(document5_plan_checklist).to_excel(writer, sheet_name='チェックリスト', index=False)
+            # 競技種目のデータフレームをシートに書き込む
+            pd.DataFrame(document5_plan_checklist_discipline).to_excel(writer, sheet_name='活動種目', index=False)
+        # 書類5_予算
+        document5_budget_checklist = make_document5_budget_checklist_for_human(club_df, application_df)
+        os.makedirs(document5_budget_checklist_for_human_folder_path, exist_ok=True)
+        # 書類5_予算のフォルダが存在しない場合は作成
+        if not os.path.exists(document5_budget_checklist_for_human_folder_path):
+            os.makedirs(document5_budget_checklist_for_human_folder_path)
+        # 書類5_予算のチェックリストをExcelファイルとして保存
+        document5_budget_checklist_for_human_file_name = f'{club_name}_document5_budget_checklist_申請{apried_date_str}.xlsx'
+        document5_budget_checklist_for_human_file_path = os.path.join(document5_budget_checklist_for_human_folder_path, document5_budget_checklist_for_human_file_name)
+        pd.DataFrame(document5_budget_checklist).to_excel(
+            document5_budget_checklist_for_human_file_path,
+            index=False)
+        # 書類6_事業報告
+        document6_report_checklist, document6_report_checklist_discipline = make_document6_report_checklist_for_human(club_df, application_df)
+        os.makedirs(document6_report_checklist_for_human_folder_path, exist_ok=True)
+        # 書類6_事業報告のフォルダが存在しない場合は作成
+        if not os.path.exists(document6_report_checklist_for_human_folder_path):
+            os.makedirs(document6_report_checklist_for_human_folder_path)
+        # 書類6_事業報告のチェックリストをExcelファイルとして保存(1つのExcelで、複数のシートに分けて出力)
+        document6_report_checklist_for_human_file_name = f'{club_name}_document6_report_checklist_申請{apried_date_str}.xlsx'
+        document6_report_checklist_for_human_file_path = os.path.join(document6_report_checklist_for_human_folder_path, document6_report_checklist_for_human_file_name)
+        with pd.ExcelWriter(document6_report_checklist_for_human_file_path, engine='openpyxl') as writer:
+            # チェックリストのデータフレームをシートに書き込む
+            pd.DataFrame(document6_report_checklist).to_excel(writer, sheet_name='チェックリスト', index=False)
+            # 競技種目のデータフレームをシートに書き込む
+            pd.DataFrame(document6_report_checklist_discipline).to_excel(writer, sheet_name='活動種目', index=False)
+        # 書類6_決算
+        document6_financial_statements_checklist = make_document6_financial_statements_checklist_for_human(club_df, application_df)
+        os.makedirs(document6_financial_statements_checklist_for_human_folder_path, exist_ok=True)
+        # 書類6_決算のフォルダが存在しない場合は作成
+        if not os.path.exists(document6_financial_statements_checklist_for_human_folder_path):
+            os.makedirs(document6_financial_statements_checklist_for_human_folder_path)
+        # 書類6_決算のチェックリストをExcelファイルとして保存
+        document6_financial_statements_checklist_for_human_file_name = f'{club_name}_document6_financial_statements_checklist_申請{apried_date_str}.xlsx'
+        document6_financial_statements_checklist_for_human_file_path = os.path.join(document6_financial_statements_checklist_for_human_folder_path, document6_financial_statements_checklist_for_human_file_name)
+        pd.DataFrame(document6_financial_statements_checklist).to_excel(
+            document6_financial_statements_checklist_for_human_file_path,
+            index=False)
+        # 書類7
+        document7_checklist = make_document7_checklist_for_human(club_df, application_df)
+        os.makedirs(document7_checklist_for_human_folder_path, exist_ok=True)
+        # 書類7のフォルダが存在しない場合は作成
+        if not os.path.exists(document7_checklist_for_human_folder_path):
+            os.makedirs(document7_checklist_for_human_folder_path)
+        # 書類7のチェックリストをExcelファイルとして保存
+        document7_checklist_for_human_file_name = f'{club_name}_document7_checklist_申請{apried_date_str}.xlsx'
+        document7_checklist_for_human_file_path = os.path.join(document7_checklist_for_human_folder_path, document7_checklist_for_human_file_name)
+        pd.DataFrame(document7_checklist).to_excel(
+            document7_checklist_for_human_file_path,
+            index=False)
+        # 書類8
+        document8_checklist = make_document8_checklist_for_human(club_df, application_df)
+        os.makedirs(document8_checklist_for_human_folder_path, exist_ok=True)
+        # 書類8のフォルダが存在しない場合は作成
+        if not os.path.exists(document8_checklist_for_human_folder_path):
+            os.makedirs(document8_checklist_for_human_folder_path)
+        # 書類8のチェックリストをExcelファイルとして保存
+        document8_checklist_for_human_file_name = f'{club_name}_document8_checklist_申請{apried_date_str}.xlsx'
+        document8_checklist_for_human_file_path = os.path.join(document8_checklist_for_human_folder_path, document8_checklist_for_human_file_name)
+        pd.DataFrame(document8_checklist).to_excel(
+            document8_checklist_for_human_file_path,
+            index=False)
+        # 書類9
+        document9_checklist = make_document9_checklist_for_human(club_df, application_df)
+        os.makedirs(document9_checklist_for_human_folder_path, exist_ok=True)
+        # 書類9のフォルダが存在しない場合は作成
+        if not os.path.exists(document9_checklist_for_human_folder_path):
+            os.makedirs(document9_checklist_for_human_folder_path)
+        # 書類9のチェックリストをExcelファイルとして保存
+        document9_checklist_for_human_file_name = f'{club_name}_document9_checklist_申請{apried_date_str}.xlsx'
+        document9_checklist_for_human_file_path = os.path.join(document9_checklist_for_human_folder_path, document9_checklist_for_human_file_name)
+        pd.DataFrame(document9_checklist).to_excel(
+            document9_checklist_for_human_file_path,
+            index=False)
 
         # 処理完了のメッセージを表示
         print(f"クラブ名: {club_name} の人間が確認する用のチェックリスト作成が完了しました")
