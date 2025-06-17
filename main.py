@@ -105,6 +105,14 @@ def main():
    
     # 6. 各クラブに対して自動チェックを実行
     print('各クラブの自動チェックを実行します...')
+    checklist_create_df.columns = checklist_create_df.columns.str.strip()
+    checklist_create_df = checklist_create_df.rename(
+        columns={
+            'チェックリスト作成日時': CHECKLIST_CREATION_DATETIME,
+            '申請日時': APPLICATION_DATETIME,
+            'クラブ名': CLUB_NAME
+        }
+    )    
     perform_automatic_checks(checklist_create_df, apried_club_list_df) 
     print('全てのクラブの自動チェックが完了しました。')
     print('処理が終了しました')
