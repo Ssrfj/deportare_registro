@@ -15,10 +15,7 @@ from make_checklist_for_each_club import make_checklist_for_each_club
 from make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
 
 from dataframe_utils import clean_column_names
-from column_names import (
-    CLUB_NAME, APPLICATION_DATETIME, CHECKLIST_CREATION_DATETIME,
-    APPLICATION_TIMESTAMP_STR
-)
+
 def main():
     # 1. Excel→CSV化
     excel_to_csv()
@@ -48,21 +45,18 @@ def main():
 
     # 5. チェックリスト作成状況ファイルの読み込みまたは新規作成
     folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')
-    os.makedirs(folder_of_checklist_create_status, exist_ok=True)
-    # チェックリスト作成状況のCSVファイルを読み込むか、新規作成
     file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
     if os.path.exists(file_of_checklist_create_status):
-        checklist_create_df = pd.read_csv(file_of_checklist_create_status)
-        checklist_create_df = clean_column_names(checklist_create_df)
+        checklist_status_df = pd.read_csv(file_of_checklist_create_status)
         # 必要なカラムがなければ追加
         for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
-            if col not in checklist_create_df.columns:
-                checklist_create_df[col] = ''
-        print("checklist_create_df columns after clean:", checklist_create_df.columns.tolist())
+            if col not in checklist_status_df.columns:
+                checklist_status_df[col] = ''
+        print("checklist_status_df columns after clean:", checklist_status_df.columns.tolist())
         print('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
     else:
-        checklist_create_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
-        checklist_create_df.to_csv(file_of_checklist_create_status, index=False)
+        checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
+        checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
         print('クラブごとのチェックリスト作成状況.csvが作成されました')
 
     # club_list_dfの['R8年度登録申請状況']が1のクラブのみを抽出
@@ -83,27 +77,27 @@ def main():
     # ここでmake_checklist_for_each_clubを呼び出す
     checklist_output_folder = folder_of_checklist_create_status
     timestamp_for_make_checklist = get_jst_now().strftime('%Y%m%d%H%M%S')
-    make_checklist_for_each_club(
+    checklist_status_df = make_checklist_for_each_club(
         apried_club_list_df,
-        checklist_create_df,
+        checklist_status_df,
         checklist_output_folder,
         timestamp_for_make_checklist
     )
    
     # 6. 各クラブに対して自動チェックを実行
     print('各クラブの自動チェックを実行します...')
-    perform_automatic_checks(checklist_create_df, apried_club_list_df)
+    checklist_status_df = perform_automatic_checks(checklist_status_df, apried_club_list_df)
     print('全てのクラブの自動チェックが完了しました。')
     print('処理が終了しました')
 
     # 7. 人間がチェックする用チェックリストの作成とチェックリストのチェック状況をクラブごとに更新
     print('人間がチェックする用のリストの作成とチェックリストのチェック状況をクラブごとに更新します...')
-    make_documents_checklist_for_human(checklist_create_df, apried_club_list_df)
+    checklist_status_df = make_documents_checklist_for_human(checklist_status_df, apried_club_list_df)
     print('人間がチェックする用のリストの作成が完了しました。')
 
     # 8. 人間がチェックする用のリストの作成とチェックリストのチェック状況の更新
     print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新を行います...')
-    write_checklist_by_human_check(checklist_create_df, apried_club_list_df, folder_of_checklist_create_status)
+    checklist_status_df = write_checklist_by_human_check(checklist_status_df, apried_club_list_df, folder_of_checklist_create_status)
     print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新が完了しました。')
     print('全ての処理が完了しました。')
 
