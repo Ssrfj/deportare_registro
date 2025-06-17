@@ -301,7 +301,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         try:
             checklist_df = pd.read_csv(checklist_file_path)
             print(f"チェックリストファイル '{checklist_file_name}' を読み込みました。")
+            print("before:", checklist_df.columns.tolist())  # デバッグ用にカラム名を表示
             checklist_df = clean_column_names(checklist_df)
+            print("after:", checklist_df.columns.tolist())  # デバッグ用にカラム名を表示
 
         except Exception as e:
             print(f"エラー: チェックリストファイル '{checklist_file_name}' の読み込み中にエラーが発生しました: {e}")
@@ -359,7 +361,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document1_checklist_for_human_file_path):
                 try:
                     document1_checklist_df = pd.read_excel(document1_checklist_for_human_file_path)
+                    print("before:", document1_checklist_df.columns.tolist())
                     document1_checklist_df = clean_column_names(document1_checklist_df)
+                    print("after:", document1_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document1_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -387,7 +391,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document2_1_checklist_for_human_file_path):
                 try:
                     document2_1_checklist_df = pd.read_excel(document2_1_checklist_for_human_file_path, sheet_name='チェックリスト')
+                    print("before:", document2_1_checklist_df.columns.tolist())
                     document2_1_checklist_df = clean_column_names(document2_1_checklist_df)
+                    print("after:", document2_1_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document2_1_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -415,7 +421,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document2_2_checklist_for_human_file_path):
                 try:
                     document2_2_checklist_df = pd.read_excel(document2_2_checklist_for_human_file_path, sheet_name='チェックリスト')
+                    print("before:", document2_2_checklist_df.columns.tolist())
                     document2_2_checklist_df = clean_column_names(document2_2_checklist_df)
+                    print("after:", document2_2_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document2_2_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -443,7 +451,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document3_checklist_for_human_file_path):
                 try:
                     document3_checklist_df = pd.read_excel(document3_checklist_for_human_file_path)
+                    print("before:", document3_checklist_df.columns.tolist())
                     document3_checklist_df = clean_column_names(document3_checklist_df)
+                    print("after:", document3_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document3_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -471,7 +481,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document4_checklist_for_human_file_path):
                 try:
                     document4_checklist_df = pd.read_excel(document4_checklist_for_human_file_path, sheet_name='チェックリスト')
+                    print("before:", document4_checklist_df.columns.tolist())
                     document4_checklist_df = clean_column_names(document4_checklist_df)
+                    print("after:", document4_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document4_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -499,7 +511,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document5_plan_checklist_for_human_file_path):
                 try:
                     document5_plan_checklist_df = pd.read_excel(document5_plan_checklist_for_human_file_path, sheet_name='チェックリスト')
+                    print("before:", document5_plan_checklist_df.columns.tolist())
                     document5_plan_checklist_df = clean_column_names(document5_plan_checklist_df)
+                    print("after:", document5_plan_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document5_plan_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -527,7 +541,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document5_budget_checklist_for_human_file_path):
                 try:
                     document5_budget_checklist_df = pd.read_excel(document5_budget_checklist_for_human_file_path)
+                    print("before:", document5_budget_checklist_df.columns.tolist())
                     document5_budget_checklist_df = clean_column_names(document5_budget_checklist_df)
+                    print("after:", document5_budget_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document5_budget_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -555,7 +571,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document6_report_checklist_for_human_file_path):
                 try:
                     document6_report_checklist_df = pd.read_excel(document6_report_checklist_for_human_file_path, sheet_name='チェックリスト')
+                    print("before:", document6_report_checklist_df.columns.tolist())
                     document6_report_checklist_df = clean_column_names(document6_report_checklist_df)
+                    print("after:", document6_report_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document6_report_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -583,7 +601,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document6_financial_statements_checklist_for_human_file_path):
                 try:
                     document6_financial_statements_checklist_df = pd.read_excel(document6_financial_statements_checklist_for_human_file_path)
+                    print("before:", document6_financial_statements_checklist_df.columns.tolist())
                     document6_financial_statements_checklist_df = clean_column_names(document6_financial_statements_checklist_df)
+                    print("after:", document6_financial_statements_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document6_financial_statements_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -611,7 +631,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document7_checklist_for_human_file_path):
                 try:
                     document7_checklist_df = pd.read_excel(document7_checklist_for_human_file_path)
+                    print("before:", document7_checklist_df.columns.tolist())
                     document7_checklist_df = clean_column_names(document7_checklist_df)
+                    print("after:", document7_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document7_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -639,7 +661,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document8_checklist_for_human_file_path):
                 try:
                     document8_checklist_df = pd.read_excel(document8_checklist_for_human_file_path)
+                    print("before:", document8_checklist_df.columns.tolist())
                     document8_checklist_df = clean_column_names(document8_checklist_df)
+                    print("after:", document8_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document8_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認
@@ -667,7 +691,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             if os.path.exists(document9_checklist_for_human_file_path):
                 try:
                     document9_checklist_df = pd.read_excel(document9_checklist_for_human_file_path)
+                    print("before:", document9_checklist_df.columns.tolist())
                     document9_checklist_df = clean_column_names(document9_checklist_df)
+                    print("after:", document9_checklist_df.columns.tolist())
                     # チェックリストの人間によるチェック状況の確認を実行
                     if 'チェック者名_{}' in document9_checklist_df.columns:
                         # チェック者名_{}の列にデータがあるかを確認

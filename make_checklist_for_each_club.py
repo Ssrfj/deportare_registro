@@ -27,7 +27,9 @@ def make_checklist_for_each_club(applied_club_df, checklist_status_df, checklist
                 '担当者登録基準最終チェック更新時間': [''],
             }
             club_df_for_make_checklist = pd.DataFrame(club_data)
+            print("before:", club_df_for_make_checklist.columns.tolist())  # デバッグ用にカラム名を表示
             club_df_for_make_checklist = clean_column_names(club_df_for_make_checklist)
+            print("after:", club_df_for_make_checklist.columns.tolist())  # デバッグ用にカラム名を表示
             print(f"{row['クラブ名']}のclub_dfが作成されました")
 
             # checklist_status_dfにクラブ名があるかを確認

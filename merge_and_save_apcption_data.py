@@ -14,7 +14,9 @@ def merge_and_save_apcption_data():
         return
     input_csv = max(csv_files, key=os.path.getctime)
     df_form = pd.read_csv(input_csv)
+    print("before:", df_form.columns.tolist())  # デバッグ用にカラム名を表示
     df_form = clean_column_names(df_form)
+    print("after:", df_form.columns.tolist())  # デバッグ用にカラム名を表示
 
     # 最新のクラブ名_YYYYMMDD.csvを探す
     club_files = glob.glob(os.path.join(os.path.dirname(__file__), 'クラブ名_*.csv'))
@@ -23,7 +25,9 @@ def merge_and_save_apcption_data():
         return
     latest_file = max(club_files, key=os.path.getctime)
     df_old = pd.read_csv(latest_file)
+    print("before:", df_old.columns.tolist())  # デバッグ用にカラム名を表示
     df_old = clean_column_names(df_old)
+    print("after:", df_old.columns.tolist())  # デバッグ用にカラム名を表示
 
     # カラム名の前後の空白を除去
     df_form.columns = df_form.columns.str.strip()
@@ -56,7 +60,9 @@ def merge_and_save_apcption_data():
     ]
     columns_order = main_columns + [col for col in df_merged.columns if col not in main_columns]
     df_merged = df_merged[columns_order]
+    print("before:", df_merged.columns.tolist())  # デバッグ用にカラム名を表示
     df_merged = clean_column_names(df_merged)
+    print("after:", df_merged.columns.tolist())  # デバッグ用にカラム名を表示
     # 保存先
     save_folder = os.path.join(os.path.dirname(__file__), 'R7_登録申請処理', '申請受付リスト')
     os.makedirs(save_folder, exist_ok=True)
