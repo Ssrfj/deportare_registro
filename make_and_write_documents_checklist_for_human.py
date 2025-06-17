@@ -52,12 +52,10 @@ def make_documents_checklist_for_human(applied_club_df, checklist_status_df):
     for index, row in applied_club_df.iterrows():
         club_name = str(row['クラブ名']).strip()
         apried_date_str = str(row['申請日時']).strip()
-
-        # checklist_status_dfから該当クラブ・申請日時の「チェックリスト作成日時」を取得
-        checklist_creation_date_str = ''
+        # ↓ここを修正
         match = checklist_status_df[
-            (checklist_status_df['クラブ名'] == club_name) &
-            (checklist_status_df['申請日時'] == apried_date_str)
+            (checklist_status_df[CLUB_NAME] == club_name) &
+            (checklist_status_df[APPLICATION_DATETIME] == apried_date_str)
         ]
         if 'チェックリスト作成日時' in match.columns and not match.empty:
             checklist_creation_date_str = match.iloc[0]['チェックリスト作成日時']
