@@ -50,7 +50,7 @@ def process_all_clubs():
     df = pd.DataFrame(summary_rows)
     os.makedirs(os.path.dirname(SUMMARY_FILE), exist_ok=True)
     df.to_excel(SUMMARY_FILE, index=False)
-    print(f"✅ 不備サマリー出力完了 → {SUMMARY_FILE}")
+    logging.info(f"✅ 不備サマリー出力完了 → {SUMMARY_FILE}")
 
 if __name__ == "__main__":
     process_all_clubs()

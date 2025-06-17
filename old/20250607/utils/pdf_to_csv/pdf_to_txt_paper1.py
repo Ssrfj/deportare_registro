@@ -22,4 +22,4 @@ with pdfplumber.open(pdf_path) as pdf:
 with open(txt_output_path, "w", encoding="utf-8") as f:
     f.write("\n\n".join(all_text))
 
-print(f"整形済みテキストを保存しました: {txt_output_path}")
+logging.info(f"整形済みテキストを保存しました: {txt_output_path}")

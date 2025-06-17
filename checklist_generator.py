@@ -118,7 +118,7 @@ def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
                 try:
                     number_of_members += int(row[column])
                 except ValueError:
-                    print(f"警告: クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                    logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
                     number_of_members += 0
         # 会員数が0の場合は、'0'と記載
         if number_of_members == 0:
@@ -166,7 +166,7 @@ def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
                 try:
                     number_of_annual_fee_members += int(row[column])
                 except ValueError:
-                    print(f"警告: クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                    logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
                     number_of_annual_fee_members += 0
         # 年会費を払っている会員数が0の場合は、'0'と記載
         if number_of_annual_fee_members == 0:

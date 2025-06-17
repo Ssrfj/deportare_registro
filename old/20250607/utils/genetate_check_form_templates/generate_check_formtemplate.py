@@ -57,7 +57,7 @@ def generate_check_template_paper_1(path=f"templates/check_paper1_registration_c
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
 
-    print(f"✅ チェックテンプレート1（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート1（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper2_1(path=f"templates/check_paper2_1_memberships_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -84,7 +84,7 @@ def generate_check_template_paper2_1(path=f"templates/check_paper2_1_memberships
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
 
-    print(f"✅ チェックテンプレート2-1（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート2-1（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper2_2(path=f"templates/check_paper2_2_activities_leaders_and_administration_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -108,7 +108,7 @@ def generate_check_template_paper2_2(path=f"templates/check_paper2_2_activities_
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
 
-    print(f"✅ チェックテンプレート2-2（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート2-2（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper3(path=f"templates/check_paper3_article_of_association_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -178,7 +178,7 @@ def generate_check_template_paper3(path=f"templates/check_paper3_article_of_asso
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
 
-    print(f"✅ チェックテンプレート3（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート3（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper4(path=f"templates/check_paper4_list_of_voting_rights_holders_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -200,7 +200,7 @@ def generate_check_template_paper4(path=f"templates/check_paper4_list_of_voting_
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
 
-    print(f"✅ チェックテンプレート4（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート4（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper5_1_business_plan(path=f"templates/check_paper5_1_business_plan_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -222,7 +222,7 @@ def generate_check_template_paper5_1_business_plan(path=f"templates/check_paper5
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
 
-    print(f"✅ チェックテンプレート5(事業計画書）（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート5(事業計画書）（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper5_2_budget(path=f"templates/check_paper5_2_budget_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -248,7 +248,7 @@ def generate_check_template_paper5_2_budget(path=f"templates/check_paper5_2_budg
             "値": [VERSION, DATE_STR, "令和6年度", "全国協議会基準2025準拠"] # 適用基準年度・備考は適宜変更
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
-    print(f"✅ チェックテンプレート5（予算書）（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート5（予算書）（{VERSION}）を出力しました → {path}")
 
 
 def generate_check_template_paper6_1_business_report(path=f"templates/check_paper6_1_business_report_template_{VERSION}.xlsx"):
@@ -270,7 +270,7 @@ def generate_check_template_paper6_1_business_report(path=f"templates/check_pape
             "値": [VERSION, DATE_STR, "令和6年度", "全国協議会基準2025準拠"] # 適用基準年度・備考は適宜変更
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
-    print(f"✅ チェックテンプレート6（事業報告書書）（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート6（事業報告書書）（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper6_2_financial_statements(path=f"templates/check_paper6_2_financial_statements_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -294,7 +294,7 @@ def generate_check_template_paper6_2_financial_statements(path=f"templates/check
             "値": [VERSION, DATE_STR, "令和6年度", "全国協議会基準2025準拠"] # 適用基準年度・備考は適宜変更
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
-    print(f"✅ チェックテンプレート6（決算書）（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート6（決算書）（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper7(path=f"templates/check_paper7_self_evaluation_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -315,7 +315,7 @@ def generate_check_template_paper7(path=f"templates/check_paper7_self_evaluation
             "値": [VERSION, DATE_STR, "令和6年度", "全国協議会基準2025準拠"] # 適用基準年度・備考は適宜変更
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
-    print(f"✅ チェックテンプレート7（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート7（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper8(path=f"templates/check_paper8_minutes_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -349,7 +349,7 @@ def generate_check_template_paper8(path=f"templates/check_paper8_minutes_templat
             "値": [VERSION, DATE_STR, "令和6年度", "全国協議会基準2025準拠"] # 適用基準年度・備考は適宜変更
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
-    print(f"✅ チェックテンプレート8（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート8（{VERSION}）を出力しました → {path}")
 
 def generate_check_template_paper9(path=f"templates/check_paper9_self_disclosure_template_{VERSION}.xlsx"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -368,7 +368,7 @@ def generate_check_template_paper9(path=f"templates/check_paper9_self_disclosure
             "値": [VERSION, DATE_STR, "令和6年度", "全国協議会基準2025準拠"] # 適用基準年度・備考は適宜変更
         })
         meta.to_excel(writer, sheet_name="meta", index=False)
-    print(f"✅ チェックテンプレート8（{VERSION}）を出力しました → {path}")
+    logging.info(f"✅ チェックテンプレート8（{VERSION}）を出力しました → {path}")
 
 if __name__ == "__main__":
     generate_check_template_paper_1()

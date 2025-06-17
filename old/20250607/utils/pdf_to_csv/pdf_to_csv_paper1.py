@@ -24,6 +24,6 @@ with pdfplumber.open(pdf_path) as pdf:
 if all_tables:
     combined_df = pd.concat(all_tables, ignore_index=True)
     combined_df.to_csv(csv_output_path, index=False, encoding="utf-8-sig")
-    print(f"✅ CSVに出力完了: {csv_output_path}")
+    logging.info(f"✅ CSVに出力完了: {csv_output_path}")
 else:
     print("⚠️ 表が検出されませんでした。")

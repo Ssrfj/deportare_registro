@@ -19,7 +19,7 @@ def create_base_directories(base_path="."):
     for folder in BASE_FOLDERS:
         path = os.path.join(base_path, folder)
         os.makedirs(path, exist_ok=True)
-        print(f"✔ 作成: {path}")
+        logging.info(f"✔ 作成: {path}")
 
 def create_club_folders(base_path="input"):
     try:
@@ -34,10 +34,10 @@ def create_club_folders(base_path="input"):
             folder_name = f"{club_id}_{club_name}"
             folder_path = os.path.join(base_path, folder_name)
             os.makedirs(folder_path, exist_ok=True)
-            print(f"📂 クラブフォルダ作成: {folder_path}")
+            logging.info(f"📂 クラブフォルダ作成: {folder_path}")
     except Exception as e:
         print("❌ クラブフォルダの作成に失敗しました。")
-        print(f"原因: {e}")
+        logging.info(f"原因: {e}")
 
 if __name__ == "__main__":
     print("📁 初期ディレクトリ構成を作成中...")

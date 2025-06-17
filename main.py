@@ -1,20 +1,12 @@
 import os
 import pandas as pd
-from datetime import datetime, timezone, timedelta
-
-from checklist_generator import (
-    make_document1_checklist_for_human, make_document2_1_checklist_for_human,
-)
 from auto_check import perform_automatic_checks
 from utils import get_jst_now
-
 from excel_to_csv import excel_to_csv
 from load_latest_club_data import load_latest_club_data
 from merge_and_save_apcption_data import merge_and_save_apcption_data
 from make_checklist_for_each_club import make_checklist_for_each_club
 from make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
-
-from dataframe_utils import clean_column_names
 import logging
 
 logging.basicConfig(

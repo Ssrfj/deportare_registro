@@ -163,9 +163,9 @@ def check_application_type(application_row, application_data_df, club_name):
         else:
             print('申請種別が正しい')
     else:
-        print(f"クラブ名 '{club_name}' に一致する行が見つかりませんでした。候補一覧:")
+        logging.info(f"クラブ名 '{club_name}' に一致する行が見つかりませんでした。候補一覧:")
         print(application_data_df['クラブ名'].unique())
-        print(f"警告: クラブ名 '{club_name}' は申請内容を含むデータに見つかりませんでした。")
+        logging.warning(f"クラブ名 '{club_name}' は申請内容を含むデータに見つかりませんでした。")
         error_dict['e_a_005-c'] = f'クラブ名 {club_name} が申請内容に見つかりませんでした。'
     return error_dict
 
@@ -615,7 +615,7 @@ def check_business_report_submission(application_row,today_date):
               if establishment_date >= one_year_ago:
                   is_new_club = True
           except ValueError:
-              print(f"警告: クラブ設立日のフォーマットが不正です: {application_row['申請_設立日'].iloc[0]}")
+              logging.warning(f"クラブ設立日のフォーマットが不正です: {application_row['申請_設立日'].iloc[0]}")
               error_dict['e_a_016-d'] = 'クラブ設立日のフォーマットが不正です。'
 
       if application_row['申請_事業報告_提出有無'].iloc[0] == '今年度新設されたクラブのため、提出しない' and not is_new_club:
@@ -656,7 +656,7 @@ def check_financial_statement_submission(application_row, today_date):
               if establishment_date >= one_year_ago:
                   is_new_club = True
           except ValueError:
-              print(f"警告: クラブ設立日のフォーマットが不正です: {application_row['申請_設立日'].iloc[0]}")
+              logging.warning(f"クラブ設立日のフォーマットが不正です: {application_row['申請_設立日'].iloc[0]}")
               error_dict['e_a_017-d'] = 'クラブ設立日のフォーマットが不正です。'
 
       if application_row['申請_決算_提出有無'].iloc[0] == '今年度新設されたクラブのため、提出しない' and not is_new_club:

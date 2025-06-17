@@ -13,4 +13,4 @@ def generate_check_template_paper4(path="templates/check_paper4_voting_rights_ho
 
     df = pd.DataFrame(data, columns=["No", "カテゴリ", "チェック項目", "確認欄", "備考例"])
     df.to_excel(path, index=False)
-    print(f"✅ 書類④用テンプレートを出力しました → {path}")
+    logging.info(f"✅ 書類④用テンプレートを出力しました → {path}")

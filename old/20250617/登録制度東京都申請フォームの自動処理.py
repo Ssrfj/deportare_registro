@@ -85,7 +85,7 @@ try:
     print(club_list_df_for_acceptance.head())
     print("クラブリストの読み込みが完了しました")
 except Exception as e:
-    print(f"クラブリストの読み込み中にエラーが発生しました: {e}")
+    logging.info(f"クラブリストの読み込み中にエラーが発生しました: {e}")
 
 # クラブからの申請内容が申請内容_{start_time_str}.csvの形式で保存されているので、最新の申請内容を読み込む
 try:
@@ -97,7 +97,7 @@ try:
     # フォルダ内のファイルをリストアップ
     # 申請内容のCSVファイルを探す
     form_files = [f for f in os.listdir(form_output_file_path) if f.startswith('申請内容_') and f.endswith('.csv')]
-    print(f"申請内容のCSVファイル: {form_files}")
+    logging.info(f"申請内容のCSVファイル: {form_files}")
     if not form_files:
         raise FileNotFoundError("申請内容のCSVファイルが見つかりません。")
     # 最新の申請内容ファイルを取得
@@ -110,7 +110,7 @@ try:
     print(form_df_for_acceptance.dtypes)
     print("申請内容の読み込みが完了しました")
 except Exception as e:
-    print(f"申請内容の読み込み中にエラーが発生しました: {e}")
+    logging.info(f"申請内容の読み込み中にエラーが発生しました: {e}")
     exit()
 
 # タイムスタンプをdatetime型に変換
@@ -151,7 +151,7 @@ output_file_path_for_acceptance = os.path.join(output_folder_path_for_acceptance
 
 # csvを出力
 merged_club_list_df_for_acceptance.to_csv(output_file_path_for_acceptance, index=False)
-print(f"出力ファイルパス: {output_file_path_for_acceptance}")
+logging.info(f"出力ファイルパス: {output_file_path_for_acceptance}")
 
 #2. クラブごとチェックリスト作成
 # 申請されたデータをもとにクラブごとのチェックリストを作成
@@ -200,9 +200,9 @@ for _, row in application_club_list_df_for_make_checklist.iterrows():
     club_folder_path = os.path.join(checklist_output_folder, club_name)
     if not os.path.exists(club_folder_path):
         os.makedirs(club_folder_path, exist_ok=True)
-        print(f"{club_name}のフォルダが作成されました")
+        logging.info(f"{club_name}のフォルダが作成されました")
     else:
-        print(f"{club_name}のフォルダはすでに存在しています")
+        logging.info(f"{club_name}のフォルダはすでに存在しています")
 
 # クラブごとのチェックリスト作成状況を保存するcsvを読み込み（ない場合は作成）
 folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')
@@ -243,7 +243,7 @@ for _, row in application_club_list_df_for_make_checklist.iterrows():
             '担当者登録基準最終チェック更新時間': [''],
             }
         club_df_for_make_checklist = pd.DataFrame(club_data)
-        print(f"{row['クラブ名']}のclub_dfが作成されました")
+        logging.info(f"{row['クラブ名']}のclub_dfが作成されました")
         # checklist_create_dfにクラブ名があるかを確認
         if row['クラブ名'] not in checklist_create_df['クラブ名'].values:
             print('クラブ名がまだ存在しません')
@@ -254,7 +254,7 @@ for _, row in application_club_list_df_for_make_checklist.iterrows():
                 'チェックリスト作成日時': timestamp_for_make_checklist
                 }])
             checklist_create_df = pd.concat([checklist_create_df, new_row], ignore_index=True)
-            print(f"{row['クラブ名']}の列が追加されました")
+            logging.info(f"{row['クラブ名']}の列が追加されました")
         else:
             print('クラブ名がすでに存在します')
 
@@ -266,11 +266,11 @@ for _, row in application_club_list_df_for_make_checklist.iterrows():
             output_folder = os.path.join(checklist_output_folder, row['クラブ名'])
             # csvに出力
             file_name = f"{row['クラブ名']}_申請{row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']}_作成{timestamp_for_make_checklist}.csv"
-            print(f"file_name: {file_name}")
-            print(f"output_folder: {output_folder}")
+            logging.info(f"file_name: {file_name}")
+            logging.info(f"output_folder: {output_folder}")
             file_path = os.path.join(output_folder, file_name)
-            print(f"file_path: {file_path}")
-            print(f"出力ファイルパス: {file_path}")
+            logging.info(f"file_path: {file_path}")
+            logging.info(f"出力ファイルパス: {file_path}")
             club_df_for_make_checklist.to_csv(file_path, index=False)
             # checklist_create_dfのアップデート
             checklist_create_df.loc[checklist_create_df['クラブ名'] == row['クラブ名'], '申請日時'] = row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']
@@ -278,11 +278,11 @@ for _, row in application_club_list_df_for_make_checklist.iterrows():
             checklist_file_name = 'クラブごとのチェックリスト作成状況.csv'
             checklist_path = os.path.join(checklist_folder_path, checklist_file_name)
             checklist_create_df.to_csv(checklist_path, index=False)
-            print(f"{row['クラブ名']}の申請日時が更新されました")
+            logging.info(f"{row['クラブ名']}の申請日時が更新されました")
         else:
             print('申請日時が同じチェックリストを作成済みです')
     except Exception as e:
-        print(f"クラブ {row['クラブ名']} の処理中にエラーが発生しました: {e}")
+        logging.info(f"クラブ {row['クラブ名']} の処理中にエラーが発生しました: {e}")
 
 #3. クラブごとに自動チェック
 # 申請されたデータをもとに記入漏れ等をチェック
@@ -435,7 +435,7 @@ def check_application_type(application_row, application_data_df, club_name):
             else:
                 print('申請種別が正しい')
         else:
-            print(f"警告: クラブ名 '{club_name}' は申請内容を含むデータに見つかりませんでした。")
+            logging.warning(f"クラブ名 '{club_name}' は申請内容を含むデータに見つかりませんでした。")
             error_dict['e_a_005-c'] = f'クラブ名 {club_name} が申請内容に見つかりませんでした。'
     else:
         print("警告: check_application_type 関数に空の application_row が渡されました。")
@@ -888,7 +888,7 @@ def check_business_report_submission(application_row,today_date):
               if establishment_date >= one_year_ago:
                   is_new_club = True
           except ValueError:
-              print(f"警告: クラブ設立日のフォーマットが不正です: {application_row['申請_設立日'].iloc[0]}")
+              logging.warning(f"クラブ設立日のフォーマットが不正です: {application_row['申請_設立日'].iloc[0]}")
               error_dict['e_a_016-d'] = 'クラブ設立日のフォーマットが不正です。'
 
       if application_row['申請_事業報告_提出有無'].iloc[0] == '今年度新設されたクラブのため、提出しない' and not is_new_club:
@@ -929,7 +929,7 @@ def check_financial_statement_submission(application_row, today_date):
               if establishment_date >= one_year_ago:
                   is_new_club = True
           except ValueError:
-              print(f"警告: クラブ設立日のフォーマットが不正です: {application_row['申請_設立日'].iloc[0]}")
+              logging.warning(f"クラブ設立日のフォーマットが不正です: {application_row['申請_設立日'].iloc[0]}")
               error_dict['e_a_017-d'] = 'クラブ設立日のフォーマットが不正です。'
 
       if application_row['申請_決算_提出有無'].iloc[0] == '今年度新設されたクラブのため、提出しない' and not is_new_club:
@@ -1000,19 +1000,19 @@ def perform_automatic_checks(club_name, application_data_df, checklist_folder_pa
     Returns:
         None: チェック結果はチェックリストファイルに書き込まれます。
     """
-    print(f"クラブ名: {club_name}")
+    logging.info(f"クラブ名: {club_name}")
 
     # 申請日時を取得（checklist_create_df から）
     # checklist_create_df にクラブ名が存在することを確認
     if club_name not in checklist_create_df['クラブ名'].values:
-        print(f"警告: クラブ名 '{club_name}' はチェックリスト作成状況に見つかりませんでした。このクラブの処理をスキップします。")
+        logging.warning(f"クラブ名 '{club_name}' はチェックリスト作成状況に見つかりませんでした。このクラブの処理をスキップします。")
         return
 
     application_date_str_from_checklist = checklist_create_df.loc[checklist_create_df['クラブ名'] == club_name, '申請日時'].iloc[0]
     checklist_creation_date_str = checklist_create_df.loc[checklist_create_df['クラブ名'] == club_name, 'チェックリスト作成日時'].iloc[0]
 
-    print(f"申請日時 (from checklist): {application_date_str_from_checklist}")
-    print(f"チェックリスト作成日時: {checklist_creation_date_str}")
+    logging.info(f"申請日時 (from checklist): {application_date_str_from_checklist}")
+    logging.info(f"チェックリスト作成日時: {checklist_creation_date_str}")
 
     # 対象クラブのチェックリストを読み込み
     # row['申請日時']をyyyymmddhhmmssに変換
@@ -1024,22 +1024,22 @@ def perform_automatic_checks(club_name, application_data_df, checklist_folder_pa
              application_date_from_checklist = application_date_str_from_checklist
         application_date_str_yyyymmddHHMMSS = str(application_date_from_checklist)
     except ValueError:
-        print(f"エラー: クラブ '{club_name}' の申請日時のフォーマットが不正です: {application_date_str_from_checklist}")
+        logging.error(f"クラブ '{club_name}' の申請日時のフォーマットが不正です: {application_date_str_from_checklist}")
         return
 
     checklist_file_name = f"{club_name}_申請{application_date_str_yyyymmddHHMMSS}_作成{checklist_creation_date_str}.csv"
     checklist_file_path = os.path.join(checklist_folder_path, checklist_file_name)
-    print(f"チェックリストファイルパス: {checklist_file_path}")
-    print(f"チェックリストの読み込みを開始しました: {club_name}")
+    logging.info(f"チェックリストファイルパス: {checklist_file_path}")
+    logging.info(f"チェックリストの読み込みを開始しました: {club_name}")
 
     # チェックリストファイルが存在するかどうかを確認
     if not os.path.exists(checklist_file_path):
-        print(f"警告: チェックリストファイル '{checklist_file_path}' が見つかりませんでした。このクラブの処理をスキップします。")
+        logging.warning(f"チェックリストファイル '{checklist_file_path}' が見つかりませんでした。このクラブの処理をスキップします。")
     
     try:
         checklist_df = pd.read_csv(checklist_file_path)
     except Exception as e:
-        print(f"エラー: チェックリストファイル '{checklist_file_path}' の読み込み中にエラーが発生しました: {e}")
+        logging.error(f"チェックリストファイル '{checklist_file_path}' の読み込み中にエラーが発生しました: {e}")
     print('チェックリストファイルが見つかりました')
 
     # application_data_dfから現在のクラブの行を取得
@@ -1049,7 +1049,7 @@ def perform_automatic_checks(club_name, application_data_df, checklist_folder_pa
     application_row = application_data_df.loc[application_data_df['クラブ名'] == club_name]
 
     if application_row.empty:
-        print(f"警告: クラブ名 '{club_name}' は申請内容を含むデータに見つかりませんでした。このクラブの処理をスキップします。")
+        logging.warning(f"クラブ名 '{club_name}' は申請内容を含むデータに見つかりませんでした。このクラブの処理をスキップします。")
         return
     else:
         print('クラブ名が申請内容に存在')
@@ -1095,7 +1095,7 @@ def perform_automatic_checks(club_name, application_data_df, checklist_folder_pa
         print('自動チェックで問題が見つかりました。')
 
     # 一旦、チェックリストをprint
-    print(f"チェック結果: {error_dict}")
+    logging.info(f"チェック結果: {error_dict}")
 
     # 自動でチェックした内容をチェックリストに書き出し(チェックリストの上書き）
     # error_dictが空の場合は空文字列を書き込む
@@ -1108,9 +1108,9 @@ def perform_automatic_checks(club_name, application_data_df, checklist_folder_pa
     # チェックリストファイルを保存
     try:
         checklist_df.to_csv(checklist_file_path, index=False)
-        print(f"チェックリストファイル '{checklist_file_path}' を更新しました。")
+        logging.info(f"チェックリストファイル '{checklist_file_path}' を更新しました。")
     except Exception as e:
-        print(f"エラー: チェックリストファイル '{checklist_file_path}' の書き込み中にエラーが発生しました: {e}")
+        logging.error(f"チェックリストファイル '{checklist_file_path}' の書き込み中にエラーが発生しました: {e}")
 
 # チェック処理の実行部分
 # 必要なデータを読み込み
@@ -1145,7 +1145,7 @@ try:
     club_list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = club_list_df['R8年度登録申請_タイムスタンプ'].dt.strftime('%Y%m%d%H%M%S')
     print("申請内容の読み込みが完了しました")
 except Exception as e:
-    print(f"申請内容の読み込み中にエラーが発生しました: {e}")
+    logging.info(f"申請内容の読み込み中にエラーが発生しました: {e}")
 
 # チェックリストのフォルダを指定
 checklist_folder_path = os.path.join('R7_登録申請処理','申請入力内容')
@@ -1157,9 +1157,9 @@ timestamp = datetime.now(timezone(timedelta(hours=9))).strftime('%Y%m%d%H%M%S')
 # checklist_create_df をイテレートして、各クラブに対してチェックを実行
 for index, row in checklist_create_df.iterrows():
     club_name = row['クラブ名']
-    print(f"クラブ名: {club_name} の自動チェックを開始します")
+    logging.info(f"クラブ名: {club_name} の自動チェックを開始します")
     perform_automatic_checks(club_name, club_list_df, checklist_folder_path, checklist_create_df, timestamp)
-    print(f"クラブ名: {club_name} の自動チェックが完了しました\n")
+    logging.info(f"クラブ名: {club_name} の自動チェックが完了しました\n")
 
 print('全てのクラブの自動チェックが完了しました。')
 
@@ -1304,7 +1304,7 @@ def make_document2_1_checklist_for_human(applicastion_row_for_human):
                 try:
                     number_of_members += int(row[column])
                 except ValueError:
-                    print(f"警告: クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                    logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
                     number_of_members += 0
         # 会員数が0の場合は、'0'と記載
         if number_of_members == 0:
@@ -1352,7 +1352,7 @@ def make_document2_1_checklist_for_human(applicastion_row_for_human):
                 try:
                     number_of_annual_fee_members += int(row[column])
                 except ValueError:
-                    print(f"警告: クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                    logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
                     number_of_annual_fee_members += 0
         # 年会費を払っている会員数が0の場合は、'0'と記載
         if number_of_annual_fee_members == 0:
