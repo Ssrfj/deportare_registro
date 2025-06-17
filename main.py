@@ -72,10 +72,13 @@ def main():
                 for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
                     if col not in checklist_status_df.columns:
                         checklist_status_df[col] = ''
+                # ここでR8年度登録申請_タイムスタンプyyyymmddHHMMSSカラムも追加
+                if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in checklist_status_df.columns:
+                    checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = ''
                 logging.debug(f"checklist_status_df columns after clean: {checklist_status_df.columns.tolist()}")
                 logging.info('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
             else:
-                checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
+                checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'])
                 checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
                 logging.info('クラブごとのチェックリスト作成状況.csvが作成されました')
         except Exception as e:
@@ -120,6 +123,9 @@ def main():
 
             logging.info('人間がチェックする用のリストの作成をクラブごとに実行します...')
             checklist_status_df = make_documents_checklist_for_human(apried_club_list_df, checklist_status_df)
+            if checklist_status_df is None:
+                logging.error("make_documents_checklist_for_humanの戻り値がNoneです")
+                return
             logging.info('人間がチェックする用のリストの作成をクラブごとに作成しました。')
 
             logging.info('人間がチェックする用チェックリストのチェック状況の更新を行います...')
