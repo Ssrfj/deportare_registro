@@ -15,7 +15,12 @@ from make_checklist_for_each_club import make_checklist_for_each_club
 from make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
 
 from dataframe_utils import clean_column_names
+import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 def main():
     # 1. Excel→CSV化
     excel_to_csv()
@@ -31,16 +36,16 @@ def main():
     folder_path = os.path.join('R7_登録申請処理','申請受付リスト')
     files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.csv')]
     if not files:
-        print(f"エラー: {folder_path} にCSVファイルが存在しません。")
+        logging.error(f"{folder_path} にCSVファイルが存在しません。")
         return
     latest_file = max(files, key=os.path.getctime)
     try:
         club_list_df = pd.read_csv(latest_file)
         club_list_df['R8年度登録申請_タイムスタンプ'] = pd.to_datetime(club_list_df['R8年度登録申請_タイムスタンプ'], errors='coerce')
         club_list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = club_list_df['R8年度登録申請_タイムスタンプ'].dt.strftime('%Y%m%d%H%M%S')
-        print("申請内容の読み込みが完了しました")
+        logging.info("申請内容の読み込みが完了しました")
     except Exception as e:
-        print(f"申請内容の読み込み中にエラーが発生しました: {e}")
+        logging.error(f"申請内容の読み込み中にエラーが発生しました: {e}")
         return
 
     # 5. チェックリスト作成状況ファイルの読み込みまたは新規作成
@@ -52,27 +57,27 @@ def main():
         for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
             if col not in checklist_status_df.columns:
                 checklist_status_df[col] = ''
-        print("checklist_status_df columns after clean:", checklist_status_df.columns.tolist())
-        print('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
+        logging.debug(f"checklist_status_df columns after clean: {checklist_status_df.columns.tolist()}")
+        logging.info('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
     else:
         checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
         checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
-        print('クラブごとのチェックリスト作成状況.csvが作成されました')
+        logging.info('クラブごとのチェックリスト作成状況.csvが作成されました')
 
     # club_list_dfの['R8年度登録申請状況']が1のクラブのみを抽出
     # club_list_dfの['R8年度登録申請状況']が1のクラブのみを抽出
     club_list_df.columns = club_list_df.columns.str.strip()
-    print("club_list_df columns:", club_list_df.columns.tolist())  # ←追加
+    logging.debug(f"club_list_df columns: {club_list_df.columns.tolist()}")
     apried_club_list_df = club_list_df[club_list_df['R8年度登録申請状況'] == 1]
-    print("apried_club_list_df columns:", apried_club_list_df.columns.tolist())  # ←追加
+    logging.debug(f"apried_club_list_df columns: {apried_club_list_df.columns.tolist()}")
     if 'R7年度登録クラブ' not in apried_club_list_df.columns:
-        print("エラー: apried_club_list_dfに'R7年度登録クラブ'カラムがありません")
+        logging.error("apried_club_list_dfに'R7年度登録クラブ'カラムがありません")
     else:
-        print("apried_club_list_dfに'R7年度登録クラブ'カラムが存在します")
+        logging.info("apried_club_list_dfに'R7年度登録クラブ'カラムが存在します")
     if apried_club_list_df.empty:
-        print("R8年度登録申請状況が1のクラブが存在しません。")
+        logging.warning("R8年度登録申請状況が1のクラブが存在しません。")
     else:
-        print(f"R8年度登録申請状況が1のクラブ数: {len(apried_club_list_df)}")
+        logging.info(f"R8年度登録申請状況が1のクラブ数: {len(apried_club_list_df)}")
 
     # ここでmake_checklist_for_each_clubを呼び出す
     checklist_output_folder = folder_of_checklist_create_status
@@ -85,21 +90,21 @@ def main():
     )
    
     # 6. 各クラブに対して自動チェックを実行
-    print('各クラブの自動チェックを実行します...')
+    logging.info('各クラブの自動チェックを実行します...')
     checklist_status_df = perform_automatic_checks(checklist_status_df, apried_club_list_df)
-    print('全てのクラブの自動チェックが完了しました。')
-    print('処理が終了しました')
+    logging.info('全てのクラブの自動チェックが完了しました。')
+    logging.info('処理が終了しました')
 
     # 7. 人間がチェックする用チェックリストの作成とチェックリストのチェック状況をクラブごとに更新
-    print('人間がチェックする用のリストの作成とチェックリストのチェック状況をクラブごとに更新します...')
+    logging.info('人間がチェックする用のリストの作成とチェックリストのチェック状況をクラブごとに更新します...')
     checklist_status_df = make_documents_checklist_for_human(checklist_status_df, apried_club_list_df)
-    print('人間がチェックする用のリストの作成が完了しました。')
+    print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新を行います...')
 
     # 8. 人間がチェックする用のリストの作成とチェックリストのチェック状況の更新
-    print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新を行います...')
+    logging.info('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新を行います...')
     checklist_status_df = write_checklist_by_human_check(checklist_status_df, apried_club_list_df, folder_of_checklist_create_status)
-    print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新が完了しました。')
-    print('全ての処理が完了しました。')
+    logging.info('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新が完了しました。')
+    logging.info('全ての処理が完了しました。')
 
 if __name__ == "__main__":
     main()
