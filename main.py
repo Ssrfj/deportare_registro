@@ -13,6 +13,15 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
+# ログファイルの設定
+log_file_path = os.path.join('R7_登録申請処理', 'logs', 'process_log.txt')
+os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+file_handler = logging.FileHandler(log_file_path)
+file_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+file_handler.setFormatter(formatter)
+logging.getLogger().addHandler(file_handler)
+
 def main():
     try:
         # 1. Excel→CSV化
@@ -56,6 +65,8 @@ def main():
         folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')
         file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
         try:
+            os.makedirs(folder_of_checklist_create_status, exist_ok=True)
+            logging.info(f"チェックリスト作成状況フォルダ: {folder_of_checklist_create_status} を作成しました")
             if os.path.exists(file_of_checklist_create_status):
                 checklist_status_df = pd.read_csv(file_of_checklist_create_status)
                 for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
@@ -112,6 +123,7 @@ def main():
             checklist_status_df = write_checklist_by_human_check(checklist_status_df, apried_club_list_df, folder_of_checklist_create_status)
             logging.info('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新が完了しました。')
             logging.info('全ての処理が完了しました。')
+            print("全ての処理が完了しました。")
         except Exception as e:
             logging.error(f"チェックリスト関連処理でエラー: {e}", exc_info=True)
             return
@@ -119,3 +131,18 @@ def main():
     except Exception as e:
         logging.critical(f"予期せぬ致命的なエラーが発生しました: {e}", exc_info=True)
         return
+    
+    # logをtxtファイルに保存
+    log_file_path = os.path.join('R7_登録申請処理', 'logs', f'log_{get_jst_now().strftime("%Y%m%d%H%M%S")}.txt')
+    os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+    with open(log_file_path, 'w') as log_file:
+        for handler in logging.getLogger().handlers:
+            if isinstance(handler, logging.FileHandler):
+                log_file.write(f"Log file: {handler.baseFilename}\n")
+                with open(handler.baseFilename, 'r') as f:
+                    log_file.write(f.read())
+    logging.info(f"ログファイルを保存しました: {log_file_path}")
+    print(f"ログファイルを保存しました: {log_file_path}")
+
+if __name__ == "__main__":
+    main()

@@ -8,6 +8,7 @@ logging.basicConfig(
 )
 
 def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, checklist_output_folder, timestamp_for_make_checklist):
+    updated_df = checklist_status_df.copy()  # ここで初期化
     for _, row in apried_club_list_df.iterrows():
         try:
             club_data = {
@@ -47,8 +48,12 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
                 logging.info('クラブ名がすでに存在します')
 
             logging.debug('checklist_status_dfにある申請日時と申請時間を照合に移行します')
-            updated_df = checklist_status_df.copy()
-            if row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] == updated_df.loc[updated_df['クラブ名'] == row['クラブ名'], '申請日時'].values[0]:
+            # 申請日時の参照を修正
+            club_name = row['クラブ名']
+            application_timestamp = row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', '')
+            # checklist_status_dfの'申請日時'が存在しない場合は空文字列で比較
+            current_application_timestamp = updated_df.loc[updated_df['クラブ名'] == club_name, '申請日時'].values[0] if not updated_df.loc[updated_df['クラブ名'] == club_name].empty else ''
+            if application_timestamp == current_application_timestamp:
                 output_folder = os.path.join(checklist_output_folder, row['クラブ名'])
                 os.makedirs(output_folder, exist_ok=True)
                 file_name = f"{row['クラブ名']}_申請{row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']}_作成{timestamp_for_make_checklist}.csv"
