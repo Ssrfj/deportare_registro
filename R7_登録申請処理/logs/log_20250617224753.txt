@@ -1,3 +1,4 @@
+Log file: E:\oasobi\jspo_comprehensive_community_sports_club_registration_and_certification_system\R7_登録申請処理\logs\process_log.txt
 2025-06-17 17:44:19,970 [INFO] 探すExcelファイル: ['登録制度東京都申請フォーム（案）（回答）.xlsx']
 2025-06-17 17:44:19,970 [INFO] Excelファイルが見つかりました。
 2025-06-17 17:44:20,225 [INFO] 登録制度東京都申請フォーム（案）（回答）.xlsx を R7_登録申請処理\申請内容\申請内容_20250617174420.csv に保存しました。
@@ -653,4 +654,3 @@ NameError: name 'checklist_status_path' is not defined
 2025-06-17 22:47:53,895 [INFO] チェックリスト作成状況を更新しました。
 2025-06-17 22:47:53,895 [INFO] 人間がチェックする用チェックリストのチェック状況の更新を行いました。
 2025-06-17 22:47:53,895 [INFO] 全ての処理が完了しました。
-2025-06-17 22:47:53,895 [INFO] ログファイルを保存しました: R7_登録申請処理\logs\log_20250617224753.txt

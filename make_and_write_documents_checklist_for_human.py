@@ -46,6 +46,8 @@ def make_documents_checklist_for_human(applied_club_df, checklist_status_df):
         applied_club_df (pd.DataFrame): 申請済みクラブの一覧
         checklist_status_df (pd.DataFrame): チェックリスト作成状況
     """
+    if checklist_status_df is None:
+        checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'])
     try:
         logging.info("人間が確認する用のチェックリストを作成しています...")
         # --- ここから元の処理 ---
@@ -694,5 +696,7 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         checklist_file_path = os.path.join(club_folder, f'{club_name}_checklist_申請{application_date}.xlsx')
         checklist_df.to_excel(checklist_file_path, index=False)
         logging.info(f"クラブ '{club_name}' の申請日時'{application_date}'のチェックリストを更新しました。")
+    checklist_status_path = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
     checklist_status_df.to_csv(checklist_status_path, index=False)
     logging.info('チェックリスト作成状況を更新しました。')
+    return checklist_status_df

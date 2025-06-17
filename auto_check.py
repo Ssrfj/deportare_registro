@@ -58,7 +58,8 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
         # 保存されているチェックリストを読み込み、チェックを実行
         club_folder_path = os.path.join(folder_path, club_name)
         if not os.path.exists(club_folder_path):
-            logging.warning(f"クラブ '{club_name}' のフォルダが存在しません。スキップします。")
+            os.makedirs(club_folder_path, exist_ok=True)
+            logging.info(f"クラブ '{club_name}' のフォルダを新規作成しました。")
             continue
         checklist_file_name = f"{club_name}_申請{apried_date_str}_作成{checklist_creation_date_str}.csv"
         checklist_file_path = os.path.join(club_folder_path, checklist_file_name)
