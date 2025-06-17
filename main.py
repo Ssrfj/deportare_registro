@@ -67,6 +67,7 @@ def main():
                 'クラブ名': CLUB_NAME
             }
         )
+        print("checklist_create_df columns after rename:", checklist_create_df.columns.tolist())
         # 必要なカラムがなければ追加（再度チェック）
         for col in [CLUB_NAME, APPLICATION_DATETIME, CHECKLIST_CREATION_DATETIME]:
             if col not in checklist_create_df.columns:

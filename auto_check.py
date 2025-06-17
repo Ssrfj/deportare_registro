@@ -31,7 +31,9 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
     for index, row in applied_club_df.iterrows():
         club_name = str(row['クラブ名']).strip()
         apried_date_str = str(row.get('申請日時', row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', ''))).strip()
-
+        if CHECKLIST_CREATION_DATETIME not in row.index:
+            print(f"エラー: {CHECKLIST_CREATION_DATETIME} カラムが存在しません。rowのカラム: {row.index.tolist()}")
+            continue
         checklist_creation_date_str = row[CHECKLIST_CREATION_DATETIME]
         # 処理開始のメッセージを表示
         print(f"クラブ名: {club_name} の自動チェックを開始します")
