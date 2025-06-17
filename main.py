@@ -115,13 +115,13 @@ def main():
             logging.info('全てのクラブの自動チェックが完了しました。')
             logging.info('処理が終了しました')
 
-            logging.info('人間がチェックする用のリストの作成とチェックリストのチェック状況をクラブごとに更新します...')
-            checklist_status_df = make_documents_checklist_for_human(checklist_status_df, apried_club_list_df)
-            logging.info('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新を行います...')
+            logging.info('人間がチェックする用のリストの作成をクラブごとに実行します...')
+            checklist_status_df = make_documents_checklist_for_human(apried_club_list_df, checklist_status_df)
+            logging.info('人間がチェックする用のリストの作成をクラブごとに作成しました。')
 
-            logging.info('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新を行います...')
+            logging.info('人間がチェックする用チェックリストのチェック状況の更新を行います...')
             checklist_status_df = write_checklist_by_human_check(checklist_status_df, apried_club_list_df, folder_of_checklist_create_status)
-            logging.info('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新が完了しました。')
+            logging.info('人間がチェックする用チェックリストのチェック状況の更新を行いました。')
             logging.info('全ての処理が完了しました。')
             print("全ての処理が完了しました。")
         except Exception as e:
