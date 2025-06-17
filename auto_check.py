@@ -27,6 +27,24 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
     # チェックリストのフォルダを指定
     folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
 
+    # checklist_status_dfに 'クラブ名' と 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' カラムが存在するか確認
+    # checklist_status_dfがDataFrameであることを確認
+    if not isinstance(checklist_status_df, pd.DataFrame):
+        logging.error("checklist_status_dfはDataFrameではありません。")
+        return
+    # checklist_status_dfに 'クラブ名'カラムが存在するか確認
+    if 'クラブ名' not in checklist_status_df.columns:
+        logging.error("'クラブ名' カラムが checklist_status_df に存在しません。")
+        return
+    # checklist_status_dfに 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'カラムが存在するか確認
+    if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in checklist_status_df.columns:
+        logging.error("'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' カラムが checklist_status_df に存在しません。")
+        return
+    # checklist_status_dfに '申請日時'カラムが存在するか確認
+    if '申請日時' not in checklist_status_df.columns:
+        logging.error("'申請日時' カラムが checklist_status_df に存在しません。")
+        return
+
     # applied_club_dfの行ごとに処理を行う
     for index, row in applied_club_df.iterrows():
         club_name = str(row['クラブ名']).strip()

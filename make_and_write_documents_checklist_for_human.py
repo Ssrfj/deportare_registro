@@ -53,8 +53,9 @@ def make_documents_checklist_for_human(applied_club_df, checklist_status_df):
     # application_dfの行ごとに処理を行う
     for index, row in applied_club_df.iterrows():
         club_name = str(row['クラブ名']).strip()
-        apried_date_str = str(row['申請日時']).strip()
-        # ↓ここを修正
+        apried_date_str = str(row.get('申請日時', row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', ''))).strip()
+        if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in checklist_status_df.columns:
+            checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = ''
         match = checklist_status_df[
             (checklist_status_df['クラブ名'] == club_name) &
             (checklist_status_df['申請日時'] == apried_date_str)
