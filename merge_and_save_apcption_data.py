@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import glob
 from utils import get_jst_now
+from dataframe_utils import clean_column_names
+from column_names import CLUB_NAME, APPLICATION_DATETIME, APPLICATION_TIMESTAMP, APPLICATION_TIMESTAMP_STR, APPLICATION_STATUS, PREV_YEAR_CLUB
 
 def merge_and_save_apcption_data():
     # 申請内容の最新CSVを探す
@@ -12,6 +14,7 @@ def merge_and_save_apcption_data():
         return
     input_csv = max(csv_files, key=os.path.getctime)
     df_form = pd.read_csv(input_csv)
+    df_form = clean_column_names(df_form)
 
     # 最新のクラブ名_YYYYMMDD.csvを探す
     club_files = glob.glob(os.path.join(os.path.dirname(__file__), 'クラブ名_*.csv'))
@@ -20,6 +23,7 @@ def merge_and_save_apcption_data():
         return
     latest_file = max(club_files, key=os.path.getctime)
     df_old = pd.read_csv(latest_file)
+    df_old = clean_column_names(df_old)
 
     # カラム名の前後の空白を除去
     df_form.columns = df_form.columns.str.strip()
@@ -41,14 +45,18 @@ def merge_and_save_apcption_data():
     )
     # カラムの順序を指定
     main_columns = [
-        '地区名', 'クラブ名', 'クラブ名（カタカナ）',
+        '地区名',
+        CLUB_NAME,
+        'クラブ名（カタカナ）',
         '選択肢（地区名：クラブ名：クラブ名（カタカナ））',
-        'R7年度登録クラブ', 'R8年度登録申請状況',
-        'R8年度登録申請_タイムスタンプ', 
-        'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'
+        'R7年度登録クラブ',
+        APPLICATION_STATUS, 
+        APPLICATION_TIMESTAMP, 
+        APPLICATION_TIMESTAMP_STR
     ]
     columns_order = main_columns + [col for col in df_merged.columns if col not in main_columns]
     df_merged = df_merged[columns_order]
+    df_merged = clean_column_names(df_merged)
     # 保存先
     save_folder = os.path.join(os.path.dirname(__file__), 'R7_登録申請処理', '申請受付リスト')
     os.makedirs(save_folder, exist_ok=True)

@@ -1,6 +1,7 @@
 import pandas as pd
 import pandas as pd
 from datetime import timedelta
+
 # 必須項目に入力があるかをチェックする関数
 def check_must_columns(form_row):
     """

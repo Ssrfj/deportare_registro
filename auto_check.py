@@ -9,26 +9,30 @@ from check_functions import (
     check_budget_submission, check_business_report_submission, check_financial_statement_submission,
     check_checklist_submission, check_self_explanation_submission
 )
+from dataframe_utils import clean_column_names
+from column_names import CHECKLIST_CREATION_DATETIME
+from column_names import CHECKLIST_CREATION_DATETIME
+from dataframe_utils import clean_column_names
+from column_names import CHECKLIST_CREATION_DATETIME
 
-def perform_automatic_checks(application_df, list_df):
+
+def perform_automatic_checks(checklist_status_df, applied_club_df):
     """
     指定されたクラブに対して自動チェックを行います。
 
     Args:
-        checklist_create_df (pd.DataFrame): チェックリスト作成状況を含むDataFrame。
-
-    Returns:
-        None: チェック結果はチェックリストファイルに書き込まれます。
+        applied_club_df (pd.DataFrame): 申請済みクラブのDataFrame
+        checklist_status_df (pd.DataFrame): チェックリスト作成状況のDataFrame
     """
     # チェックリストのフォルダを指定
     folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
 
-    # application_dfの行ごとに処理を行う
-    for index, row in application_df.iterrows():
+    # applied_club_dfの行ごとに処理を行う
+    for index, row in applied_club_df.iterrows():
         club_name = str(row['クラブ名']).strip()
-        apried_date_str = str(row['申請日時']).strip()
+        apried_date_str = str(row.get('申請日時', row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', ''))).strip()
 
-        checklist_creation_date_str = row['チェックリスト作成日時']
+        checklist_creation_date_str = row[CHECKLIST_CREATION_DATETIME]
         # 処理開始のメッセージを表示
         print(f"クラブ名: {club_name} の自動チェックを開始します")
         # 保存されているチェックリストを読み込み、チェックを実行
@@ -43,6 +47,7 @@ def perform_automatic_checks(application_df, list_df):
             continue
         try:
             checklist_df = pd.read_csv(checklist_file_path)
+            checklist_df = clean_column_names(checklist_df)
             print(f"チェックリストファイル '{checklist_file_name}' を読み込みました。")
         except Exception as e:
             print(f"エラー: チェックリストファイル '{checklist_file_name}' の読み込み中にエラーが発生しました: {e}")
@@ -62,19 +67,19 @@ def perform_automatic_checks(application_df, list_df):
             # 今日の日付を取得
             today_date = jst_now.date()
         
-        list_df['クラブ名'] = list_df['クラブ名'].astype(str).str.strip()
-        list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'].astype(str).str.strip()
+        checklist_status_df['クラブ名'] = checklist_status_df['クラブ名'].astype(str).str.strip()
+        checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'].astype(str).str.strip()
 
 
         # 申請内容から該当行を抽出
-        target_row = list_df[
-            (list_df['クラブ名'] == club_name) &
-            (list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] == apried_date_str)
+        target_row = checklist_status_df[
+            (checklist_status_df['クラブ名'] == club_name) &
+            (checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] == apried_date_str)
         ]
-        print(list_df[['クラブ名', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS']])
+        print(checklist_status_df[['クラブ名', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS']])
         print(f"検索値: クラブ名={club_name}, 申請日時={apried_date_str}")
         print(repr(club_name), repr(apried_date_str))
-        print(list_df[['クラブ名', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS']].applymap(repr))
+        print(checklist_status_df[['クラブ名', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS']].applymap(repr))
         if target_row.empty:
             print(f"申請内容に該当データがありません: {club_name}, {apried_date_str}")
             continue
@@ -85,7 +90,7 @@ def perform_automatic_checks(application_df, list_df):
         error_dict.update(check_phone_number(target_row))
         error_dict.update(check_fax_number(target_row))
         # check_application_type 関数には application_data_df を渡す
-        error_dict.update(check_application_type(target_row, list_df, club_name))
+        error_dict.update(check_application_type(target_row, checklist_status_df, club_name))
         error_dict.update(check_standard_compliance(target_row))
         error_dict.update(check_number_of_members(target_row))
         error_dict.update(check_number_of_disciplines(target_row))
@@ -136,10 +141,14 @@ if __name__ == "__main__":
     if os.path.exists(file_of_checklist_create_status):
         checklist_create_df = pd.read_csv(file_of_checklist_create_status)
         print('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
+        checklist_create_df = clean_column_names(checklist_create_df)
     else:
         checklist_create_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
+        checklist_create_df = clean_column_names(checklist_create_df)
         checklist_create_df.to_csv(file_of_checklist_create_status, index=False)
         print('クラブごとのチェックリスト作成状況.csvが作成されました')
+    for idx, row in checklist_create_df.iterrows():
+        checklist_creation_date_str = row[CHECKLIST_CREATION_DATETIME]
 
     # 自動チェックを実行
     perform_automatic_checks(checklist_create_df)

@@ -14,6 +14,11 @@ from merge_and_save_apcption_data import merge_and_save_apcption_data
 from make_checklist_for_each_club import make_checklist_for_each_club
 from make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
 
+from dataframe_utils import clean_column_names
+from column_names import (
+    CLUB_NAME, APPLICATION_DATETIME, CHECKLIST_CREATION_DATETIME,
+    APPLICATION_TIMESTAMP_STR
+)
 def main():
     # 1. Excel→CSV化
     excel_to_csv()
@@ -46,6 +51,24 @@ def main():
     file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
     if os.path.exists(file_of_checklist_create_status):
         checklist_create_df = pd.read_csv(file_of_checklist_create_status)
+        checklist_create_df = clean_column_names(checklist_create_df)
+        # 必要なカラムがなければ追加
+        for col in [CLUB_NAME, APPLICATION_DATETIME, CHECKLIST_CREATION_DATETIME]:
+            if col not in checklist_create_df.columns:
+                checklist_create_df[col] = ''
+        # ここでカラム名の空白除去とリネーム
+        checklist_create_df.columns = checklist_create_df.columns.str.strip()
+        checklist_create_df = checklist_create_df.rename(
+            columns={
+                'チェックリスト作成日時': CHECKLIST_CREATION_DATETIME,
+                '申請日時': APPLICATION_DATETIME,
+                'クラブ名': CLUB_NAME
+            }
+        )
+        # 必要なカラムがなければ追加（再度チェック）
+        for col in [CLUB_NAME, APPLICATION_DATETIME, CHECKLIST_CREATION_DATETIME]:
+            if col not in checklist_create_df.columns:
+                checklist_create_df[col] = ''
         print('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
     else:
         checklist_create_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
