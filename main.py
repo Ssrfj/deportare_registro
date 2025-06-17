@@ -105,7 +105,6 @@ def main():
    
     # 6. 各クラブに対して自動チェックを実行
     print('各クラブの自動チェックを実行します...')
-    checklist_create_df.columns = checklist_create_df.columns.str.strip()
     checklist_create_df = checklist_create_df.rename(
         columns={
             'チェックリスト作成日時': CHECKLIST_CREATION_DATETIME,
@@ -113,19 +112,19 @@ def main():
             'クラブ名': CLUB_NAME
         }
     )    
-    perform_automatic_checks(checklist_create_df, apried_club_list_df) 
+    perform_automatic_checks(checklist_create_df, apried_club_list_df)
     print('全てのクラブの自動チェックが完了しました。')
     print('処理が終了しました')
 
     # 7. 人間がチェックする用チェックリストの作成とチェックリストのチェック状況をクラブごとに更新
     print('人間がチェックする用のリストの作成とチェックリストのチェック状況をクラブごとに更新します...')
     checklist_create_df.columns = checklist_create_df.columns.str.strip()
-    # ここで定数名にリネーム
+    # ここでカラム名を「日本語名」にリネーム
     checklist_create_df = checklist_create_df.rename(
         columns={
-            'チェックリスト作成日時': CHECKLIST_CREATION_DATETIME,
-            '申請日時': APPLICATION_DATETIME,
-            'クラブ名': CLUB_NAME
+            CHECKLIST_CREATION_DATETIME: 'チェックリスト作成日時',
+            APPLICATION_DATETIME: '申請日時',
+            CLUB_NAME: 'クラブ名'
         }
     )
     print("checklist_create_df columns before make_documents_checklist_for_human:", checklist_create_df.columns.tolist())
