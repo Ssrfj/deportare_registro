@@ -3,7 +3,6 @@ import pandas as pd
 import glob
 from utils import get_jst_now
 from dataframe_utils import clean_column_names
-from column_names import CLUB_NAME, APPLICATION_DATETIME, APPLICATION_TIMESTAMP, APPLICATION_TIMESTAMP_STR, APPLICATION_STATUS, PREV_YEAR_CLUB
 
 def merge_and_save_apcption_data():
     # 申請内容の最新CSVを探す

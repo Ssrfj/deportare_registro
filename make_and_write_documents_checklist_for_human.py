@@ -18,7 +18,6 @@ from checklist_generator import (
 from datetime import datetime, timezone, timedelta
 from utils import get_jst_now
 from dataframe_utils import clean_column_names, to_datetime_column, add_datetime_str_column
-from column_names import CLUB_NAME, APPLICATION_DATETIME
 
 # 書類の種類をリストで定義
 type_of_documents = [
@@ -54,8 +53,8 @@ def make_documents_checklist_for_human(applied_club_df, checklist_status_df):
         apried_date_str = str(row['申請日時']).strip()
         # ↓ここを修正
         match = checklist_status_df[
-            (checklist_status_df[CLUB_NAME] == club_name) &
-            (checklist_status_df[APPLICATION_DATETIME] == apried_date_str)
+            (checklist_status_df['クラブ名'] == club_name) &
+            (checklist_status_df['申請日時'] == apried_date_str)
         ]
         if 'チェックリスト作成日時' in match.columns and not match.empty:
             checklist_creation_date_str = match.iloc[0]['チェックリスト作成日時']

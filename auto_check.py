@@ -9,8 +9,6 @@ from check_functions import (
     check_budget_submission, check_business_report_submission, check_financial_statement_submission,
     check_checklist_submission, check_self_explanation_submission
 )
-from dataframe_utils import clean_column_names
-from column_names import CHECKLIST_CREATION_DATETIME
 
 def perform_automatic_checks(checklist_status_df, applied_club_df):
     """
@@ -27,10 +25,10 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
     for index, row in applied_club_df.iterrows():
         club_name = str(row['クラブ名']).strip()
         apried_date_str = str(row.get('申請日時', row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', ''))).strip()
-        if CHECKLIST_CREATION_DATETIME not in row.index:
-            print(f"エラー: {CHECKLIST_CREATION_DATETIME} カラムが存在しません。rowのカラム: {row.index.tolist()}")
+        if 'チェックリスト作成日時' not in row.index:
+            print(f"エラー: 'チェックリスト作成日時' カラムが存在しません。rowのカラム: {row.index.tolist()}")
             continue
-        checklist_creation_date_str = row[CHECKLIST_CREATION_DATETIME]
+        checklist_creation_date_str = row['チェックリスト作成日時']
         # 処理開始のメッセージを表示
         print(f"クラブ名: {club_name} の自動チェックを開始します")
         # 保存されているチェックリストを読み込み、チェックを実行
@@ -46,7 +44,6 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
         try:
             checklist_df = pd.read_csv(checklist_file_path)
             print("before:", checklist_df.columns.tolist())  # デバッグ用にカラム名を表示
-            checklist_df = clean_column_names(checklist_df)
             print("after:", checklist_df.columns.tolist())  # デバッグ用にカラム名を表示
             print(f"チェックリストファイル '{checklist_file_name}' を読み込みました。")
         except Exception as e:
@@ -142,17 +139,15 @@ if __name__ == "__main__":
         checklist_create_df = pd.read_csv(file_of_checklist_create_status)
         print('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
         print("before:", checklist_create_df.columns.tolist())  # デバッグ用にカラム名を表示
-        checklist_create_df = clean_column_names(checklist_create_df)
         print("after:", checklist_create_df.columns.tolist())
     else:
         checklist_create_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
         print("before:", checklist_create_df.columns.tolist())  # デバッグ用にカラム名を表示
-        checklist_create_df = clean_column_names(checklist_create_df)
         print("after:", checklist_create_df.columns.tolist())
         checklist_create_df.to_csv(file_of_checklist_create_status, index=False)
         print('クラブごとのチェックリスト作成状況.csvが作成されました')
     for idx, row in checklist_create_df.iterrows():
-        checklist_creation_date_str = row[CHECKLIST_CREATION_DATETIME]
+        checklist_creation_date_str = row['チェックリスト作成日時']
 
     # 自動チェックを実行
     perform_automatic_checks(checklist_create_df)

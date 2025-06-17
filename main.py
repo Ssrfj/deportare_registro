@@ -55,23 +55,10 @@ def main():
         checklist_create_df = pd.read_csv(file_of_checklist_create_status)
         checklist_create_df = clean_column_names(checklist_create_df)
         # 必要なカラムがなければ追加
-        for col in [CLUB_NAME, APPLICATION_DATETIME, CHECKLIST_CREATION_DATETIME]:
+        for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
             if col not in checklist_create_df.columns:
                 checklist_create_df[col] = ''
-        # ここでカラム名の空白除去とリネーム
-        checklist_create_df.columns = checklist_create_df.columns.str.strip()
-        checklist_create_df = checklist_create_df.rename(
-            columns={
-                'チェックリスト作成日時': CHECKLIST_CREATION_DATETIME,
-                '申請日時': APPLICATION_DATETIME,
-                'クラブ名': CLUB_NAME
-            }
-        )
-        print("checklist_create_df columns after rename:", checklist_create_df.columns.tolist())
-        # 必要なカラムがなければ追加（再度チェック）
-        for col in [CLUB_NAME, APPLICATION_DATETIME, CHECKLIST_CREATION_DATETIME]:
-            if col not in checklist_create_df.columns:
-                checklist_create_df[col] = ''
+        print("checklist_create_df columns after clean:", checklist_create_df.columns.tolist())
         print('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
     else:
         checklist_create_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
@@ -105,44 +92,17 @@ def main():
    
     # 6. 各クラブに対して自動チェックを実行
     print('各クラブの自動チェックを実行します...')
-    checklist_create_df = checklist_create_df.rename(
-        columns={
-            'チェックリスト作成日時': CHECKLIST_CREATION_DATETIME,
-            '申請日時': APPLICATION_DATETIME,
-            'クラブ名': CLUB_NAME
-        }
-    )    
     perform_automatic_checks(checklist_create_df, apried_club_list_df)
     print('全てのクラブの自動チェックが完了しました。')
     print('処理が終了しました')
 
     # 7. 人間がチェックする用チェックリストの作成とチェックリストのチェック状況をクラブごとに更新
     print('人間がチェックする用のリストの作成とチェックリストのチェック状況をクラブごとに更新します...')
-    checklist_create_df.columns = checklist_create_df.columns.str.strip()
-    # ここでカラム名を「日本語名」にリネーム
-    checklist_create_df = checklist_create_df.rename(
-        columns={
-            CHECKLIST_CREATION_DATETIME: 'チェックリスト作成日時',
-            APPLICATION_DATETIME: '申請日時',
-            CLUB_NAME: 'クラブ名'
-        }
-    )
-    print("checklist_create_df columns before make_documents_checklist_for_human:", checklist_create_df.columns.tolist())
     make_documents_checklist_for_human(checklist_create_df, apried_club_list_df)
     print('人間がチェックする用のリストの作成が完了しました。')
 
     # 8. 人間がチェックする用のリストの作成とチェックリストのチェック状況の更新
     print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新を行います...')
-    checklist_create_df.columns = checklist_create_df.columns.str.strip()
-    # ここでカラム名を「英語名」にリネーム
-    checklist_create_df = checklist_create_df.rename(
-        columns={
-            'チェックリスト作成日時': CHECKLIST_CREATION_DATETIME,
-            '申請日時': APPLICATION_DATETIME,
-            'クラブ名': CLUB_NAME
-        }
-    )
-    print("checklist_create_df columns before make_documents_checklist_for_human:", checklist_create_df.columns.tolist())
     write_checklist_by_human_check(checklist_create_df, apried_club_list_df, folder_of_checklist_create_status)
     print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新が完了しました。')
     print('全ての処理が完了しました。')

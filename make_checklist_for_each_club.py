@@ -3,14 +3,13 @@ import pandas as pd
 from datetime import datetime, timezone, timedelta
 from utils import get_jst_now
 from dataframe_utils import clean_column_names, to_datetime_column, add_datetime_str_column
-from column_names import CLUB_NAME, APPLICATION_DATETIME, APPLICATION_TIMESTAMP_STR
 
 def make_checklist_for_each_club(applied_club_df, checklist_status_df, checklist_output_folder, timestamp_for_make_checklist):
     for _, row in applied_club_df.iterrows():
         try:
             club_data = {
-                CLUB_NAME: [row[CLUB_NAME]],
-                APPLICATION_DATETIME: [row[APPLICATION_TIMESTAMP_STR]],
+                'クラブ名': [row['クラブ名']],
+                '申請日時': [row['申請日時']],
                 '担当者名': [row['申請_申請担当者名']],
                 '役職名': [row['申請_申請担当者役職']],
                 'メールアドレス': [row['申請_メールアドレス']],
