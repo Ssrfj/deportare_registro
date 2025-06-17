@@ -48,6 +48,8 @@ def main():
 
     # 5. チェックリスト作成状況ファイルの読み込みまたは新規作成
     folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')
+    os.makedirs(folder_of_checklist_create_status, exist_ok=True)
+    # チェックリスト作成状況のCSVファイルを読み込むか、新規作成
     file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
     if os.path.exists(file_of_checklist_create_status):
         checklist_create_df = pd.read_csv(file_of_checklist_create_status)
