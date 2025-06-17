@@ -129,6 +129,20 @@ def main():
     )
     print("checklist_create_df columns before make_documents_checklist_for_human:", checklist_create_df.columns.tolist())
     make_documents_checklist_for_human(checklist_create_df, apried_club_list_df)
+    print('人間がチェックする用のリストの作成が完了しました。')
+
+    # 8. 人間がチェックする用のリストの作成とチェックリストのチェック状況の更新
+    print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新を行います...')
+    checklist_create_df.columns = checklist_create_df.columns.str.strip()
+    # ここでカラム名を「日本語名」にリネーム
+    checklist_create_df = checklist_create_df.rename(
+        columns={
+            CHECKLIST_CREATION_DATETIME: 'チェックリスト作成日時',
+            APPLICATION_DATETIME: '申請日時',
+            CLUB_NAME: 'クラブ名'
+        }
+    )
+    print("checklist_create_df columns before make_documents_checklist_for_human:", checklist_create_df.columns.tolist())
     write_checklist_by_human_check(checklist_create_df, apried_club_list_df, folder_of_checklist_create_status)
     print('人間がチェックする用のリストの作成とチェックリストのチェック状況の更新が完了しました。')
     print('全ての処理が完了しました。')
