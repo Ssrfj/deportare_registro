@@ -9,6 +9,16 @@ logging.basicConfig(
 
 def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, checklist_output_folder, timestamp_for_make_checklist):
     updated_df = checklist_status_df.copy()  # ここで初期化
+    # デバッグ用にapried_club_list_dfとchecklist_status_dfに'申請日時'と'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'のカラムが存在するか確認
+    if '申請日時' not in checklist_status_df.columns:
+        logging.error("checklist_status_dfに'申請日時'カラムがありません")
+    if '申請日時' not in apried_club_list_df.columns:
+        logging.error("apried_club_list_dfに'申請日時'カラムがありません")
+    if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in apried_club_list_df.columns:
+        logging.error("apried_club_list_dfに'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'カラムがありません")
+    if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in apried_club_list_df.columns:
+        logging.error("apried_club_list_dfに'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'カラムがありません")
+
     for _, row in apried_club_list_df.iterrows():
         try:
             club_data = {

@@ -104,7 +104,7 @@ def main():
         try:
             # カラム名の確認とリネーム
             if '申請日時' not in apried_club_list_df.columns and 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' in apried_club_list_df.columns:
-                apried_club_list_df = apried_club_list_df.rename(columns={'R8年度登録申請_タイムスタンプyyyymmddHHMMSS': '申請日時'})
+                apried_club_list_df['申請日時'] = apried_club_list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']
             checklist_output_folder = folder_of_checklist_create_status
             timestamp_for_make_checklist = get_jst_now().strftime('%Y%m%d%H%M%S')
             checklist_status_df = make_checklist_for_each_club(
