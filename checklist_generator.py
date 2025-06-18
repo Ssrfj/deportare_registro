@@ -479,7 +479,7 @@ def make_document4_checklist_for_human(applied_club_df, checklist_status_df):
     document4_lists_checklist = []
 
     # 隣接自治体リストの読み込み
-    municipalities_df = pd.read_csv('municipality.csv')
+    municipalities_df = pd.read_csv('municipality_test_tokyo.csv')
 
     for index, row in applied_club_df.iterrows():
         club_name = row['クラブ名']

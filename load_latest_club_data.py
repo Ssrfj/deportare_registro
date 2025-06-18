@@ -8,9 +8,9 @@ logging.basicConfig(
 )
 
 def load_latest_club_data():
-    csv_files = glob.glob('クラブ名_*.csv')
+    csv_files = glob.glob('クラブ名_test_*.csv')
     if not csv_files:
-        logging.error("クラブ名_YYYYMMDD.csv ファイルが見つかりません。")
+        logging.error("クラブ名_test_YYYYMMDD.csv ファイルが見つかりません。")
         return None
     latest_file = max(csv_files)
     df = pd.read_csv(latest_file)
