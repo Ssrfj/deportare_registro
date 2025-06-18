@@ -11,6 +11,7 @@ import logging
 
 logging.basicConfig(
     level=logging.INFO,
+    encoding='utf-8',
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 # ログファイルの設定
@@ -91,6 +92,7 @@ def main():
             logging.debug(f"club_list_df columns: {club_list_df.columns.tolist()}")
             apried_club_list_df = club_list_df[club_list_df['R8年度登録申請状況'] == 1]
             logging.debug(f"apried_club_list_df columns: {apried_club_list_df.columns.tolist()}")
+            logging.debug(f"apried_club_list_df: {apried_club_list_df}")
             if 'R7年度登録クラブ' not in apried_club_list_df.columns:
                 logging.error("apried_club_list_dfに'R7年度登録クラブ'カラムがありません")
             else:
@@ -150,11 +152,11 @@ def main():
     # logをtxtファイルに保存
     log_file_path = os.path.join('R7_登録申請処理', 'logs', f'log_{get_jst_now().strftime("%Y%m%d%H%M%S")}.txt')
     os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
-    with open(log_file_path, 'w') as log_file:
+    with open(log_file_path, 'w', encoding='utf-8') as log_file:
         for handler in logging.getLogger().handlers:
             if isinstance(handler, logging.FileHandler):
                 log_file.write(f"Log file: {handler.baseFilename}\n")
-                with open(handler.baseFilename, 'r') as f:
+                with open(handler.baseFilename, 'r', encoding='utf-8') as f:
                     log_file.write(f.read())
     logging.info(f"ログファイルを保存しました: {log_file_path}")
     print(f"ログファイルを保存しました: {log_file_path}")

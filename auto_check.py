@@ -13,6 +13,7 @@ from check_functions import (
 
 logging.basicConfig(
     level=logging.INFO,
+    encoding='utf-8',
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 

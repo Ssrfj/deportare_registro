@@ -4,6 +4,7 @@ import logging
 from dataframe_utils import clean_column_names
 logging.basicConfig(
     level=logging.INFO,
+    encoding='utf-8',
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 

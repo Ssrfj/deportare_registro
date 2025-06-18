@@ -1,6 +1,16 @@
 import pandas as pd
 import pandas as pd
 from datetime import timedelta
+import logging
+from datetime import datetime, timezone
+import os
+
+# ログの設定
+logging.basicConfig(
+    level=logging.INFO,
+    encoding='utf-8',
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # 必須項目に入力があるかをチェックする関数
 def check_must_columns(form_row):
