@@ -16,7 +16,7 @@ from checklist_generator import (
     make_document9_checklist_for_human
 )
 from utils import get_jst_now
-
+from get_latest_checklist_file import get_latest_checklist_file
 logging.basicConfig(
     level=logging.INFO,
     encoding='utf-8',

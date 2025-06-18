@@ -64,15 +64,15 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
             logging.info(f"クラブ '{club_name}' のフォルダを新規作成しました。")
             continue
         checklist_file_name = f"{club_name}_申請{apried_date_str}_作成{checklist_creation_date_str}.csv"
-        checklist_file_path = get_latest_checklist_file(club_name, apried_date_str, folder_path)
+        each_folder_path = os.path.join(folder_path, club_name)
+        checklist_file_path = get_latest_checklist_file(club_name, apried_date_str, each_folder_path)
         if not checklist_file_path or not os.path.exists(checklist_file_path):
             logging.warning(f"クラブ '{club_name}' のチェックリストファイルが存在しません。スキップします。")
             continue
 
         try:
             checklist_df = pd.read_csv(checklist_file_path)
-            logging.debug(f"before: {checklist_df.columns.tolist()}")  # デバッグ用
-            logging.debug(f"after: {checklist_df.columns.tolist()}")   # デバッグ用
+            # チェックリストのカラム名を確認
             logging.info(f"チェックリストファイル '{checklist_file_name}' を読み込みました。")
         except Exception as e:
             logging.error(f"チェックリストファイル '{checklist_file_name}' の読み込み中にエラーが発生しました: {e}")
