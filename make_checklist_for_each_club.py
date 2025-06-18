@@ -62,24 +62,31 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
             # 申請日時の参照を修正
             club_name = row['クラブ名']
             application_timestamp = row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', '')
-            # checklist_status_dfの'申請日時'が存在しない場合は空文字列で比較
-            current_application_timestamp = updated_df.loc[updated_df['クラブ名'] == club_name, '申請日時'].values[0] if not updated_df.loc[updated_df['クラブ名'] == club_name].empty else ''
-            if application_timestamp == current_application_timestamp:
-                output_folder = os.path.join(checklist_output_folder, row['クラブ名'])
+            # クラブ名と申請日時の組み合わせで存在チェック
+            mask = (updated_df['クラブ名'] == club_name) & (updated_df['申請日時'] == application_timestamp)
+            if not mask.any():
+                # 新規 or 申請日時が異なる場合は必ず作成
+                output_folder = os.path.join(checklist_output_folder, club_name)
                 os.makedirs(output_folder, exist_ok=True)
-                file_name = f"{row['クラブ名']}_申請{row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']}_作成{timestamp_for_make_checklist}.csv"
+                file_name = f"{club_name}_申請{application_timestamp}_作成{timestamp_for_make_checklist}.csv"
                 file_path = os.path.join(output_folder, file_name)
                 club_df_for_make_checklist.to_csv(file_path, index=False)
                 logging.info(f"{file_path} にチェックリストを保存しました")
-                updated_df.loc[updated_df['クラブ名'] == row['クラブ名'], '申請日時'] = row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']
-                updated_df.loc[updated_df['クラブ名'] == row['クラブ名'], 'チェックリスト作成日時'] = timestamp_for_make_checklist
+                # DataFrameも更新
+                new_row = pd.DataFrame([{
+                    'クラブ名': club_name,
+                    '申請日時': application_timestamp,
+                    'チェックリスト作成日時': timestamp_for_make_checklist
+                }])
+                updated_df = pd.concat([updated_df, new_row], ignore_index=True)
                 checklist_folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
                 checklist_file_name = 'クラブごとのチェックリスト作成状況.csv'
                 checklist_path = os.path.join(checklist_folder_path, checklist_file_name)
                 updated_df.to_csv(checklist_path, index=False)
-                logging.info(f"{row['クラブ名']}の申請日時が更新されました")
+                logging.info(f"{club_name}の申請日時が更新されました")
             else:
                 logging.info('申請日時が同じチェックリストを作成済みです')
+                logging.info(checklist_output_folder)
         except Exception as e:
             logging.error(f"クラブ {row['クラブ名']} の処理中にエラーが発生しました: {e}")
     return updated_df
