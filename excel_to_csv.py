@@ -11,7 +11,7 @@ logging.basicConfig(
 
 def excel_to_csv():
     # main.pyと同じフォルダのExcelファイルを探す
-    excel_files = glob.glob('登録制度東京都申請フォーム（案）（回答）.xlsx')
+    excel_files = glob.glob('申請データ.xlsx')
     logging.info(f"探すExcelファイル: {excel_files}")
     if not excel_files:
         logging.error("Excelファイルが見つかりません。")

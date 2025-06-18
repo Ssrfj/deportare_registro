@@ -20,9 +20,9 @@ def merge_and_save_apcption_data():
     df_form = pd.read_csv(input_csv)
 
     # 最新のクラブ名_YYYYMMDD.csvを探す
-    club_files = glob.glob(os.path.join(os.path.dirname(__file__), 'クラブ名_test_*.csv'))
+    club_files = glob.glob(os.path.join(os.path.dirname(__file__), 'クラブ名_*.csv'))
     if not club_files:
-        logging.error("クラブ名_test_YYYYMMDD.csv ファイルが見つかりません。")
+        logging.error("クラブ名_YYYYMMDD.csv ファイルが見つかりません。")
         return
     latest_file = max(club_files, key=os.path.getctime)
     df_old = pd.read_csv(latest_file)
