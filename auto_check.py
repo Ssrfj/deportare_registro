@@ -10,6 +10,7 @@ from check_functions import (
     check_budget_submission, check_business_report_submission, check_financial_statement_submission,
     check_checklist_submission, check_self_explanation_submission
 )
+from get_latest_checklist_file import get_latest_checklist_file
 
 logging.basicConfig(
     level=logging.INFO,
@@ -63,10 +64,11 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
             logging.info(f"クラブ '{club_name}' のフォルダを新規作成しました。")
             continue
         checklist_file_name = f"{club_name}_申請{apried_date_str}_作成{checklist_creation_date_str}.csv"
-        checklist_file_path = os.path.join(club_folder_path, checklist_file_name)
-        if not os.path.exists(checklist_file_path):
+        checklist_file_path = get_latest_checklist_file(club_name, apried_date_str, folder_path)
+        if not checklist_file_path or not os.path.exists(checklist_file_path):
             logging.warning(f"クラブ '{club_name}' のチェックリストファイルが存在しません。スキップします。")
             continue
+
         try:
             checklist_df = pd.read_csv(checklist_file_path)
             logging.debug(f"before: {checklist_df.columns.tolist()}")  # デバッグ用

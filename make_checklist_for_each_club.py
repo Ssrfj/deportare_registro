@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import logging
 from dataframe_utils import clean_column_names
+from utils import get_jst_now
 logging.basicConfig(
     level=logging.INFO,
     encoding='utf-8',
@@ -9,67 +10,49 @@ logging.basicConfig(
 )
 
 def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, checklist_output_folder, timestamp_for_make_checklist):
-    updated_df = checklist_status_df.copy()  # ここで初期化
-    # デバッグ用にapried_club_list_dfとchecklist_status_dfに'申請日時'と'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'のカラムが存在するか確認
-    if '申請日時' not in checklist_status_df.columns:
+    updated_df = checklist_status_df.copy()
+    if '申請日時' not in updated_df.columns:
         logging.error("checklist_status_dfに'申請日時'カラムがありません")
     if '申請日時' not in apried_club_list_df.columns:
         logging.error("apried_club_list_dfに'申請日時'カラムがありません")
     if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in apried_club_list_df.columns:
         logging.error("apried_club_list_dfに'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'カラムがありません")
-    if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in apried_club_list_df.columns:
-        logging.error("apried_club_list_dfに'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'カラムがありません")
 
     for _, row in apried_club_list_df.iterrows():
         try:
-            club_data = {
-                'クラブ名': [row['クラブ名']],
-                '申請日時': [row['申請日時']],
-                '担当者名': [row['申請_申請担当者名']],
-                '役職名': [row['申請_申請担当者役職']],
-                'メールアドレス': [row['申請_メールアドレス']],
-                '電話番号': [row['申請_TEL']],
-                'FAX番号': [row['申請_FAX(任意)']],
-                '申請時間': [row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']],
-                '自動チェック': [''],
-                '自動チェック更新時間': [''],
-                '書類チェック': [''],
-                '書類チェック更新時間': [''],
-                '書類間チェック': [''],
-                '書類間チェック更新時間': [''],
-                '担当者登録基準最終チェック': [''],
-                '担当者登録基準最終チェック更新時間': [''],
-            }
-            club_df_for_make_checklist = pd.DataFrame(club_data)
-            logging.debug(f"before: {club_df_for_make_checklist.columns.tolist()}")
-            club_df_for_make_checklist = clean_column_names(club_df_for_make_checklist)
-            logging.debug(f"after: {club_df_for_make_checklist.columns.tolist()}")
-            logging.info(f"{row['クラブ名']}のclub_dfが作成されました")
+            club_name = str(row['クラブ名']).strip()
+            application_timestamp = str(row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']).strip()
+            output_folder = os.path.join(checklist_output_folder, club_name)
+            os.makedirs(output_folder, exist_ok=True)
+            file_name = f"{club_name}_申請{application_timestamp}_作成{timestamp_for_make_checklist}.csv"
+            file_path = os.path.join(output_folder, file_name)
 
-            if row['クラブ名'] not in checklist_status_df['クラブ名'].values:
-                logging.info('クラブ名がまだ存在しません')
-                new_row = pd.DataFrame([{
-                    'クラブ名': row['クラブ名'],
-                    '申請日時': row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'],
-                    'チェックリスト作成日時': timestamp_for_make_checklist
-                }])
-                checklist_status_df = pd.concat([checklist_status_df, new_row], ignore_index=True)
-                logging.info(f"{row['クラブ名']}の列が追加されました")
-            else:
-                logging.info('クラブ名がすでに存在します')
-
-            logging.debug('checklist_status_dfにある申請日時と申請時間を照合に移行します')
-            # 申請日時の参照を修正
-            club_name = row['クラブ名']
-            application_timestamp = row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', '')
             # クラブ名と申請日時の組み合わせで存在チェック
             mask = (updated_df['クラブ名'] == club_name) & (updated_df['申請日時'] == application_timestamp)
             if not mask.any():
-                # 新規 or 申請日時が異なる場合は必ず作成
-                output_folder = os.path.join(checklist_output_folder, club_name)
-                os.makedirs(output_folder, exist_ok=True)
-                file_name = f"{club_name}_申請{application_timestamp}_作成{timestamp_for_make_checklist}.csv"
-                file_path = os.path.join(output_folder, file_name)
+                club_data = {
+                    'クラブ名': [club_name],
+                    '申請日時': [row['申請日時']],
+                    '担当者名': [row['申請_申請担当者名']],
+                    '役職名': [row['申請_申請担当者役職']],
+                    'メールアドレス': [row['申請_メールアドレス']],
+                    '電話番号': [row['申請_TEL']],
+                    'FAX番号': [row['申請_FAX(任意)']],
+                    '申請時間': [application_timestamp],
+                    '自動チェック': [''],
+                    '自動チェック更新時間': [''],
+                    '書類チェック': [''],
+                    '書類チェック更新時間': [''],
+                    '書類間チェック': [''],
+                    '書類間チェック更新時間': [''],
+                    '担当者登録基準最終チェック': [''],
+                    '担当者登録基準最終チェック更新時間': [''],
+                }
+                logging.info(f"club_data: {club_data}")
+                club_df_for_make_checklist = pd.DataFrame(club_data)
+                logging.info(f"club_df_for_make_checklist:\n{club_df_for_make_checklist}")
+                club_df_for_make_checklist = pd.DataFrame(club_data)
+                club_df_for_make_checklist = clean_column_names(club_df_for_make_checklist)
                 club_df_for_make_checklist.to_csv(file_path, index=False)
                 logging.info(f"{file_path} にチェックリストを保存しました")
                 # DataFrameも更新
@@ -85,8 +68,7 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
                 updated_df.to_csv(checklist_path, index=False)
                 logging.info(f"{club_name}の申請日時が更新されました")
             else:
-                logging.info('申請日時が同じチェックリストを作成済みです')
-                logging.info(checklist_output_folder)
+                logging.info(f"申請日時が同じチェックリストを作成済みです: {file_path}")
         except Exception as e:
             logging.error(f"クラブ {row['クラブ名']} の処理中にエラーが発生しました: {e}")
     return updated_df

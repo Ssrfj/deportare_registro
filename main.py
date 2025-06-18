@@ -9,6 +9,16 @@ from make_checklist_for_each_club import make_checklist_for_each_club
 from make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
 import logging
 
+import chardet
+
+def read_log_with_detected_encoding(filepath):
+    with open(filepath, 'rb') as f:
+        raw = f.read()
+        result = chardet.detect(raw)
+        encoding = result['encoding']
+    with open(filepath, 'r', encoding=encoding) as f:
+        return f.read()
+
 logging.basicConfig(
     level=logging.INFO,
     encoding='utf-8',
@@ -152,14 +162,18 @@ def main():
     # logをtxtファイルに保存
     log_file_path = os.path.join('R7_登録申請処理', 'logs', f'log_{get_jst_now().strftime("%Y%m%d%H%M%S")}.txt')
     os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+
+    # ログファイルを出力する箇所で
     with open(log_file_path, 'w', encoding='utf-8') as log_file:
         for handler in logging.getLogger().handlers:
             if isinstance(handler, logging.FileHandler):
                 log_file.write(f"Log file: {handler.baseFilename}\n")
-                with open(handler.baseFilename, 'r', encoding='utf-8') as f:
-                    log_file.write(f.read())
-    logging.info(f"ログファイルを保存しました: {log_file_path}")
-    print(f"ログファイルを保存しました: {log_file_path}")
+                try:
+                    log_file.write(read_log_with_detected_encoding(handler.baseFilename))
+                except Exception as e:
+                    log_file.write(f"\n[ログ読込エラー: {e}]\n")
+        logging.info(f"ログファイルを保存しました: {log_file_path}")
+        print(f"ログファイルを保存しました: {log_file_path}")
 
 if __name__ == "__main__":
     main()
