@@ -18,7 +18,7 @@ from checklist_generator import (
 from utils import get_jst_now
 from get_latest_checklist_file import get_latest_checklist_file
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     encoding='utf-8',
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
@@ -283,12 +283,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
     
     for idx, row in applied_club_df.iterrows():
         club_name = str(row['クラブ名']).strip()
-        # 申請日時を取得(['申請日時']が存在しない場合はR8年度登録申請_タイムスタンプyyyymmddHHMMSSを流用)
         application_date = str(row['申請日時']).strip() if '申請日時' in row else str(row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', '')).strip()
-        # チェックリスト作成日時を取得
         checklist_creation_date = str(row['チェックリスト作成日時']).strip()
         club_folder = os.path.join(folder_of_checklist_create_status, club_name)
-        # 処理開始のメッセージを表示
         logging.info(f"クラブ名: {club_name} の人間によるチェック状況の確認を開始します")
         if not os.path.exists(club_folder):
             logging.warning(f"クラブ '{club_name}' のフォルダが存在しません。スキップします。")
@@ -298,17 +295,15 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             files_in_club_folder = os.listdir(club_folder)
             logging.debug(f"クラブ '{club_name}' のフォルダ内のファイル: {files_in_club_folder}")
         # クラブごとのチェックリストのファイル名を定義
-        checklist_file_name = f"{club_name}_申請{application_date}_作成{checklist_creation_date}.csv"
-        checklist_file_path = os.path.join(club_folder, checklist_file_name)
-        # チェックリストのファイルが存在しない場合はスキップ
-        if not os.path.exists(checklist_file_path):
+        checklist_file_path = get_latest_checklist_file(club_name, application_date, club_folder)
+        if not checklist_file_path or not os.path.exists(checklist_file_path):
             logging.warning(f"クラブ '{club_name}' のチェックリストファイルが存在しません。スキップします。")
             continue
         try:
             checklist_df = pd.read_csv(checklist_file_path)
-            logging.info(f"チェックリストファイル '{checklist_file_name}' を読み込みました。")
+            logging.info(f"チェックリストファイル '{os.path.basename(checklist_file_path)}' を読み込みました。")
         except Exception as e:
-            logging.error(f"チェックリストファイル '{checklist_file_name}' の読み込み中にエラーが発生しました: {e}")
+            logging.error(f"チェックリストファイル '{os.path.basename(checklist_file_path)}' の読み込み中にエラーが発生しました: {e}")
             continue
         # チェックリストの人間によるチェック状況の確認を実行する必要があるかを確認
         # 申請時間が一致し、かつ人間によるチェック状況の確認更新時間が空でない場合のみスキップ
@@ -694,8 +689,7 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         ] = ', '.join(error_dict.values())
 
         # チェックリストファイルを保存
-        checklist_file_path = os.path.join(club_folder, f'{club_name}_checklist_申請{application_date}.xlsx')
-        checklist_df.to_excel(checklist_file_path, index=False)
+        checklist_df.to_csv(checklist_file_path, index=False, encoding='utf-8-sig')
         logging.info(f"クラブ '{club_name}' の申請日時'{application_date}'のチェックリストを更新しました。")
     checklist_status_path = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
     checklist_status_df.to_csv(checklist_status_path, index=False)

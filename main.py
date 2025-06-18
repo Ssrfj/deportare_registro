@@ -20,7 +20,7 @@ def read_log_with_detected_encoding(filepath):
         return f.read()
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     encoding='utf-8',
     format="%(asctime)s [%(levelname)s] %(message)s"
 )

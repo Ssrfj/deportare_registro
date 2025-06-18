@@ -13,7 +13,7 @@ from check_functions import (
 from get_latest_checklist_file import get_latest_checklist_file
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     encoding='utf-8',
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
@@ -67,6 +67,10 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
         each_folder_path = os.path.join(folder_path, club_name)
         checklist_file_path = get_latest_checklist_file(club_name, apried_date_str, each_folder_path)
         if not checklist_file_path or not os.path.exists(checklist_file_path):
+            # デバッグ用にeach_folder_pathにあるファイルをリストアップ
+            logging.debug(f"each_folder_path: {each_folder_path}")
+            logging.debug(f"each_folder_pathにあるファイル: {os.listdir(each_folder_path)}")
+            # チェックリストファイルが存在しない場合の処理
             logging.warning(f"クラブ '{club_name}' のチェックリストファイルが存在しません。スキップします。")
             continue
 
@@ -144,6 +148,12 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
             logging.error(f"チェックリストファイル '{checklist_file_path}' の書き込み中にエラーが発生しました: {e}")
         logging.info(f"クラブ名: {club_name} の自動チェックが完了しました\n")
     logging.info("全てのクラブの自動チェックが完了しました。")
+
+    # checklist_status_df を保存
+    folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')
+    file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
+    checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
+    logging.info('クラブごとのチェックリスト作成状況.csvを自動チェック後に保存しました。')
 
 if __name__ == "__main__":
     folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')

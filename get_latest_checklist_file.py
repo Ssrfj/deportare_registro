@@ -1,10 +1,19 @@
 import glob
 import os
+import logging
 
-def get_latest_checklist_file(club_name, application_timestamp, checklist_output_folder):
-    folder = os.path.join(checklist_output_folder, club_name)
-    pattern = f"{club_name}_申請{application_timestamp}_作成*.csv"
-    files = glob.glob(os.path.join(folder, pattern))
+logging.basicConfig(
+    level=logging.DEBUG,
+    encoding='utf-8',
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
+def get_latest_checklist_file(club_name, applied_date, checklist_output_folder):
+    pattern = f"{club_name}_申請{applied_date}_作成*.csv"
+    search_path = os.path.join(checklist_output_folder, pattern)
+    logging.debug(f"glob search_path: {search_path}")
+    files = glob.glob(search_path)
+    logging.debug(f"glob found files: {files}")
     if not files:
         return None
     files.sort(reverse=True)
