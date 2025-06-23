@@ -90,7 +90,7 @@ def main():
                 logging.debug(f"checklist_status_df columns after clean: {checklist_status_df.columns.tolist()}")
                 logging.info('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
             else:
-                checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'])
+                checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
                 checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
                 logging.info('クラブごとのチェックリスト作成状況.csvが作成されました')
         except Exception as e:
@@ -144,6 +144,7 @@ def main():
             logging.info(f"make_checklist_for_each_club後のeach_club_checklist_status_df: {each_club_checklist_status_df}")
             logging.info('各クラブの自動チェックを実行します...')
             each_club_checklist_status_df = perform_automatic_checks(each_club_checklist_status_df, apried_club_list_df)
+            each_club_checklist_status_df.to_csv(file_of_checklist_create_status, index=False, encoding='utf-8-sig')
             logging.info('全てのクラブの自動チェックが完了しました。')
             logging.info('処理が終了しました')
 

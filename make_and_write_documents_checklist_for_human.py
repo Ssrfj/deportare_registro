@@ -48,16 +48,16 @@ def make_documents_checklist_for_human(applied_club_df, checklist_status_df):
         checklist_status_df (pd.DataFrame): チェックリスト作成状況
     """
     if checklist_status_df is None:
-        checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'])
+        checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
     try:
         logging.info("人間が確認する用のチェックリストを作成しています...")
         # --- ここから元の処理 ---
         folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
         for index, row in applied_club_df.iterrows():
             club_name = str(row['クラブ名']).strip()
-            apried_date_str = str(row.get('申請日時', row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', ''))).strip()
-            if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in checklist_status_df.columns:
-                checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = ''
+            apried_date_str = str(row.get('申請日時')).strip()
+            if '申請日時' not in checklist_status_df.columns:
+                checklist_status_df['申請日時'] = ''
             match = checklist_status_df[
                 (checklist_status_df['クラブ名'] == club_name) &
                 (checklist_status_df['申請日時'] == apried_date_str)
@@ -265,8 +265,8 @@ def make_documents_checklist_for_human(applied_club_df, checklist_status_df):
         return checklist_status_df
     except Exception as e:
         logging.error(f"make_documents_checklist_for_humanでエラー: {e}", exc_info=True)
-        # 空のDataFrameを返すことで後続のAttributeErrorを防ぐ
-        return pd.DataFrame()
+        # 必要なカラムを持つ空DataFrameを返す
+        return pd.DataFrame(columns=['クラブ名', '申請日時', 'チェックリスト作成日時'])
 
 def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_of_checklist_create_status):
     """
@@ -277,13 +277,13 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         applied_club_df (pd.DataFrame): 申請済みクラブの一覧
         folder_of_checklist_create_status (str): 保存先フォルダパス
     """
-
-    # チェックリスト作成状況ファイルのパス
-    # checklist_status_path = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
+    if checklist_status_df is None or checklist_status_df.empty:
+        logging.error("checklist_status_dfが空です。人間によるチェック状況の更新をスキップします。")
+        return checklist_status_df
     
     for idx, row in applied_club_df.iterrows():
         club_name = str(row['クラブ名']).strip()
-        application_date = str(row['申請日時']).strip() if '申請日時' in row else str(row.get('R8年度登録申請_タイムスタンプyyyymmddHHMMSS', '')).strip()
+        application_date = str(row['申請日時']).strip()
         checklist_creation_date = str(row['チェックリスト作成日時']).strip()
         club_folder = os.path.join(folder_of_checklist_create_status, club_name)
         logging.info(f"クラブ名: {club_name} の人間によるチェック状況の確認を開始します")
@@ -685,6 +685,16 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         ] = pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
         checklist_df.loc[
             (checklist_df['クラブ名'] == club_name) & (checklist_df['申請時間'] == application_date),
+            '人間によるチェック状況'
+        ] = ', '.join(error_dict.values())
+
+        # ★ checklist_status_dfも同様に更新
+        checklist_status_df.loc[
+            (checklist_status_df['クラブ名'] == club_name) & (checklist_status_df['申請日時'] == application_date),
+            '書類チェック更新時間'
+        ] = pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
+        checklist_status_df.loc[
+            (checklist_status_df['クラブ名'] == club_name) & (checklist_status_df['申請日時'] == application_date),
             '人間によるチェック状況'
         ] = ', '.join(error_dict.values())
 

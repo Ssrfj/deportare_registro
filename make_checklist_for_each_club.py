@@ -10,11 +10,11 @@ logging.basicConfig(
 )
 import glob
 
-def add_row_if_not_exists(csv_path, club_name, application_datetime, checklist_created_datetime, r8_timestamp=None):
+def add_row_if_not_exists(csv_path, club_name, application_datetime, checklist_created_datetime, ):
     if os.path.exists(csv_path):
         df = pd.read_csv(csv_path)
     else:
-        df = pd.DataFrame(columns=['クラブ名','申請日時','チェックリスト作成日時','R8年度登録申請_タイムスタンプyyyymmddHHMMSS'])
+        df = pd.DataFrame(columns=['クラブ名','申請日時','チェックリスト作成日時'])
     # ここで型を揃えて比較
     exists = ((df['クラブ名'].astype(str) == str(club_name)) & (df['申請日時'].astype(str) == str(application_datetime))).any()
     if not exists:
@@ -22,12 +22,11 @@ def add_row_if_not_exists(csv_path, club_name, application_datetime, checklist_c
             'クラブ名': club_name,
             '申請日時': application_datetime,
             'チェックリスト作成日時': checklist_created_datetime,
-            'R8年度登録申請_タイムスタンプyyyymmddHHMMSS': r8_timestamp if r8_timestamp else application_datetime
         }
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+        logging.info(f"DEBUG: 新規行追加: {club_name}, {application_datetime}, {checklist_created_datetime}")
         df.to_csv(csv_path, index=False)
         logging.info(f"状況CSVに新規行を追加: {club_name}, {application_datetime}")
-        return df
     else:
         logging.info(f"DEBUG: 既存行あり: {club_name}, {application_datetime}")
 
@@ -36,8 +35,6 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
         logging.error("checklist_status_dfに'申請日時'カラムがありません")
     if '申請日時' not in apried_club_list_df.columns:
         logging.error("apried_club_list_dfに'申請日時'カラムがありません")
-    if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in apried_club_list_df.columns:
-        logging.error("apried_club_list_dfに'R8年度登録申請_タイムスタンプyyyymmddHHMMSS'カラムがありません")
 
     checklist_folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
     checklist_file_name = 'クラブごとのチェックリスト作成状況.csv'
@@ -46,12 +43,11 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
     for _, row in apried_club_list_df.iterrows():
         try:
             club_name = str(row['クラブ名']).strip()
-            application_timestamp = str(row['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']).strip()
             application_datetime = str(row['申請日時']).strip()
-            logging.info(f"DEBUG: club_name={club_name}, application_datetime={application_datetime}, application_timestamp={application_timestamp}")
+            logging.info(f"DEBUG: club_name={club_name}, application_datetime={application_datetime}, application_timestamp={application_datetime}")
             output_folder = os.path.join(checklist_output_folder, club_name)
             os.makedirs(output_folder, exist_ok=True)
-            file_name = f"{club_name}_申請{application_timestamp}_作成{timestamp_for_make_checklist}.csv"
+            file_name = f"{club_name}_申請{application_datetime}.csv"
             file_path = os.path.join(output_folder, file_name)
 
             # 既存ファイルがあっても必ずCSVに追加
@@ -59,8 +55,7 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
                 checklist_path,
                 club_name,
                 application_datetime,
-                timestamp_for_make_checklist,
-                application_timestamp
+                timestamp_for_make_checklist
             )
             logging.info(f"状況CSVに行を追加またはスキップ: {club_name}, {application_datetime}")
 
@@ -73,7 +68,7 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
                 'メールアドレス': [row['申請_メールアドレス']],
                 '電話番号': [row['申請_TEL']],
                 'FAX番号': [row['申請_FAX(任意)']],
-                '申請時間': [application_timestamp],
+                '申請時間': [application_datetime],
                 '自動チェック': [''],
                 '自動チェック更新時間': [''],
                 '書類チェック': [''],

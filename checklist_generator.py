@@ -265,7 +265,7 @@ def make_document2_2_checklist_for_human(applied_club_df, checklist_status_df):
         # 競技種目数の取得  
         # 種目のカラムを修正（'申請_種目_'を付記）
         disciplines_columns = [f'申請_種目_{discipline}' for discipline in discipline]
-        extra_disciplines_column = row['申請_種目_その他_数(選択時必須)']
+        extra_disciplines_column = row.get('申請_種目_その他_数(選択時必須)', 0)
         count_of_disciplines = 0
         # 各種目カラムをループし、「定期的に行っている」が選択されているかを確認
         for col in disciplines_columns:
@@ -293,7 +293,7 @@ def make_document2_2_checklist_for_human(applied_club_df, checklist_status_df):
             count_of_coaches = str(count_of_coaches)
         
         # クラブマネジャーの配置状況を取得
-        club_manager_columns = row['申請_マネジャー_配置状況']
+        club_manager_columns = row.get('申請_マネジャー_配置状況', '')
         club_manager_status = club_manager_columns
 
         # マネジメント指導者資格の数
