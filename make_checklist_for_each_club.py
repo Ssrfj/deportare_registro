@@ -10,9 +10,9 @@ logging.basicConfig(
 )
 import glob
 
-def add_row_if_not_exists(csv_path, club_name, application_datetime, checklist_created_datetime, ):
-    if os.path.exists(csv_path):
-        df = pd.read_csv(csv_path)
+def add_row_if_not_exists(xlsx_path, club_name, application_datetime, checklist_created_datetime, ):
+    if os.path.exists(xlsx_path):
+        df = pd.read_excel(xlsx_path)
     else:
         df = pd.DataFrame(columns=['クラブ名','申請日時','チェックリスト作成日時'])
     # ここで型を揃えて比較
@@ -25,8 +25,8 @@ def add_row_if_not_exists(csv_path, club_name, application_datetime, checklist_c
         }
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
         logging.info(f"DEBUG: 新規行追加: {club_name}, {application_datetime}, {checklist_created_datetime}")
-        df.to_csv(csv_path, index=False)
-        logging.info(f"状況CSVに新規行を追加: {club_name}, {application_datetime}")
+        df.to_excel(xlsx_path, index=False)
+        logging.info(f"状況Excelに新規行を追加: {club_name}, {application_datetime}")
     else:
         logging.info(f"DEBUG: 既存行あり: {club_name}, {application_datetime}")
 
@@ -37,7 +37,7 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
         logging.error("apried_club_list_dfに'申請日時'カラムがありません")
 
     checklist_folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
-    checklist_file_name = 'クラブごとのチェックリスト作成状況.csv'
+    checklist_file_name = 'クラブごとのチェックリスト作成状況.xlsx'
     checklist_path = os.path.join(checklist_folder_path, checklist_file_name)
 
     for _, row in apried_club_list_df.iterrows():
@@ -47,17 +47,17 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
             logging.info(f"DEBUG: club_name={club_name}, application_datetime={application_datetime}, application_timestamp={application_datetime}")
             output_folder = os.path.join(checklist_output_folder, club_name)
             os.makedirs(output_folder, exist_ok=True)
-            file_name = f"{club_name}_申請{application_datetime}.csv"
+            file_name = f"{club_name}_申請{application_datetime}.xlsx"
             file_path = os.path.join(output_folder, file_name)
 
-            # 既存ファイルがあっても必ずCSVに追加
+            # 既存ファイルがあっても必ずExcelに追加
             each_club_checklist_status_df = add_row_if_not_exists(
                 checklist_path,
                 club_name,
                 application_datetime,
                 timestamp_for_make_checklist
             )
-            logging.info(f"状況CSVに行を追加またはスキップ: {club_name}, {application_datetime}")
+            logging.info(f"状況Excelに行を追加またはスキップ: {club_name}, {application_datetime}")
 
             # ...以下は新規作成処理...
             club_data = {
@@ -80,12 +80,12 @@ def make_checklist_for_each_club(apried_club_list_df, checklist_status_df, check
             }
             club_df_for_make_checklist = pd.DataFrame(club_data)
             club_df_for_make_checklist = clean_column_names(club_df_for_make_checklist)
-            club_df_for_make_checklist.to_csv(file_path, index=False)
+            club_df_for_make_checklist.to_excel(file_path, index=False)
             logging.info(f"{file_path} にチェックリストを保存しました")
         except Exception as e:
             logging.error(f"クラブ {row['クラブ名']} の処理中にエラーが発生しました: {e}")
-    # 最後に最新の状況CSVを読み込んで返す
+    # 最後に最新の状況Excelを読み込んで返す
     if os.path.exists(checklist_path):
-        return pd.read_csv(checklist_path)
+        return pd.read_excel(checklist_path)
     else:
         return each_club_checklist_status_df

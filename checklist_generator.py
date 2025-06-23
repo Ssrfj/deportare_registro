@@ -297,10 +297,10 @@ def make_document2_2_checklist_for_human(applied_club_df, checklist_status_df):
         club_manager_status = club_manager_columns
 
         # マネジメント指導者資格の数
-        num_of_club_managers_as_manager = row['申請_マネジャー_マネ資格_数']
-        num_of_assistant_managers_as_manager = row['申請_マネジャー_アシマネ資格_数']
-        num_of_club_managers_as_staff = row['申請_事務局_マネ資格_数']
-        num_of_assistant_managers_as_staff = row['申請_事務局_アシマネ資格_数']
+        num_of_club_managers_as_manager = row.get('申請_マネジャー_マネ資格_数', 0)
+        num_of_assistant_managers_as_manager = row.get('申請_マネジャー_アシマネ資格_数', 0)
+        num_of_club_managers_as_staff = row.get('申請_事務局_マネ資格_数', 0)
+        num_of_assistant_managers_as_staff = row.get('申請_事務局_アシマネ資格_数', 0)
 
         checklist_row = {
             'クラブ名': club_name,

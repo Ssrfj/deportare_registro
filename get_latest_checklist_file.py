@@ -9,7 +9,7 @@ logging.basicConfig(
 )
 
 def get_latest_checklist_file(club_name, applied_date, checklist_output_folder):
-    pattern = f"{club_name}_申請{applied_date}.csv"
+    pattern = f"{club_name}_申請{applied_date}.xlsx"
     search_path = os.path.join(checklist_output_folder, pattern)
     logging.debug(f"glob search_path: {search_path}")
     files = glob.glob(search_path)

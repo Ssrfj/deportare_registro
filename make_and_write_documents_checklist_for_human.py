@@ -300,7 +300,7 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
             logging.warning(f"クラブ '{club_name}' のチェックリストファイルが存在しません。スキップします。")
             continue
         try:
-            checklist_df = pd.read_csv(checklist_file_path)
+            checklist_df = pd.read_excel(checklist_file_path)
             logging.info(f"チェックリストファイル '{os.path.basename(checklist_file_path)}' を読み込みました。")
         except Exception as e:
             logging.error(f"チェックリストファイル '{os.path.basename(checklist_file_path)}' の読み込み中にエラーが発生しました: {e}")
@@ -699,9 +699,9 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         ] = ', '.join(error_dict.values())
 
         # チェックリストファイルを保存
-        checklist_df.to_csv(checklist_file_path, index=False, encoding='utf-8-sig')
+        checklist_df.to_excel(checklist_file_path, index=False)
         logging.info(f"クラブ '{club_name}' の申請日時'{application_date}'のチェックリストを更新しました。")
-    checklist_status_path = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
-    checklist_status_df.to_csv(checklist_status_path, index=False)
+    checklist_status_path = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.xlsx')
+    checklist_status_df.to_excel(checklist_status_path, index=False)
     logging.info('チェックリスト作成状況を更新しました。')
     return checklist_status_df
