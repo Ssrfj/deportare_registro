@@ -58,7 +58,7 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
             os.makedirs(club_folder_path, exist_ok=True)
             logging.info(f"クラブ '{club_name}' のフォルダを新規作成しました。")
             continue
-        checklist_file_name = f"{club_name}_申請{apried_date_str}.csv"
+        checklist_file_name = f"{club_name}_申請{apried_date_str}.xlsx"
         each_folder_path = os.path.join(folder_path, club_name)
         checklist_file_path = get_latest_checklist_file(club_name, apried_date_str, each_folder_path)
         if not checklist_file_path or not os.path.exists(checklist_file_path):
@@ -70,7 +70,7 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
             continue
 
         try:
-            checklist_df = pd.read_csv(checklist_file_path)
+            checklist_df = pd.read_excel(checklist_file_path)
             # チェックリストのカラム名を確認
             logging.info(f"チェックリストファイル '{checklist_file_name}' を読み込みました。")
         except Exception as e:
@@ -137,7 +137,7 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
         logging.debug(checklist_df[['自動チェック','自動チェック更新時間']].iloc[0])
 
         try:
-            checklist_df.to_csv(checklist_file_path, index=False)
+            checklist_df.to_excel(checklist_file_path, index=False)
             logging.info(f"チェックリストファイル '{checklist_file_path}' を更新しました。")
         except Exception as e:
             logging.error(f"チェックリストファイル '{checklist_file_path}' の書き込み中にエラーが発生しました: {e}")
@@ -146,25 +146,25 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
 
     # checklist_status_df を保存
     folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')
-    file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
-    checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
-    logging.info('クラブごとのチェックリスト作成状況.csvを自動チェック後に保存しました。')
+    file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.xlsx')
+    checklist_status_df.to_excel(file_of_checklist_create_status, index=False)
+    logging.info('クラブごとのチェックリスト作成状況.xlsxを自動チェック後に保存しました。')
     return checklist_status_df
 
 if __name__ == "__main__":
     folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')
-    file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
+    file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.xlsx')
     if os.path.exists(file_of_checklist_create_status):
-        checklist_create_df = pd.read_csv(file_of_checklist_create_status)
-        logging.info('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
+        checklist_create_df = pd.read_excel(file_of_checklist_create_status)
+        logging.info('クラブごとのチェックリスト作成状況.xlsxはすでに存在しています')
         logging.debug(f"before: {checklist_create_df.columns.tolist()}")
         logging.debug(f"after: {checklist_create_df.columns.tolist()}")
     else:
         checklist_create_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
         logging.debug(f"before: {checklist_create_df.columns.tolist()}")
         logging.debug(f"after: {checklist_create_df.columns.tolist()}")
-        checklist_create_df.to_csv(file_of_checklist_create_status, index=False)
-        logging.info('クラブごとのチェックリスト作成状況.csvが作成されました')
+        checklist_create_df.to_excel(file_of_checklist_create_status, index=False)
+        logging.info('クラブごとのチェックリスト作成状況.xlsxが作成されました')
     for idx, row in checklist_create_df.iterrows():
         checklist_creation_date_str = row['チェックリスト作成日時']
 

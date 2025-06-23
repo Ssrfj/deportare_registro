@@ -10,7 +10,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-def excel_to_csv():
+def column_name_change():
     # main.pyと同じフォルダのExcelファイルを探す
     excel_files = glob.glob('申請データ.xlsx')
     logging.info(f"探すExcelファイル: {excel_files}")
@@ -44,11 +44,10 @@ def excel_to_csv():
     
     # 保存先フォルダ
     save_folder = os.path.join('R7_登録申請処理', '申請内容')
-    save_file_name = f"申請内容_{get_jst_now().strftime('%Y%m%d%H%M%S')}.csv"
+    save_file_name = f"申請データ_カラム処理済み_{get_jst_now().strftime('%Y%m%d%H%M%S')}.xlsx"
+    logging.info(f"保存先フォルダ: {save_folder}, 保存ファイル名: {save_file_name}")
     os.makedirs(save_folder, exist_ok=True)
     save_path = os.path.join(save_folder, save_file_name)
-    df.to_csv(save_path, index=False)
+    df.to_excel(save_path, index=False)
     logging.info(f"{excel_path} を {save_path} に保存しました。")
-
-if __name__ == "__main__":
-    excel_to_csv()
+    logging.info("Excelファイルのカラム名変換が完了しました。")

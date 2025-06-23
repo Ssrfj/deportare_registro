@@ -11,22 +11,22 @@ logging.basicConfig(
 )
 
 def merge_and_save_apcption_data():
-    # 申請内容の最新CSVを探す
+    # 申請内容の最新excelを探す
     input_folder = os.path.join(os.path.dirname(__file__), 'R7_登録申請処理', '申請内容')
-    csv_files = glob.glob(os.path.join(input_folder, '申請内容_*.csv'))
-    if not csv_files:
-        logging.error(f"{input_folder} に申請内容_*.csv が見つかりません。")
+    excel_files = glob.glob(os.path.join(input_folder, '申請データ_カラム処理済み_*.xlsx'))
+    if not excel_files:
+        logging.error(f"{input_folder} に申請データ_カラム処理済み_*.xlsx が見つかりません。")
         return
-    input_csv = max(csv_files, key=os.path.getctime)
-    df_form = pd.read_csv(input_csv)
+    input_excel = max(excel_files, key=os.path.getctime)
+    df_form = pd.read_excel(input_excel)
 
-    # 最新のクラブ名_YYYYMMDD.csvを探す
-    club_files = glob.glob(os.path.join(os.path.dirname(__file__), 'クラブ名_*.csv'))
+    # 最新のクラブ名_YYYYMMDD.xlsxを探す
+    club_files = glob.glob(os.path.join(os.path.dirname(__file__), 'クラブ名_*.xlsx'))
     if not club_files:
-        logging.error("クラブ名_YYYYMMDD.csv ファイルが見つかりません。")
+        logging.error("クラブ名_YYYYMMDD.xlsx ファイルが見つかりません。")
         return
     latest_file = max(club_files, key=os.path.getctime)
-    df_old = pd.read_csv(latest_file)
+    df_old = pd.read_excel(latest_file)
 
     # カラム名の前後の空白を除去
     df_form.columns = df_form.columns.str.strip()
@@ -62,8 +62,8 @@ def merge_and_save_apcption_data():
     # 保存先
     save_folder = os.path.join(os.path.dirname(__file__), 'R7_登録申請処理', '申請受付リスト')
     os.makedirs(save_folder, exist_ok=True)
-    save_path = os.path.join(save_folder, f'申請受付リスト_{get_jst_now().strftime("%Y%m%d%H%M%S")}.csv')
-    df_merged.to_csv(save_path, index=False)
+    save_path = os.path.join(save_folder, f'申請受付リスト_{get_jst_now().strftime("%Y%m%d%H%M%S")}.xlsx')
+    df_merged.to_excel(save_path, index=False)
     logging.debug(f"df_merged columns: {df_merged.columns.tolist()}")
     logging.info(f"結合データを {save_path} に保存しました。")
 

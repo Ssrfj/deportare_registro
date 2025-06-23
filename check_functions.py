@@ -310,18 +310,18 @@ def check_number_of_disciplines(application_row):
     """
     error_dict = {}
 
-    # 種目リストのcsvファイルを読み込み
+    # 種目リストのxlsxファイルを読み込み
     try:
-        disciplines_df = pd.read_csv('list_of_disciplines.csv')
+        disciplines_df = pd.read_excel('list_of_disciplines.xlsx')
     except FileNotFoundError:
-        print("list_of_disciplines.csv が見つかりません。")
+        print("list_of_disciplines.xlsx が見つかりません。")
         return error_dict
 
     # disciplines_dfの['disciplines']から種目のカラムを取得
     if 'disciplines' in disciplines_df.columns:
         disciplines_columns_for_disciplines = disciplines_df['disciplines'].tolist()
     else:
-        print("list_of_disciplines.csv に 'disciplines' カラムが見つかりません。")
+        print("list_of_disciplines.xlsx に 'disciplines' カラムが見つかりません。")
         return error_dict
 
     # 種目のカラムを修正（'申請_種目_'を付記）

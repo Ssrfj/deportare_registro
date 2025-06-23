@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from auto_check import perform_automatic_checks
 from utils import get_jst_now
-from excel_to_csv import excel_to_csv
+from column_name_change import column_name_change
 from load_latest_club_data import load_latest_club_data
 from merge_and_save_apcption_data import merge_and_save_apcption_data
 from make_checklist_for_each_club import make_checklist_for_each_club
@@ -35,11 +35,11 @@ logging.getLogger().addHandler(file_handler)
 
 def main():
     try:
-        # 1. Excel→CSV化
+        # 1. Excelのカラム名修正
         try:
-            excel_to_csv()
+            column_name_change()
         except Exception as e:
-            logging.error(f"Excel→CSV化処理でエラー: {e}", exc_info=True)
+            logging.error(f"Excelのカラム名修正でエラー: {e}", exc_info=True)
             return
 
         # 2. 最新クラブデータの読み込み
@@ -59,12 +59,13 @@ def main():
         # 4. 申請受付リストの最新ファイルを取得
         folder_path = os.path.join('R7_登録申請処理','申請受付リスト')
         try:
-            files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.csv')]
+            os.makedirs(folder_path, exist_ok=True)
+            files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.xlsx')]
             if not files:
-                logging.error(f"{folder_path} にCSVファイルが存在しません。")
+                logging.error(f"{folder_path} にExcelファイルが存在しません。")
                 return
             latest_file = max(files, key=os.path.getctime)
-            club_list_df = pd.read_csv(latest_file)
+            club_list_df = pd.read_excel(latest_file)
             club_list_df['R8年度登録申請_タイムスタンプ'] = pd.to_datetime(club_list_df['R8年度登録申請_タイムスタンプ'], errors='coerce')
             club_list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = club_list_df['R8年度登録申請_タイムスタンプ'].dt.strftime('%Y%m%d%H%M%S')
             logging.info("申請内容の読み込みが完了しました")
@@ -74,13 +75,13 @@ def main():
 
         # 5. チェックリスト作成状況ファイルの読み込みまたは新規作成
         folder_of_checklist = os.path.join('R7_登録申請処理', '申請入力内容')
-        file_of_checklist_create_status = os.path.join(folder_of_checklist, 'クラブごとのチェックリスト作成状況.csv')
+        file_of_checklist_create_status = os.path.join(folder_of_checklist, 'クラブごとのチェックリスト作成状況.xlsx')
         logging.info(f"チェックリスト作成状況ファイル: {file_of_checklist_create_status}")
         try:
             os.makedirs(folder_of_checklist, exist_ok=True)
             logging.info(f"チェックリスト作成状況フォルダ: {folder_of_checklist} を作成しました")
             if os.path.exists(file_of_checklist_create_status):
-                checklist_status_df = pd.read_csv(file_of_checklist_create_status)
+                checklist_status_df = pd.read_excel(file_of_checklist_create_status)
                 for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
                     if col not in checklist_status_df.columns:
                         checklist_status_df[col] = ''
@@ -88,11 +89,11 @@ def main():
                 if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in checklist_status_df.columns:
                     checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = ''
                 logging.debug(f"checklist_status_df columns after clean: {checklist_status_df.columns.tolist()}")
-                logging.info('クラブごとのチェックリスト作成状況.csvはすでに存在しています')
+                logging.info('クラブごとのチェックリスト作成状況.xlsxはすでに存在しています')
             else:
                 checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
-                checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
-                logging.info('クラブごとのチェックリスト作成状況.csvが作成されました')
+                checklist_status_df.to_excel(file_of_checklist_create_status, index=False)
+                logging.info('クラブごとのチェックリスト作成状況.xlsxが作成されました')
         except Exception as e:
             logging.error(f"チェックリスト作成状況ファイルの処理でエラー: {e}", exc_info=True)
             return
@@ -135,16 +136,16 @@ def main():
                 checklist_output_folder,
                 timestamp_for_make_checklist
             )
-            # クラブごとのチェックリスト作成状況.csvを更新
+            # クラブごとのチェックリスト作成状況.xlsxを更新
             if each_club_checklist_status_df is None:
                 logging.error("make_checklist_for_each_clubの戻り値がNoneです")
                 return
-            each_club_checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
-            logging.info(f"クラブごとのチェックリスト作成状況.csvを更新しました: {file_of_checklist_create_status}")
+            each_club_checklist_status_df.to_excel(file_of_checklist_create_status, index=False)
+            logging.info(f"クラブごとのチェックリスト作成状況.xlsxを更新しました: {file_of_checklist_create_status}")
             logging.info(f"make_checklist_for_each_club後のeach_club_checklist_status_df: {each_club_checklist_status_df}")
             logging.info('各クラブの自動チェックを実行します...')
             each_club_checklist_status_df = perform_automatic_checks(each_club_checklist_status_df, apried_club_list_df)
-            each_club_checklist_status_df.to_csv(file_of_checklist_create_status, index=False, encoding='utf-8-sig')
+            each_club_checklist_status_df.to_excel(file_of_checklist_create_status, index=False, encoding='utf-8-sig')
             logging.info('全てのクラブの自動チェックが完了しました。')
             logging.info('処理が終了しました')
 

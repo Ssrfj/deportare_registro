@@ -253,7 +253,7 @@ def make_document2_2_checklist_for_human(applied_club_df, checklist_status_df):
 
     for index, row in applied_club_df.iterrows():
         club_name = row['クラブ名']
-        discipline_df = pd.read_csv('list_of_disciplines.csv')  # 競技種目のリストを読み込む
+        discipline_df = pd.read_excel('list_of_disciplines.xlsx')  # 競技種目のリストを読み込む
         discipline = discipline_df['disciplines']
         # 申請日時はapplied_club_dfにもあるが、checklist_status_df優先で取得
         if club_name in checklist_status_df['クラブ名'].values:
@@ -326,7 +326,7 @@ def make_document2_2_checklist_for_human(applied_club_df, checklist_status_df):
 
         # 書類2_2の競技種目と指導者のリストを作成
         # discipline_dfの読み込み
-        discipline_df = pd.read_csv('list_of_disciplines.csv')
+        discipline_df = pd.read_excel('list_of_disciplines.xlsx')
         disciplines = discipline_df['disciplines'].tolist()
 
         # 種目ごとの実施有無・指導者有無の表を作成
@@ -479,7 +479,7 @@ def make_document4_checklist_for_human(applied_club_df, checklist_status_df):
     document4_lists_checklist = []
 
     # 隣接自治体リストの読み込み
-    municipalities_df = pd.read_csv('municipality_test_tokyo.csv')
+    municipalities_df = pd.read_excel('municipality_test_tokyo.xlsx')
 
     for index, row in applied_club_df.iterrows():
         club_name = row['クラブ名']
@@ -533,7 +533,7 @@ def make_document5_plan_checklist_for_human(applied_club_df, checklist_status_df
         document5_plan_checklist.append(checklist_row)
 
         # discipline_dfの読み込み
-        discipline_df = pd.read_csv('list_of_disciplines.csv')
+        discipline_df = pd.read_excel('list_of_disciplines.xlsx')
         disciplines = discipline_df['disciplines'].tolist()
 
         # 実施種目ごとのリスト（実施しているもののみ）
@@ -616,7 +616,7 @@ def make_document6_report_checklist_for_human(applied_club_df, checklist_status_
         }
         document6_report_checklist.append(checklist_row)
         # discipline_dfの読み込み
-        discipline_df = pd.read_csv('list_of_disciplines.csv')
+        discipline_df = pd.read_excel('list_of_disciplines.xlsx')
         disciplines = discipline_df['disciplines'].tolist()
         # 実施種目ごとのリスト（実施しているもののみ）
         # 実施種目ごとのリスト（実施しているもののみ）
