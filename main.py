@@ -73,11 +73,12 @@ def main():
             return
 
         # 5. チェックリスト作成状況ファイルの読み込みまたは新規作成
-        folder_of_checklist_create_status = os.path.join('R7_登録申請処理', '申請入力内容')
-        file_of_checklist_create_status = os.path.join(folder_of_checklist_create_status, 'クラブごとのチェックリスト作成状況.csv')
+        folder_of_checklist = os.path.join('R7_登録申請処理', '申請入力内容')
+        file_of_checklist_create_status = os.path.join(folder_of_checklist, 'クラブごとのチェックリスト作成状況.csv')
+        logging.info(f"チェックリスト作成状況ファイル: {file_of_checklist_create_status}")
         try:
-            os.makedirs(folder_of_checklist_create_status, exist_ok=True)
-            logging.info(f"チェックリスト作成状況フォルダ: {folder_of_checklist_create_status} を作成しました")
+            os.makedirs(folder_of_checklist, exist_ok=True)
+            logging.info(f"チェックリスト作成状況フォルダ: {folder_of_checklist} を作成しました")
             if os.path.exists(file_of_checklist_create_status):
                 checklist_status_df = pd.read_csv(file_of_checklist_create_status)
                 for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
@@ -101,8 +102,8 @@ def main():
             club_list_df.columns = club_list_df.columns.str.strip()
             logging.debug(f"club_list_df columns: {club_list_df.columns.tolist()}")
             apried_club_list_df = club_list_df[club_list_df['R8年度登録申請状況'] == 1]
-            logging.debug(f"apried_club_list_df columns: {apried_club_list_df.columns.tolist()}")
-            logging.debug(f"apried_club_list_df: {apried_club_list_df}")
+            logging.info(f"apried_club_list_df columns: {apried_club_list_df.columns.tolist()}")
+            logging.info(f"apried_club_list_df: {apried_club_list_df}")
             if 'R7年度登録クラブ' not in apried_club_list_df.columns:
                 logging.error("apried_club_list_dfに'R7年度登録クラブ'カラムがありません")
             else:
@@ -126,28 +127,35 @@ def main():
                     apried_club_list_df[col] = ''
                 if col not in checklist_status_df.columns:
                     checklist_status_df[col] = ''
-            checklist_output_folder = folder_of_checklist_create_status
+            checklist_output_folder = folder_of_checklist
             timestamp_for_make_checklist = get_jst_now().strftime('%Y%m%d%H%M%S')
-            checklist_status_df = make_checklist_for_each_club(
+            each_club_checklist_status_df = make_checklist_for_each_club(
                 apried_club_list_df,
                 checklist_status_df,
                 checklist_output_folder,
                 timestamp_for_make_checklist
             )
+            # クラブごとのチェックリスト作成状況.csvを更新
+            if each_club_checklist_status_df is None:
+                logging.error("make_checklist_for_each_clubの戻り値がNoneです")
+                return
+            each_club_checklist_status_df.to_csv(file_of_checklist_create_status, index=False)
+            logging.info(f"クラブごとのチェックリスト作成状況.csvを更新しました: {file_of_checklist_create_status}")
+            logging.info(f"make_checklist_for_each_club後のeach_club_checklist_status_df: {each_club_checklist_status_df}")
             logging.info('各クラブの自動チェックを実行します...')
-            checklist_status_df = perform_automatic_checks(checklist_status_df, apried_club_list_df)
+            each_club_checklist_status_df = perform_automatic_checks(each_club_checklist_status_df, apried_club_list_df)
             logging.info('全てのクラブの自動チェックが完了しました。')
             logging.info('処理が終了しました')
 
             logging.info('人間がチェックする用のリストの作成をクラブごとに実行します...')
-            checklist_status_df = make_documents_checklist_for_human(apried_club_list_df, checklist_status_df)
-            if checklist_status_df is None:
+            each_club_checklist_status_df = make_documents_checklist_for_human(apried_club_list_df, each_club_checklist_status_df)
+            if each_club_checklist_status_df is None:
                 logging.error("make_documents_checklist_for_humanの戻り値がNoneです")
                 return
             logging.info('人間がチェックする用のリストの作成をクラブごとに作成しました。')
 
             logging.info('人間がチェックする用チェックリストのチェック状況の更新を行います...')
-            checklist_status_df = write_checklist_by_human_check(checklist_status_df, apried_club_list_df, folder_of_checklist_create_status)
+            each_club_checklist_status_df = write_checklist_by_human_check(each_club_checklist_status_df, apried_club_list_df, folder_of_checklist)
             logging.info('人間がチェックする用チェックリストのチェック状況の更新を行いました。')
             logging.info('全ての処理が完了しました。')
             print("全ての処理が完了しました。")

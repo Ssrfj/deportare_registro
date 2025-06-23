@@ -100,6 +100,14 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
             (checklist_status_df['クラブ名'] == club_name) &
             (checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] == apried_date_str)
         ]
+        # デバッグ（target_rowに['申請_クラブ名_選択']のカラムが存在するか確認）
+        if '申請_クラブ名_選択' in target_row.columns:
+            logging.debug(f"target_row['申請_クラブ名_選択'] の値: {target_row['申請_クラブ名_選択'].tolist()}")
+            logging.info(f"form_rowとなるtarget_rowに['申請_クラブ名_選択']のカラムが'含まれています: {target_row}")
+        else:
+            logging.error("target_rowに['申請_クラブ名_選択']のカラムが含まれていません。")
+            logging.debug(f"target_rowのカラム: {target_row.columns.tolist()}")
+            continue
         logging.debug(checklist_status_df[['クラブ名', 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS']])
         logging.debug(f"検索値: クラブ名={club_name}, 申請日時={apried_date_str}")
         logging.debug(f"{repr(club_name)}, {repr(apried_date_str)}")
