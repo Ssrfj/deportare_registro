@@ -150,13 +150,18 @@ def main():
             logging.info('処理が終了しました')
 
             logging.info('人間がチェックする用のリストの作成をクラブごとに実行します...')
-            each_club_checklist_status_df = make_documents_checklist_for_human(apried_club_list_df, each_club_checklist_status_df)
+            each_club_checklist_status_df = make_documents_checklist_for_human(each_club_checklist_status_df, apried_club_list_df)
             if each_club_checklist_status_df is None:
                 logging.error("make_documents_checklist_for_humanの戻り値がNoneです")
                 return
             logging.info('人間がチェックする用のリストの作成をクラブごとに作成しました。')
 
             logging.info('人間がチェックする用チェックリストのチェック状況の更新を行います...')
+            # apried_club_list_dfに申請_区市町村名というカラムが存在するか確認
+            if '申請_区市町村名' not in apried_club_list_df.columns:
+                logging.error("apried_club_list_dfに'申請_区市町村名'カラムが存在しません。")
+            else:
+                logging.info("apried_club_list_dfに'申請_区市町村名'カラムが存在します。")
             each_club_checklist_status_df = write_checklist_by_human_check(each_club_checklist_status_df, apried_club_list_df, folder_of_checklist)
             logging.info('人間がチェックする用チェックリストのチェック状況の更新を行いました。')
             logging.info('全ての処理が完了しました。')

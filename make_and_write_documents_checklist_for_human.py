@@ -39,7 +39,7 @@ type_of_documents = [
     'document_9'
 ]
 
-def make_documents_checklist_for_human(applied_club_df, checklist_status_df):
+def make_documents_checklist_for_human(checklist_status_df, applied_club_df):
     """
     人間がチェックする用のリストを作成する関数
 
@@ -152,6 +152,11 @@ def make_documents_checklist_for_human(applied_club_df, checklist_status_df):
                 document3_checklist_for_human_file_path,
                 index=False)
             # 書類4
+            # club_dfに申請_区市町村名というカラムが存在するか確認
+            if '申請_区市町村名' not in club_df.columns:
+                logging.error("club_dfに'申請_区市町村名'カラムが存在しません。")
+            else:
+                logging.info("club_dfに'申請_区市町村名'カラムが存在します。")
             document4_checklist, document4_lists_checklist = make_document4_checklist_for_human(club_df, applied_club_df)
             os.makedirs(document4_checklist_for_human_folder_path, exist_ok=True)
             # 書類4のフォルダが存在しない場合は作成

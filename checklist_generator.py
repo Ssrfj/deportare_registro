@@ -2,6 +2,8 @@ import pandas as pd
 import os
 from datetime import datetime, timezone, timedelta
 from utils import get_jst_now
+import logging
+
 
 # 書類1に関するチェックリストを作成する関数
 def make_document1_checklist_for_human(applied_club_df, checklist_status_df):
@@ -282,9 +284,9 @@ def make_document2_2_checklist_for_human(applied_club_df, checklist_status_df):
         coaches_discipline = discipline_df[discipline_df['coach'] == 1]['disciplines'].tolist()
         coaches_columns = [f'申請_指導者_{discipline}' for discipline in coaches_discipline]
         count_of_coaches = 0
-        # 各指導者カラムをループし、「定期的に行っている」が選択されているかを確認
+        # 各指導者カラムをループし、「配置している」が選択されているかを確認
         for col in coaches_columns:
-            if col in row and row[col] == '定期的に行っている':
+            if col in row and row[col] == '配置している':
                 count_of_coaches += 1
         # 指導者数が0の場合は、'0'と記載
         if count_of_coaches == 0:
