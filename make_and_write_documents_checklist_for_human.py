@@ -102,15 +102,29 @@ def make_documents_checklist_for_human(checklist_status_df, applied_club_df):
             ]
             # 書類1
             document1_checklist = make_document1_checklist_for_human(club_df, applied_club_df)
+            # document1_checklistをdfに変換
+            document1_checklist = pd.DataFrame(document1_checklist)
+            logging.info(f"クラブ名: {club_name} の書類1のチェックリストを作成しました")
+            logging.info(f"debug; 書類1のチェックリスト内容: {document1_checklist}")
+            # 書類1のフォルダが存在しない場合は作成
             os.makedirs(document1_checklist_for_human_folder_path, exist_ok=True)
             # 書類1のチェックリストをExcelファイルとして保存
             document1_checklist_for_human_file_name = f'{club_name}_document1_checklist_申請{apried_date_str}.xlsx'
-            pd.DataFrame(document1_checklist).to_excel(
+            document1_checklist.to_excel(
                 os.path.join(document1_checklist_for_human_folder_path, document1_checklist_for_human_file_name),
                 index=False
             )
             # 書類2_1
             document2_1_checklist,document2_1_number_of_menbers,document2_1_number_of_annual_fee_members = make_document2_1_checklist_for_human(club_df, applied_club_df)
+            # dfに変換
+            document2_1_checklist = pd.DataFrame(document2_1_checklist)
+            document2_1_number_of_menbers = pd.DataFrame(document2_1_number_of_menbers)
+            document2_1_number_of_annual_fee_members = pd.DataFrame(document2_1_number_of_annual_fee_members)
+            logging.info(f"クラブ名: {club_name} の書類2_1のチェックリストを作成しました")
+            logging.info(f"debug; 書類2_1のチェックリスト内容: {document2_1_checklist}")
+            logging.info(f"debug; 書類2_1の会員数内容: {document2_1_number_of_menbers}")
+            logging.info(f"debug; 書類2_1の年会費会員数内容: {document2_1_number_of_annual_fee_members}")
+            # 書類2_1のフォルダが存在しない場合は作成
             os.makedirs(document2_1_checklist_for_human_folder_path, exist_ok=True)
             # 書類2_1のフォルダが存在しない場合は作成
             if not os.path.exists(document2_1_checklist_for_human_folder_path):
@@ -127,6 +141,12 @@ def make_documents_checklist_for_human(checklist_status_df, applied_club_df):
                 pd.DataFrame(document2_1_number_of_annual_fee_members).to_excel(writer, sheet_name='年会費会員数', index=False)
             # 書類2_2
             document2_2_checklist, document2_2_discipline_and_coaches = make_document2_2_checklist_for_human(club_df, applied_club_df)
+            document2_2_checklist = pd.DataFrame(document2_2_checklist)
+            document2_2_discipline_and_coaches = pd.DataFrame(document2_2_discipline_and_coaches)
+            logging.info(f"クラブ名: {club_name} の書類2_2のチェックリストを作成しました")
+            logging.info(f"debug; 書類2_2のチェックリスト内容: {document2_2_checklist}")
+            logging.info(f"debug; 書類2_2の競技種目および指導者内容: {document2_2_discipline_and_coaches}")
+            # 書類2_2のフォルダが存在しない場合は作成
             os.makedirs(document2_2_checklist_for_human_folder_path, exist_ok=True)
             # 書類2_2のフォルダが存在しない場合は作成
             if not os.path.exists(document2_2_checklist_for_human_folder_path):
@@ -141,6 +161,9 @@ def make_documents_checklist_for_human(checklist_status_df, applied_club_df):
                 pd.DataFrame(document2_2_discipline_and_coaches).to_excel(writer, sheet_name='競技種目_および_指導者', index=False)
             # 書類3
             document3_checklist = make_document3_checklist_for_human(club_df, applied_club_df)
+            document3_checklist = pd.DataFrame(document3_checklist)
+            logging.info(f"クラブ名: {club_name} の書類3のチェックリストを作成しました")
+            logging.info(f"debug; 書類3のチェックリスト内容: {document3_checklist}")
             os.makedirs(document3_checklist_for_human_folder_path, exist_ok=True)
             # 書類3のフォルダが存在しない場合は作成
             if not os.path.exists(document3_checklist_for_human_folder_path):
@@ -157,6 +180,11 @@ def make_documents_checklist_for_human(checklist_status_df, applied_club_df):
                 logging.error("club_dfに'申請_区市町村名'カラムが存在しません。")
             else:
                 logging.info("club_dfに'申請_区市町村名'カラムが存在します。")
+            # applied_club_dfに申請_区市町村名というカラムが存在するか確認
+            if '申請_区市町村名' not in applied_club_df.columns:
+                logging.error("applied_club_dfに'申請_区市町村名'カラムが存在しません。")
+            else:
+                logging.info("applied_club_dfに'申請_区市町村名'カラムが存在します。")
             document4_checklist, document4_lists_checklist = make_document4_checklist_for_human(club_df, applied_club_df)
             os.makedirs(document4_checklist_for_human_folder_path, exist_ok=True)
             # 書類4のフォルダが存在しない場合は作成
@@ -282,6 +310,13 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         applied_club_df (pd.DataFrame): 申請済みクラブの一覧
         folder_of_checklist_create_status (str): 保存先フォルダパス
     """
+    logging.info("人間によるチェック状況の更新を開始します...")
+    # folder_of_checklist_create_statusの存在確認
+    if not os.path.exists(folder_of_checklist_create_status):
+        logging.error(f"フォルダ '{folder_of_checklist_create_status}' が存在しません。人間によるチェック状況の更新をスキップします。")
+        return None
+    else:
+        logging.info(f"フォルダ '{folder_of_checklist_create_status}' が存在します。人間によるチェック状況の更新を続行します。")
     if checklist_status_df is None or checklist_status_df.empty:
         logging.error("checklist_status_dfが空です。人間によるチェック状況の更新をスキップします。")
         return checklist_status_df
@@ -357,29 +392,33 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         
         # 各書類のチェックリストを確認
         # 書類1のチェックリストを確認
+        document1_checklist_for_human_file_name = f'{club_name}_document1_checklist_申請{application_date}.xlsx'
+        document1_checklist_for_human_file_path = os.path.join(document1_checklist_for_human_folder_path, document1_checklist_for_human_file_name)
         if os.path.exists(document1_checklist_for_human_folder_path):
-            document1_checklist_for_human_file_name = f'{club_name}_document1_checklist_申請{application_date}.xlsx'
-            document1_checklist_for_human_file_path = os.path.join(document1_checklist_for_human_folder_path, document1_checklist_for_human_file_name)
-            if os.path.exists(document1_checklist_for_human_file_path):
-                try:
-                    document1_checklist_df = pd.read_excel(document1_checklist_for_human_file_path)
-                    if 'チェック者名_{}' in document1_checklist_df.columns:
-                        checked = document1_checklist_df['チェック者名_{}'].notna().any()
-                        if checked:
-                            logging.info(f"クラブ '{club_name}' の書類1のチェックリストは人間によるチェックが完了しています。")
-                        else:
-                            logging.info(f"クラブ '{club_name}' の書類1のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類1'] = '人間によるチェックが未完了'
-                    else:
-                        logging.warning(f"クラブ '{club_name}' の書類1のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類1'] = 'チェック者名の列が存在しない'
-                except Exception as e:
-                    logging.error(f"クラブ '{club_name}' の書類1のチェックリストの読み込み中にエラーが発生しました: {e}")
-            else:
-                logging.warning(f"クラブ '{club_name}' の書類1のチェックリストファイルが存在しません。")
-                error_dict['書類1'] = 'チェックリストファイルが存在しない'
+            logging.info(f"クラブ '{club_name}' の書類1のチェックリストフォルダが存在します。")
         else:
             logging.warning(f"クラブ '{club_name}' の書類1のチェックリストフォルダが存在しません。")
+            os.makedirs(document1_checklist_for_human_folder_path, exist_ok=True)
+        # 書類1のチェックリストファイルが存在するか確認
+        if os.path.exists(document1_checklist_for_human_file_path):
+            try:
+                document1_checklist_df = pd.read_excel(document1_checklist_for_human_file_path)
+                if 'チェック者名_{}' in document1_checklist_df.columns:
+                    checked = document1_checklist_df['チェック者名_{}'].notna().any()
+                    if checked:
+                        logging.info(f"クラブ '{club_name}' の書類1のチェックリストは人間によるチェックが完了しています。")
+                    else:
+                        logging.info(f"クラブ '{club_name}' の書類1のチェックリストは人間によるチェックが未完了です。")
+                        error_dict['e_h_001-1'] = '書類1のチェックが未完了'
+                else:
+                    logging.warning(f"クラブ '{club_name}' の書類1のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
+                    error_dict['e_h_001-2'] = '書類1のチェック者名の列が存在しない'
+            except Exception as e:
+                logging.error(f"クラブ '{club_name}' の書類1のチェックリストの読み込み中にエラーが発生しました: {e}")
+        else:
+            logging.warning(f"クラブ '{club_name}' の書類1のチェックリストファイルが存在しません。")
+            error_dict['e_h_001-3'] = '書類1のチェックリストファイルが存在しない'
+
         # 書類2_1のチェックリストを確認
         if os.path.exists(document2_1_checklist_for_human_folder_path):
             document2_1_checklist_for_human_file_name = f'{club_name}_document2_1_checklist_申請{application_date}.xlsx'
@@ -395,18 +434,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類2_1のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類2_1のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類2_1'] = '人間によるチェックが未完了'
+                            error_dict['e_h_002-1-1'] = '書類2_1のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類2_1のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類2_1'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_002-1-2'] = '書類2_1のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"エラー: クラブ '{club_name}' の書類2_1のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類2_1のチェックリストファイルが存在しません。")
-                error_dict['書類2_1'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_002-1-3'] = '書類2_1のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類2_1のチェックリストフォルダが存在しません。")
-            error_dict['書類2_1'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_002-1-4'] = '書類2_1のチェックリストフォルダが存在しない'
         # 書類2_2のチェックリストを確認
         if os.path.exists(document2_2_checklist_for_human_folder_path):
             document2_2_checklist_for_human_file_name = f'{club_name}_document2_2_checklist_申請{application_date}.xlsx'
@@ -422,18 +461,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類2_2のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類2_2のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類2_2'] = '人間によるチェックが未完了'
+                            error_dict['e_h_002-2-1'] = '書類2_2のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類2_2のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類2_2'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_002-2-2'] = '書類2_2のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類2_2のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類2_2のチェックリストファイルが存在しません。")
-                error_dict['書類2_2'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_002-2-3'] = '書類2_2のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類2_2のチェックリストフォルダが存在しません。")
-            error_dict['書類2_2'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_002-2-4'] = '書類2_2のチェックリストフォルダが存在しない'
         # 書類3のチェックリストを確認
         if os.path.exists(document3_checklist_for_human_folder_path):
             document3_checklist_for_human_file_name = f'{club_name}_document3_checklist_申請{application_date}.xlsx'
@@ -449,18 +488,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類3のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類3のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類3'] = '人間によるチェックが未完了'
+                            error_dict['e_h_003-1'] = '書類3のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類3のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類3'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_003-2'] = '書類3のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類3のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類3のチェックリストファイルが存在しません。")
-                error_dict['書類3'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_003-3'] = '書類3のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類3のチェックリストフォルダが存在しません。")
-            error_dict['書類3'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_003-4'] = '書類3のチェックリストフォルダが存在しない'
         # 書類4のチェックリストを確認
         if os.path.exists(document4_checklist_for_human_folder_path):
             document4_checklist_for_human_file_name = f'{club_name}_document4_checklist_申請{application_date}.xlsx'
@@ -476,18 +515,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類4のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類4のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類4'] = '人間によるチェックが未完了'
+                            error_dict['e_h_004-1'] = '書類4のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類4のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類4'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_004-2'] = '書類4のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類4のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類4のチェックリストファイルが存在しません。")
-                error_dict['書類4'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_004-3'] = '書類4のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類4のチェックリストフォルダが存在しません。")
-            error_dict['書類4'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_004-4'] = '書類4のチェックリストフォルダが存在しない'
         # 書類5_事業計画のチェックリストを確認
         if os.path.exists(document5_plan_checklist_for_human_folder_path):
             document5_plan_checklist_for_human_file_name = f'{club_name}_document5_plan_checklist_申請{application_date}.xlsx'
@@ -503,18 +542,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類5_事業計画のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類5_事業計画のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類5_事業計画'] = '人間によるチェックが未完了'
+                            error_dict['e_h_005-1-1'] = '書類5_事業計画のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類5_事業計画のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類5_事業計画'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_005-1-2'] = '書類5_事業計画のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類5_事業計画のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類5_事業計画のチェックリストファイルが存在しません。")
-                error_dict['書類5_事業計画'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_005-1-3'] = '書類5_事業計画のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類5_事業計画のチェックリストフォルダが存在しません。")
-            error_dict['書類5_事業計画'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_005-1-4'] = '書類5_事業計画のチェックリストフォルダが存在しない'
         # 書類5_予算のチェックリストを確認
         if os.path.exists(document5_budget_checklist_for_human_folder_path):
             document5_budget_checklist_for_human_file_name = f'{club_name}_document5_budget_checklist_申請{application_date}.xlsx'
@@ -530,18 +569,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類5_予算のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類5_予算のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類5_予算'] = '人間によるチェックが未完了'
+                            error_dict['e_h_005-2-1'] = '書類5_予算のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類5_予算のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類5_予算'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_005-2-2'] = '書類5_予算のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類5_予算のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類5_予算のチェックリストファイルが存在しません。")
-                error_dict['書類5_予算'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_005-2-3'] = '書類5_予算のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類5_予算のチェックリストフォルダが存在しません。")
-            error_dict['書類5_予算'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_005-2-4'] = '書類5_予算のチェックリストフォルダが存在しない'
         # 書類6_事業報告のチェックリストを確認
         if os.path.exists(document6_report_checklist_for_human_folder_path):
             document6_report_checklist_for_human_file_name = f'{club_name}_document6_report_checklist_申請{application_date}.xlsx'
@@ -557,18 +596,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類6_事業報告のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類6_事業報告のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類6_事業報告'] = '人間によるチェックが未完了'
+                            error_dict['e_h_006-1-1'] = '書類6_事業報告のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類6_事業報告のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類6_事業報告'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_006-1-2'] = '書類6_事業報告のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類6_事業報告のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類6_事業報告のチェックリストファイルが存在しません。")
-                error_dict['書類6_事業報告'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_006-1-3'] = '書類6_事業報告のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類6_事業報告のチェックリストフォルダが存在しません。")
-            error_dict['書類6_事業報告'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_006-1-4'] = '書類6_事業報告のチェックリストフォルダが存在しない'
         # 書類6_決算のチェックリストを確認
         if os.path.exists(document6_financial_statements_checklist_for_human_folder_path):
             document6_financial_statements_checklist_for_human_file_name = f'{club_name}_document6_financial_statements_checklist_申請{application_date}.xlsx'
@@ -584,18 +623,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類6_決算のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類6_決算のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類6_決算'] = '人間によるチェックが未完了'
+                            error_dict['e_h_006-2-1'] = '書類6_決算のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類6_決算のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類6_決算'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_006-2-2'] = '書類6_決算のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類6_決算のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類6_決算のチェックリストファイルが存在しません。")
-                error_dict['書類6_決算'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_006-2-3'] = '書類6_決算のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類6_決算のチェックリストフォルダが存在しません。")
-            error_dict['書類6_決算'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_006-2-4'] = '書類6_決算のチェックリストフォルダが存在しない'
         # 書類7のチェックリストを確認
         if os.path.exists(document7_checklist_for_human_folder_path):
             document7_checklist_for_human_file_name = f'{club_name}_document7_checklist_申請{application_date}.xlsx'
@@ -611,18 +650,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類7のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類7のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類7'] = '人間によるチェックが未完了'
+                            error_dict['e_h_007-1'] = '書類7のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類7のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類7'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_007-2'] = '書類7のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類7のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類7のチェックリストファイルが存在しません。")
-                error_dict['書類7'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_007-3'] = '書類7のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類7のチェックリストフォルダが存在しません。")
-            error_dict['書類7'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_007-4'] = '書類7のチェックリストフォルダが存在しない'
         # 書類8のチェックリストを確認
         if os.path.exists(document8_checklist_for_human_folder_path):
             document8_checklist_for_human_file_name = f'{club_name}_document8_checklist_申請{application_date}.xlsx'
@@ -638,18 +677,18 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類8のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類8のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類8'] = '人間によるチェックが未完了'
+                            error_dict['e_h_008-1'] = '書類8のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類8のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類8'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_008-2'] = '書類8のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類8のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類8のチェックリストファイルが存在しません。")
-                error_dict['書類8'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_008-3'] = '書類8のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類8のチェックリストフォルダが存在しません。")
-            error_dict['書類8'] = 'チェックリストフォルダが存在しない'
+            error_dict['e_h_008-4'] = '書類8のチェックリストフォルダが存在しない'
         # 書類9のチェックリストを確認
         if os.path.exists(document9_checklist_for_human_folder_path):
             document9_checklist_for_human_file_name = f'{club_name}_document9_checklist_申請{application_date}.xlsx'
@@ -665,33 +704,38 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
                             logging.info(f"クラブ '{club_name}' の書類9のチェックリストは人間によるチェックが完了しています。")
                         else:
                             logging.info(f"クラブ '{club_name}' の書類9のチェックリストは人間によるチェックが未完了です。")
-                            error_dict['書類9'] = '人間によるチェックが未完了'
+                            error_dict['e_h_009-1'] = '書類9のチェックが未完了'
                     else:
                         logging.warning(f"クラブ '{club_name}' の書類9のチェックリストに 'チェック者名_{{}}' の列が存在しません。")
-                        error_dict['書類9'] = 'チェック者名の列が存在しない'
+                        error_dict['e_h_009-2'] = '書類9のチェック者名の列が存在しない'
                 except Exception as e:
                     logging.error(f"クラブ '{club_name}' の書類9のチェックリストの読み込み中にエラーが発生しました: {e}")
             else:
                 logging.warning(f"クラブ '{club_name}' の書類9のチェックリストファイルが存在しません。")
-                error_dict['書類9'] = 'チェックリストファイルが存在しない'
+                error_dict['e_h_009-3'] = '書類9のチェックリストファイルが存在しない'
         else:
             logging.warning(f"クラブ '{club_name}' の書類9のチェックリストフォルダが存在しません。")
-            error_dict['書類9'] = 'チェックリストフォルダが存在しない'
-        
+            error_dict['e_h_009-4'] = '書類9のチェックリストフォルダが存在しない'
+
         # error_dictが空の時は、問題が無いことを示すメッセージを追加
         if not error_dict:
             logging.info(f"クラブ '{club_name}' の申請日時'{application_date}'の書類は全て人間によるチェックが完了しています。")
-            error_dict['全ての書類'] = '人間によるチェックが完了'
+            error_dict['info'] = '書類のチェックで問題は見つかりませんでした。'
 
         # チェックリストの人間によるチェック状況の確認を更新
+        # 時間のデータをstr型に変換
+        checklist_df['申請時間'] = checklist_df['申請時間'].astype(str)
+        checklist_df['書類チェック更新時間'] = checklist_df['書類チェック更新時間'].astype(str)
+        checklist_status_df['申請日時'] = checklist_status_df['申請日時'].astype(str)
+
         checklist_df.loc[
             (checklist_df['クラブ名'] == club_name) & (checklist_df['申請時間'] == application_date),
             '書類チェック更新時間'
         ] = pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
         checklist_df.loc[
             (checklist_df['クラブ名'] == club_name) & (checklist_df['申請時間'] == application_date),
-            '人間によるチェック状況'
-        ] = ', '.join(error_dict.values())
+            '書類チェック'
+        ] = ', '.join([f"{k}: {v}" for k, v in error_dict.items()])
 
         # ★ checklist_status_dfも同様に更新
         checklist_status_df.loc[
@@ -700,8 +744,8 @@ def write_checklist_by_human_check(checklist_status_df, applied_club_df, folder_
         ] = pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')
         checklist_status_df.loc[
             (checklist_status_df['クラブ名'] == club_name) & (checklist_status_df['申請日時'] == application_date),
-            '人間によるチェック状況'
-        ] = ', '.join(error_dict.values())
+            '書類チェック'
+        ] = ', '.join([f"{k}: {v}" for k, v in error_dict.items()])
 
         # チェックリストファイルを保存
         checklist_df.to_excel(checklist_file_path, index=False)

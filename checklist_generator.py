@@ -6,7 +6,7 @@ import logging
 
 
 # 書類1に関するチェックリストを作成する関数
-def make_document1_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document1_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類1に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -34,6 +34,7 @@ def make_document1_checklist_for_human(applied_club_df, checklist_status_df):
             '昨年度登録状況': last_year_status,
             '申請種別': row.get('申請_申請種別', ''),
             '申請_設立日': row.get('申請_設立日', ''),
+            '区市町村名': row.get('申請_区市町村名', ''),
             '申請_住所': row.get('申請_住所', ''),
             '申請_建物名(任意)': row.get('申請_建物名(任意)', ''),
             '申請_電話番号': row.get('申請_TEL', ''),
@@ -59,7 +60,7 @@ def make_document1_checklist_for_human(applied_club_df, checklist_status_df):
     return document1_checklist
 
 # 書類2_1に関するチェックリストを作成する関数
-def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document2_1_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類2_1に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -72,7 +73,6 @@ def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
     # 各クラブの行をイテレート
     for index, row in applied_club_df.iterrows():
         club_name = row['クラブ名']
-        # 申請日時はapplied_club_dfにもあるが、checklist_status_df優先で取得
         if club_name in checklist_status_df['クラブ名'].values:
             application_date = checklist_status_df.loc[
                 checklist_status_df['クラブ名'] == club_name, '申請日時'
@@ -113,6 +113,7 @@ def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
             '申請_会員_70s_女_数',
             '申請_会員_70s_不_数'
         ]
+        warning_issued = set()
         number_of_members = 0
         # 各列の値を足し合わせて会員数を算出
         for column in columns_of_number_of_members:
@@ -120,7 +121,10 @@ def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
                 try:
                     number_of_members += int(row[column])
                 except ValueError:
-                    logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                    key = (club_name, column)
+                    if key not in warning_issued:
+                        logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                        warning_issued.add(key)
                     number_of_members += 0
         # 会員数が0の場合は、'0'と記載
         if number_of_members == 0:
@@ -164,12 +168,15 @@ def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
         number_of_annual_fee_members = 0
         # 各列の値を足し合わせて年会費を払っている会員数を算出
         for column in columns_of_annual_fee_members:
-            if column in row and not pd.isna(row[column]):
-                try:
-                    number_of_annual_fee_members += int(row[column])
-                except ValueError:
-                    logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
-                    number_of_annual_fee_members += 0
+                if column in row and not pd.isna(row[column]):
+                    try:
+                        number_of_annual_fee_members += int(row[column])
+                    except ValueError:
+                        key = (club_name, column)
+                        if key not in warning_issued:
+                            logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                            warning_issued.add(key)
+                        number_of_annual_fee_members += 0
         # 年会費を払っている会員数が0の場合は、'0'と記載
         if number_of_annual_fee_members == 0:
             number_of_annual_fee_members = '0'
@@ -208,18 +215,17 @@ def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
         # 会員数表
         document2_1_number_of_menbers = []
         for gender in genders:
-            row = {'性別': gender}
+            row_gender = {'性別': gender}
             for age in ages:
                 col_name = age_gender_columns[age][gender]
                 value = 0
-                for _, club_row in applied_club_df.iterrows():
-                    if col_name in club_row and not pd.isna(club_row[col_name]):
-                        try:
-                            value += int(club_row[col_name])
-                        except ValueError:
-                            pass
-                row[age] = value
-            document2_1_number_of_menbers.append(row)
+                if col_name in row and not pd.isna(row[col_name]):
+                    try:
+                        value = int(row[col_name])
+                    except ValueError:
+                        pass
+                row_gender[age] = value
+            document2_1_number_of_menbers.append(row_gender)
 
         # 年会費会員数表（カラム名だけ「申請_年会_...」に置換）
         annual_fee_age_gender_columns = {
@@ -228,23 +234,22 @@ def make_document2_1_checklist_for_human(applied_club_df, checklist_status_df):
         }
         document2_1_number_of_annual_fee_members = []
         for gender in genders:
-            row = {'性別': gender}
+            row_gender = {'性別': gender}
             for age in ages:
                 col_name = annual_fee_age_gender_columns[age][gender]
                 value = 0
-                for _, club_row in applied_club_df.iterrows():
-                    if col_name in club_row and not pd.isna(club_row[col_name]):
-                        try:
-                            value += int(club_row[col_name])
-                        except ValueError:
-                            pass
-                row[age] = value
-            document2_1_number_of_annual_fee_members.append(row)
+                if col_name in row and not pd.isna(row[col_name]):
+                    try:
+                        value = int(row[col_name])
+                    except ValueError:
+                        pass
+                row_gender[age] = value
+            document2_1_number_of_annual_fee_members.append(row_gender)
 
     return document2_1_checklist, document2_1_number_of_menbers, document2_1_number_of_annual_fee_members
 
 # 書類2_2に関するチェックリストを作成する関数
-def make_document2_2_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document2_2_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類2_2に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -374,7 +379,7 @@ def make_document2_2_checklist_for_human(applied_club_df, checklist_status_df):
     return document2_2_checklist, document2_2_discipline_and_coaches
 
 # 書類3に関するチェックリストを作成する関数(規約についてのチェックリスト)
-def make_document3_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document3_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類3に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -431,7 +436,7 @@ def make_document3_checklist_for_human(applied_club_df, checklist_status_df):
     return document3_checklist
 
 # 書類4に関するチェックリストを作成する関数(議決権保有者名簿についてのチェックリスト)
-def make_document4_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document4_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類4に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -446,11 +451,10 @@ def make_document4_checklist_for_human(applied_club_df, checklist_status_df):
             ].iloc[0]
         else:
             application_date = row.get('申請日時', '不明')
-        address = row['申請_区市町村名']
         # チェックリストの行を作成
         checklist_row = {
             'クラブ名': club_name,
-            '区市町村名': address,
+            '区市町村名': row.get('申請_区市町村名', ''),
             'チェック項目_議決権保有者名簿_1の構成員': '',
             'チェック項目_議決権保有者名簿_1の記載人数': '',
             'チェック項目_議決権保有者名簿_1の近隣住民数': '',
@@ -506,7 +510,7 @@ def make_document4_checklist_for_human(applied_club_df, checklist_status_df):
     return document4_checklist, document4_lists_checklist
 
 # 書類5_事業計画に関するチェックリストを作成する関数(事業計画書についてのチェックリスト)
-def make_document5_plan_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document5_plan_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類5_事業計画に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -564,7 +568,7 @@ def make_document5_plan_checklist_for_human(applied_club_df, checklist_status_df
     return document5_plan_checklist, document5_plan_checklist_discipline
 
 # 書類5_予算に関するチェックリストを作成する関数(予算書についてのチェックリスト)
-def make_document5_budget_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document5_budget_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類5_予算に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -591,7 +595,7 @@ def make_document5_budget_checklist_for_human(applied_club_df, checklist_status_
     return document5_budget_checklist
 
 # 書類6_事業報告に関するチェックリストを作成する関数(事業報告書についてのチェックリスト)(事業計画とほぼ同じ)
-def make_document6_report_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document6_report_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類6_事業報告に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -646,7 +650,7 @@ def make_document6_report_checklist_for_human(applied_club_df, checklist_status_
     return document6_report_checklist, document6_report_checklist_discipline
 
 # 書類6_決算に関するチェックリストを作成する関数(決算書についてのチェックリスト)
-def make_document6_financial_statements_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document6_financial_statements_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類6_決算に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -673,7 +677,7 @@ def make_document6_financial_statements_checklist_for_human(applied_club_df, che
     return document6_financial_statements_checklist
 
 # 書類7に関するチェックリストを作成する関数
-def make_document7_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document7_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類7に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -699,7 +703,7 @@ def make_document7_checklist_for_human(applied_club_df, checklist_status_df):
         document7_checklist.append(checklist_row)
     return document7_checklist
 # 書類8に関するチェックリストを作成する関数
-def make_document8_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document8_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類8に関する人間がチェックするためのチェックリストを作成します。
     """
@@ -766,7 +770,7 @@ def make_document8_checklist_for_human(applied_club_df, checklist_status_df):
     return document8_checklist
 
 # 書類9に関するチェックリストを作成する関数
-def make_document9_checklist_for_human(applied_club_df, checklist_status_df):
+def make_document9_checklist_for_human(checklist_status_df, applied_club_df):
     """
     書類9に関する人間がチェックするためのチェックリストを作成します。
     """

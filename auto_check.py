@@ -47,6 +47,9 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
     for index, row in checklist_status_df.iterrows():
         club_name = str(row['クラブ名']).strip()
         apried_date_str = str(row.get('申請日時')).strip()
+        # ここで小数点以下を除去
+        if '.' in apried_date_str:
+            apried_date_str = apried_date_str.split('.')[0]
         if 'チェックリスト作成日時' not in row.index:
             logging.error(f"'チェックリスト作成日時' カラムが存在しません。rowのカラム: {row.index.tolist()}")
             continue
@@ -60,11 +63,14 @@ def perform_automatic_checks(checklist_status_df, applied_club_df):
             continue
         checklist_file_name = f"{club_name}_申請{apried_date_str}.xlsx"
         each_folder_path = os.path.join(folder_path, club_name)
-        checklist_file_path = get_latest_checklist_file(club_name, apried_date_str, each_folder_path)
+        checklist_file_path = os.path.join(each_folder_path, checklist_file_name)
+        # パスの正規化を追加
+        checklist_file_path = os.path.normpath(checklist_file_path)
+        logging.info(f"debug; checklist_file_path: {checklist_file_path}")
         if not checklist_file_path or not os.path.exists(checklist_file_path):
             # デバッグ用にeach_folder_pathにあるファイルをリストアップ
-            logging.debug(f"each_folder_path: {each_folder_path}")
-            logging.debug(f"each_folder_pathにあるファイル: {os.listdir(each_folder_path)}")
+            logging.info(f"debug; each_folder_path: {each_folder_path}")
+            logging.info(f"debug; each_folder_pathにあるファイル: {os.listdir(each_folder_path)}")
             # チェックリストファイルが存在しない場合の処理
             logging.warning(f"クラブ '{club_name}' のチェックリストファイルが存在しません。スキップします。")
             continue

@@ -1,0 +1,7 @@
+{
+    "python.testing.pytestArgs": [
+        "R7_登録申請処理"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

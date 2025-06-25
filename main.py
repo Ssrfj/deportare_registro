@@ -136,6 +136,8 @@ def main():
                 checklist_output_folder,
                 timestamp_for_make_checklist
             )
+            logging.info(f"debug; each_club_checklist_status_df columns: {each_club_checklist_status_df.columns.tolist()}")
+            logging.info(f"debug; each_club_checklist_status_df: {each_club_checklist_status_df}")
             # クラブごとのチェックリスト作成状況.xlsxを更新
             if each_club_checklist_status_df is None:
                 logging.error("make_checklist_for_each_clubの戻り値がNoneです")
@@ -158,10 +160,21 @@ def main():
 
             logging.info('人間がチェックする用チェックリストのチェック状況の更新を行います...')
             # apried_club_list_dfに申請_区市町村名というカラムが存在するか確認
-            if '申請_区市町村名' not in apried_club_list_df.columns:
-                logging.error("apried_club_list_dfに'申請_区市町村名'カラムが存在しません。")
+            if '申請_区市町村名' not in each_club_checklist_status_df.columns:
+                if '申請_区市町村名' in apried_club_list_df.columns:
+                    each_club_checklist_status_df['申請_区市町村名'] = apried_club_list_df['申請_区市町村名']
+                else:
+                    each_club_checklist_status_df['申請_区市町村名'] = ''
+            # each_club_checklist_status_dfがNoneでないことを確認
+            if each_club_checklist_status_df is None:
+                logging.error("each_club_checklist_status_dfがNoneです。")
             else:
-                logging.info("apried_club_list_dfに'申請_区市町村名'カラムが存在します。")
+                logging.info("each_club_checklist_status_dfはNoneではありません。")
+            # each_club_checklist_status_dfが空でないことを確認
+            if each_club_checklist_status_df.empty:
+                logging.error("each_club_checklist_status_dfが空です。")
+            else:
+                logging.info("each_club_checklist_status_dfは空ではありません。")
             each_club_checklist_status_df = write_checklist_by_human_check(each_club_checklist_status_df, apried_club_list_df, folder_of_checklist)
             logging.info('人間がチェックする用チェックリストのチェック状況の更新を行いました。')
             logging.info('全ての処理が完了しました。')
