@@ -14,18 +14,18 @@ from setting import (
     output_main_folder,
     log_folder_name,
     log_folder_path,
-    application_data_folder_name,
-    application_data_folder_path,
-    application_data_with_club_info_folder_name,
-    application_data_with_club_info_folder_path,
+    reception_data_folder_name,
+    reception_data_folder_path,
+    reception_data_with_club_info_folder_name,
+    reception_data_with_club_info_folder_path,
     Content_check_folder_name,
     Content_check_folder_path
 )
 from make_folders import create_folders
 from logginng import setup_logging, save_logs
-from processing_application_data import processing_application_data
-from marge_application_data_with_club_info import marge_application_data_with_club_info
-from application_statues import application_statues
+from processing_reception_data import processing_reception_data
+from marge_reception_data_with_club_info import marge_reception_data_with_club_info
+from reception_statues import reception_statues
 from make_detailed_data_folders import make_detailed_data_folders
 from make_chacklists import make_chacklists
 from automation_check_and_update_checklist import automation_check_and_update_checklist
@@ -54,29 +54,29 @@ def main():
     create_folders()
     logging.info("必要なフォルダを作成しました")
 
-    # 申請データ処理の受付処理
-    logging.info("申請データ処理の受付を開始します")
-    latest_application_data_date = processing_application_data()
-    if latest_application_data_date is None:
-        logging.error("申請データ処理に失敗しました。処理を終了します。")
+    # 受付データ処理の受付処理
+    logging.info("受付データ処理の受付を開始します")
+    latest_reception_data_date = processing_reception_data()
+    if latest_reception_data_date is None:
+        logging.error("受付データ処理に失敗しました。処理を終了します。")
         return
-    logging.info("申請データ処理の受付が完了しました")
-    logging.info(f"最新の申請データの日付: {latest_application_data_date}")
+    logging.info("受付データ処理の受付が完了しました")
+    logging.info(f"最新の受付データの日付: {latest_reception_data_date}")
 
     # 処理済みデータにクラブ情報を追加
-    logging.info("処理済み申請データにクラブ情報を追加します")
-    marge_application_data_with_club_info(latest_application_data_date)
-    logging.info("処理済み申請データにクラブ情報を追加しました")
+    logging.info("処理済み受付データにクラブ情報を追加します")
+    marge_reception_data_with_club_info(latest_reception_data_date)
+    logging.info("処理済み受付データにクラブ情報を追加しました")
 
-    # 申請状況を更新
-    logging.info("申請状況を更新します")
-    application_statues(latest_application_data_date)
-    logging.info("申請状況の更新が完了しました")
+    # 受付状況を更新
+    logging.info("受付状況を更新します")
+    reception_statues(latest_reception_data_date)
+    logging.info("受付状況の更新が完了しました")
 
-    # 申請内容チェック用ように参照するデータを保存するクラブごとのフォルダを作成
-    logging.info("申請内容チェック用のフォルダを作成します")
+    # 受付内容チェック用ように参照するデータを保存するクラブごとのフォルダを作成
+    logging.info("受付内容チェック用のフォルダを作成します")
     make_detailed_data_folders()
-    logging.info("申請内容チェック用のフォルダを作成しました")
+    logging.info("受付内容チェック用のフォルダを作成しました")
 
 # 今後の作業memo
 # チェックリストの作成処理
@@ -86,7 +86,7 @@ def main():
 
     # チェックリストを作成
     logging.info("チェックリストを作成します")
-    make_chacklists(latest_application_data_date)
+    make_chacklists(latest_reception_data_date)
     logging.info("チェックリストの作成が完了しました")
 
     # チェックリストの更新・自動チェック
@@ -133,15 +133,15 @@ def main():
             logging.error(f"最新クラブデータの読み込みでエラー: {e}", exc_info=True)
             return
 
-        # 3. 申請内容と過去データを結合
+        # 3. 受付内容と過去データを結合
         try:
             merge_and_save_apcption_data()
         except Exception as e:
-            logging.error(f"申請内容と過去データの結合でエラー: {e}", exc_info=True)
+            logging.error(f"受付内容と過去データの結合でエラー: {e}", exc_info=True)
             return
 
-        # 4. 申請受付リストの最新ファイルを取得
-        folder_path = os.path.join('R7_登録申請処理','申請受付')
+        # 4. 受付受付リストの最新ファイルを取得
+        folder_path = os.path.join('R7_登録受付処理','受付受付')
         try:
             os.makedirs(folder_path, exist_ok=True)
             files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.xlsx')]
@@ -150,43 +150,43 @@ def main():
                 return
             latest_file = max(files, key=os.path.getctime)
             club_list_df = pd.read_excel(latest_file)
-            club_list_df['R8年度登録申請_タイムスタンプ'] = pd.to_datetime(club_list_df['R8年度登録申請_タイムスタンプ'], errors='coerce')
-            club_list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = club_list_df['R8年度登録申請_タイムスタンプ'].dt.strftime('%Y%m%d%H%M%S')
-            logging.info("申請内容の読み込みが完了しました")
+            club_list_df['R8年度登録受付_タイムスタンプ'] = pd.to_datetime(club_list_df['R8年度登録受付_タイムスタンプ'], errors='coerce')
+            club_list_df['R8年度登録受付_タイムスタンプyyyymmddHHMMSS'] = club_list_df['R8年度登録受付_タイムスタンプ'].dt.strftime('%Y%m%d%H%M%S')
+            logging.info("受付内容の読み込みが完了しました")
         except Exception as e:
-            logging.error(f"申請受付リストの取得・読み込みでエラー: {e}", exc_info=True)
+            logging.error(f"受付受付リストの取得・読み込みでエラー: {e}", exc_info=True)
             return
 
-        # 5. 申請内容チェックリスト作成状況ファイルの読み込みまたは新規作成
-        folder_of_checklist = os.path.join('R7_登録申請処理', '申請内容チェック')
-        file_of_checklist_create_status = os.path.join(folder_of_checklist, '申請内容チェックリスト.xlsx')
-        logging.info(f"申請内容チェックリストファイル: {file_of_checklist_create_status}")
+        # 5. 受付内容チェックリスト作成状況ファイルの読み込みまたは新規作成
+        folder_of_checklist = os.path.join('R7_登録受付処理', '受付内容チェック')
+        file_of_checklist_create_status = os.path.join(folder_of_checklist, '受付内容チェックリスト.xlsx')
+        logging.info(f"受付内容チェックリストファイル: {file_of_checklist_create_status}")
         try:
             os.makedirs(folder_of_checklist, exist_ok=True)
-            logging.info(f"申請内容チェックリスト作成状況フォルダ: {folder_of_checklist} を作成しました")
+            logging.info(f"受付内容チェックリスト作成状況フォルダ: {folder_of_checklist} を作成しました")
             if os.path.exists(file_of_checklist_create_status):
                 checklist_status_df = pd.read_excel(file_of_checklist_create_status)
-                for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
+                for col in ['クラブ名', '受付日時', 'チェックリスト作成日時']:
                     if col not in checklist_status_df.columns:
                         checklist_status_df[col] = ''
-                # ここでR8年度登録申請_タイムスタンプyyyymmddHHMMSSカラムも追加
-                if 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' not in checklist_status_df.columns:
-                    checklist_status_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS'] = ''
+                # ここでR8年度登録受付_タイムスタンプyyyymmddHHMMSSカラムも追加
+                if 'R8年度登録受付_タイムスタンプyyyymmddHHMMSS' not in checklist_status_df.columns:
+                    checklist_status_df['R8年度登録受付_タイムスタンプyyyymmddHHMMSS'] = ''
                 logging.debug(f"checklist_status_df columns after clean: {checklist_status_df.columns.tolist()}")
                 logging.info('クラブごとのチェックリスト作成状況.xlsxはすでに存在しています')
             else:
-                checklist_status_df = pd.DataFrame(columns=['クラブ名','申請日時', 'チェックリスト作成日時'])
+                checklist_status_df = pd.DataFrame(columns=['クラブ名','受付日時', 'チェックリスト作成日時'])
                 checklist_status_df.to_excel(file_of_checklist_create_status, index=False)
                 logging.info('クラブごとのチェックリスト作成状況.xlsxが作成されました')
         except Exception as e:
             logging.error(f"チェックリスト作成状況ファイルの処理でエラー: {e}", exc_info=True)
             return
 
-        # 6. club_list_dfの['R8年度登録申請状況']が1のクラブのみを抽出
+        # 6. club_list_dfの['R8年度登録受付状況']が1のクラブのみを抽出
         try:
             club_list_df.columns = club_list_df.columns.str.strip()
             logging.debug(f"club_list_df columns: {club_list_df.columns.tolist()}")
-            apried_club_list_df = club_list_df[club_list_df['R8年度登録申請状況'] == 1]
+            apried_club_list_df = club_list_df[club_list_df['R8年度登録受付状況'] == 1]
             logging.info(f"apried_club_list_df columns: {apried_club_list_df.columns.tolist()}")
             logging.info(f"apried_club_list_df: {apried_club_list_df}")
             if 'R7年度登録クラブ' not in apried_club_list_df.columns:
@@ -194,9 +194,9 @@ def main():
             else:
                 logging.info("apried_club_list_dfに'R7年度登録クラブ'カラムが存在します")
             if apried_club_list_df.empty:
-                logging.warning("R8年度登録申請状況が1のクラブが存在しません。")
+                logging.warning("R8年度登録受付状況が1のクラブが存在しません。")
             else:
-                logging.info(f"R8年度登録申請状況が1のクラブ数: {len(apried_club_list_df)}")
+                logging.info(f"R8年度登録受付状況が1のクラブ数: {len(apried_club_list_df)}")
         except Exception as e:
             logging.error(f"クラブ抽出処理でエラー: {e}", exc_info=True)
             return
@@ -204,8 +204,8 @@ def main():
         # 7. 各種処理
         try:
             # カラム名の確認とリネーム
-            if '申請日時' not in apried_club_list_df.columns and 'R8年度登録申請_タイムスタンプyyyymmddHHMMSS' in apried_club_list_df.columns:
-                apried_club_list_df['申請日時'] = apried_club_list_df['R8年度登録申請_タイムスタンプyyyymmddHHMMSS']
+            if '受付日時' not in apried_club_list_df.columns and 'R8年度登録受付_タイムスタンプyyyymmddHHMMSS' in apried_club_list_df.columns:
+                apried_club_list_df['受付日時'] = apried_club_list_df['R8年度登録受付_タイムスタンプyyyymmddHHMMSS']
             # 必要なカラムがなければ追加
             for col in ['チェックリスト作成日時']:
                 if col not in apried_club_list_df.columns:
@@ -243,12 +243,12 @@ def main():
             logging.info('人間がチェックする用のリストの作成をクラブごとに作成しました。')
 
             logging.info('人間がチェックする用チェックリストのチェック状況の更新を行います...')
-            # apried_club_list_dfに申請_区市町村名というカラムが存在するか確認
-            if '申請_区市町村名' not in each_club_checklist_status_df.columns:
-                if '申請_区市町村名' in apried_club_list_df.columns:
-                    each_club_checklist_status_df['申請_区市町村名'] = apried_club_list_df['申請_区市町村名']
+            # apried_club_list_dfに受付_区市町村名というカラムが存在するか確認
+            if '受付_区市町村名' not in each_club_checklist_status_df.columns:
+                if '受付_区市町村名' in apried_club_list_df.columns:
+                    each_club_checklist_status_df['受付_区市町村名'] = apried_club_list_df['受付_区市町村名']
                 else:
-                    each_club_checklist_status_df['申請_区市町村名'] = ''
+                    each_club_checklist_status_df['受付_区市町村名'] = ''
             # each_club_checklist_status_dfがNoneでないことを確認
             if each_club_checklist_status_df is None:
                 logging.error("each_club_checklist_status_dfがNoneです。")
@@ -272,7 +272,7 @@ def main():
         return
     
     # logをtxtファイルに保存
-    log_file_path = os.path.join('R7_登録申請処理', 'logs', f'log_{get_jst_now().strftime("%Y%m%d%H%M%S")}.txt')
+    log_file_path = os.path.join('R7_登録受付処理', 'logs', f'log_{get_jst_now().strftime("%Y%m%d%H%M%S")}.txt')
     os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
 
     # ログファイルを出力する箇所で

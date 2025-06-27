@@ -9,7 +9,7 @@ def setup_logging():
         os.makedirs(log_folder_path)
         logging.info(f"ログフォルダを作成しました: {log_folder_path}")
     logging.basicConfig(
-        filename=os.path.join(log_folder_path, 'application.log'),
+        filename=os.path.join(log_folder_path, 'reception.log'),
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )

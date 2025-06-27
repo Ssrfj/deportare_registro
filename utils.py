@@ -6,9 +6,9 @@ def get_jst_now():
     """
     return datetime.now(timezone(timedelta(hours=9)))
 
-def make_checklist_filename(club_name, application_date_str):
+def make_checklist_filename(club_name, reception_date_str):
     """
-    クラブ名・申請日・作成日からチェックリスト用のファイル名を生成する。
+    クラブ名・受付日・作成日からチェックリスト用のファイル名を生成する。
     """
     club_name = str(club_name).strip()
-    return f"{club_name}_申請{application_date_str}.xlsx"
+    return f"{club_name}_受付{reception_date_str}.xlsx"

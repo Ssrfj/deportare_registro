@@ -4,15 +4,15 @@ import logging
 from setting import (
     output_main_folder,
     log_folder_path,
-    application_data_folder_path,
-    application_data_with_club_info_folder_path,
+    reception_data_folder_path,
+    reception_data_with_club_info_folder_path,
     Content_check_folder_path
 )
 
 def setup_logging():
     """ロギングの設定"""
     logging.basicConfig(
-        filename=os.path.join(log_folder_path, 'application.log'),
+        filename=os.path.join(log_folder_path, 'reception.log'),
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(message)s'
     )
@@ -23,8 +23,8 @@ def create_folders():
     folders_to_create = [
         output_main_folder,
         log_folder_path,
-        application_data_folder_path,
-        application_data_with_club_info_folder_path,
+        reception_data_folder_path,
+        reception_data_with_club_info_folder_path,
         Content_check_folder_path
     ]
     for folder in folders_to_create:
