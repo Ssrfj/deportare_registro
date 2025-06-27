@@ -89,43 +89,116 @@ def make_document02_1_checklist(latest_reception_data_date):
         club_name = row['クラブ名']
         document02_1_checklist_df.loc[index, '申請日時'] = row['申請_タイムスタンプ']
         document02_1_checklist_df.loc[index, 'クラブ名'] = club_name
-        document02_1_checklist_df.loc[index, '入力されたクラブ名'] = row['申請_クラブ名_テキスト']
-        document02_1_checklist_df.loc[index, '申請_法人格'] = row['申請_法人格']
-        document02_1_checklist_df.loc[index, '申請_代表者名'] = row['申請_代表者名']
-        document02_1_checklist_df.loc[index, '昨年度登録状況'] = row['R7年度登録クラブ']
-        document02_1_checklist_df.loc[index, '申請種別'] = row['申請_申請種別']
-        document02_1_checklist_df.loc[index, '申請_設立日'] = row['申請_設立日']
-        document02_1_checklist_df.loc[index, '申請_都道府県'] = row['申請_東京チェック']
-        document02_1_checklist_df.loc[index, '地区名'] = row['地区名']
-        document02_1_checklist_df.loc[index, '区市町村名'] = row['申請_区市町村名']
-        document02_1_checklist_df.loc[index, '申請_住所'] = row['申請_住所']
-        document02_1_checklist_df.loc[index, '申請_建物名(任意)'] = row['申請_建物名(任意)']
-        document02_1_checklist_df.loc[index, '申請_担当者名'] = row['申請_担当者名']
-        document02_1_checklist_df.loc[index, '申請_担当者役職名'] = row['申請_担当者役職名']
-        document02_1_checklist_df.loc[index, '申請_メールアドレス'] = row['申請_メールアドレス']
-        document02_1_checklist_df.loc[index, '申請_電話番号'] = row['申請_電話番号']
-        document02_1_checklist_df.loc[index, '申請_FAX番号'] = row['申請_FAX番号']
-        document02_1_checklist_df.loc[index, '申請_適合状況(1)①'] = row['申請_適合状況(1)①']
-        document02_1_checklist_df.loc[index, '申請_適合状況(1)②'] = row['申請_適合状況(1)②']
-        document02_1_checklist_df.loc[index, '申請_適合状況(1)③'] = row['申請_適合状況(1)③']
-        document02_1_checklist_df.loc[index, '申請_適合状況(1)④'] = row['申請_適合状況(1)④']
-        document02_1_checklist_df.loc[index, '申請_適合状況(2)⑤'] = row['申請_適合状況(2)⑤']
-        document02_1_checklist_df.loc[index, '申請_適合状況(3)⑥'] = row['申請_適合状況(3)⑥']
-        document02_1_checklist_df.loc[index, '申請_適合状況(3)⑦'] = row['申請_適合状況(3)⑦']
-        
+        # 入力内容を基に会員数を算出
+        columns_of_number_of_members = [
+            '申請_会員_未就_男_数',
+            '申請_会員_未就_女_数',
+            '申請_会員_未就_不_数',
+            '申請_会員_小_男_数',
+            '申請_会員_小_女_数',
+            '申請_会員_小_不_数',
+            '申請_会員_中_男_数',
+            '申請_会員_中_女_数',
+            '申請_会員_中_不_数',
+            '申請_会員_高_男_数',
+            '申請_会員_高_女_数',
+            '申請_会員_高_不_数',
+            '申請_会員_20s_男_数',
+            '申請_会員_20s_女_数',
+            '申請_会員_20s_不_数',
+            '申請_会員_30s_男_数',
+            '申請_会員_30s_女_数',
+            '申請_会員_30s_不_数',
+            '申請_会員_40s_男_数',
+            '申請_会員_40s_女_数',
+            '申請_会員_40s_不_数',
+            '申請_会員_50s_男_数',
+            '申請_会員_50s_女_数',
+            '申請_会員_50s_不_数',
+            '申請_会員_60s_男_数',
+            '申請_会員_60s_女_数',
+            '申請_会員_60s_不_数',
+            '申請_会員_70s_男_数',
+            '申請_会員_70s_女_数',
+            '申請_会員_70s_不_数'
+        ]
+        warning_issued = set()
+        number_of_members = 0
+        # 各列の値を足し合わせて会員数を算出
+        for column in columns_of_number_of_members:
+            if column in row and not pd.isna(row[column]):
+                try:
+                    number_of_members += int(row[column])
+                except ValueError:
+                    key = (club_name, column)
+                    if key not in warning_issued:
+                        logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                        warning_issued.add(key)
+                    number_of_members += 0
+        # 会員数が0の場合は、'0'と記載
+        if number_of_members == 0:
+            number_of_members = '0'
+        else:
+            number_of_members = str(number_of_members)
+        document02_1_checklist_df.loc[index, '会員数の合計'] = number_of_members
+        # 入力内容を基に年会費を払っている会員数を算出
+        columns_of_annual_fee_members = [
+            '申請_年会_未就_男_数',
+            '申請_年会_未就_女_数',
+            '申請_年会_未就_不_数',
+            '申請_年会_小_男_数',
+            '申請_年会_小_女_数',
+            '申請_年会_小_不_数',
+            '申請_年会_中_男_数',
+            '申請_年会_中_女_数',
+            '申請_年会_中_不_数',
+            '申請_年会_高_男_数',
+            '申請_年会_高_女_数',
+            '申請_年会_高_不_数',
+            '申請_年会_20s_男_数',
+            '申請_年会_20s_女_数',
+            '申請_年会_20s_不_数',
+            '申請_年会_30s_男_数',
+            '申請_年会_30s_女_数',
+            '申請_年会_30s_不_数',
+            '申請_年会_40s_男_数',
+            '申請_年会_40s_女_数',
+            '申請_年会_40s_不_数',
+            '申請_年会_50s_男_数',
+            '申請_年会_50s_女_数',
+            '申請_年会_50s_不_数',
+            '申請_年会_60s_男_数',
+            '申請_年会_60s_女_数',
+            '申請_年会_60s_不_数',
+            '申請_年会_70s_男_数',
+            '申請_年会_70s_女_数',
+            '申請_年会_70s_不_数'
+        ]
+        number_of_annual_fee_members = 0
+        # 各列の値を足し合わせて年会費を払っている会員数を算出
+        for column in columns_of_annual_fee_members:
+                if column in row and not pd.isna(row[column]):
+                    try:
+                        number_of_annual_fee_members += int(row[column])
+                    except ValueError:
+                        key = (club_name, column)
+                        if key not in warning_issued:
+                            logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
+                            warning_issued.add(key)
+                        number_of_annual_fee_members += 0
+        # 年会費を払っている会員数が0の場合は、'0'と記載
+        if number_of_annual_fee_members == 0:
+            number_of_annual_fee_members = '0'
+        else:
+            number_of_annual_fee_members = str(number_of_annual_fee_members)
+        document02_1_checklist_df.loc[index, '年会費を払っている会員数の合計'] = number_of_annual_fee_members
         # 受付日時のカラムはlatest_reception_data_dateを使用
         document02_1_checklist_df.loc[index, '受付日時'] = pd.to_datetime(latest_reception_data_date, format='%Y%m%d%H%M%S').strftime('%Y-%m-%d %H:%M:%S')
         # チェックリスト作成日時のカラムは現在のJST日時を使用
         document02_1_checklist_df.loc[index, 'チェックリスト作成日時'] = pd.to_datetime(get_jst_now()).strftime('%Y-%m-%d %H:%M:%S')
-
         # チェック項目のカラムを指定
         check_columns = [
-            'チェック項目_クラブ名',
-            'チェック項目_申請種別',
-            'チェック項目_住所',
-            'チェック項目_担当者名',
-            'チェック項目_連絡先',
-            'チェック項目_適合状況',
+            'チェック項目_会員数',
         ]
         # チェック項目の初期状態は「未チェック」
         for col in check_columns:
@@ -133,7 +206,7 @@ def make_document02_1_checklist(latest_reception_data_date):
         # チェック項目_その他の初期状態は空文字列
         document02_1_checklist_df.loc[index, 'チェック項目_その他'] = ''
         # チェック者名の初期状態は「チェックが完了していません」
-        document02_1_checklist_df.loc[index, 'チェック者名_申請内容'] = 'チェックが完了していません'
+        document02_1_checklist_df.loc[index, 'チェック者名_会員数'] = 'チェックが完了していません'
     logging.info("書類02_1のチェックリストのデータフレームを作成しました")
 
     # 5. 書類02_1のチェックリストのデータフレームを保存(ファイル名は「書類02_1チェックリスト_受付{latest_reception_data_date}_作成{YYYYMMDDHHMMSS}.xlsx」)
