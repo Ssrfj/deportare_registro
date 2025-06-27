@@ -57,22 +57,11 @@ def make_chacklists(latest_reception_data_date):
     make_documents_checklists(latest_reception_data_date)
     logging.info("書類ごとのチェックリストを作成しました")
 
-
-
-
-
-
-
-
-
 '''今後の作業memo
 作るファイル
-（総合の）チェックリスト
-書類ごとのチェックリスト
+書類ごとのチェックリスト(1と2_1は済)
 一貫性のチェックリスト
 基準に適合しているかのチェックリスト
 クラブごと＊書類ごとの詳細なデータ
-
 ※ファイルについては処理ごとに、また別のPythonファイルを作る
-
 '''
