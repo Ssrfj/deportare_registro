@@ -1,5 +1,8 @@
 import os
 import pandas as pd
+import logging
+import chardet
+
 from auto_check import perform_automatic_checks
 from utils import get_jst_now
 from column_name_change import column_name_change
@@ -7,10 +10,31 @@ from load_latest_club_data import load_latest_club_data
 from merge_and_save_apcption_data import merge_and_save_apcption_data
 from make_checklist_for_each_club import make_checklist_for_each_club
 from make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
-import logging
+from setting import (
+    output_main_folder,
+    log_folder_name,
+    log_folder_path,
+    application_data_folder_name,
+    application_data_folder_path,
+    application_data_with_club_info_folder_name,
+    application_data_with_club_info_folder_path,
+    Content_check_folder_name,
+    Content_check_folder_path
+)
+from make_folders import create_folders
+from logginng import setup_logging, save_logs
+from processing_application_data import processing_application_data
+from marge_application_data_with_club_info import marge_application_data_with_club_info
+from application_statues import application_statues
+from make_detailed_data_folders import make_detailed_data_folders
+from make_chacklists import make_chacklists
+from automation_check_and_update_checklist import automation_check_and_update_checklist
+from make_email_templates import make_email_templates
+from output_check_status_pdf import output_check_status_pdf
 
+# ログファイルのエンコーディングを自動検出して読み込む関数
+# 作業のログを実行ごとにtxtファイルに保存するための関数
 import chardet
-
 def read_log_with_detected_encoding(filepath):
     with open(filepath, 'rb') as f:
         raw = f.read()
@@ -19,20 +43,80 @@ def read_log_with_detected_encoding(filepath):
     with open(filepath, 'r', encoding=encoding) as f:
         return f.read()
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    encoding='utf-8',
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
-# ログファイルの設定
-log_file_path = os.path.join('R7_登録申請処理', 'logs', 'process_log.txt')
-os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
-file_handler = logging.FileHandler(log_file_path)
-file_handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
-file_handler.setFormatter(formatter)
-logging.getLogger().addHandler(file_handler)
+# メインの処理
+def main():
+    # ログの設定
+    setup_logging()
+    logging.info("ロギングを設定しました")
 
+    # フォルダの作成
+    logging.info("必要なフォルダを作成します")
+    create_folders()
+    logging.info("必要なフォルダを作成しました")
+
+    # 申請データ処理の受付処理
+    logging.info("申請データ処理の受付を開始します")
+    latest_application_data_date = processing_application_data()
+    if latest_application_data_date is None:
+        logging.error("申請データ処理に失敗しました。処理を終了します。")
+        return
+    logging.info("申請データ処理の受付が完了しました")
+    logging.info(f"最新の申請データの日付: {latest_application_data_date}")
+
+    # 処理済みデータにクラブ情報を追加
+    logging.info("処理済み申請データにクラブ情報を追加します")
+    marge_application_data_with_club_info(latest_application_data_date)
+    logging.info("処理済み申請データにクラブ情報を追加しました")
+
+    # 申請状況を更新
+    logging.info("申請状況を更新します")
+    application_statues(latest_application_data_date)
+    logging.info("申請状況の更新が完了しました")
+
+    # 申請内容チェック用ように参照するデータを保存するクラブごとのフォルダを作成
+    logging.info("申請内容チェック用のフォルダを作成します")
+    make_detailed_data_folders()
+    logging.info("申請内容チェック用のフォルダを作成しました")
+
+# 今後の作業memo
+# チェックリストの作成処理
+# チェックリストの更新・自動チェック
+# チェック状況に応じたメールの文面案の作成
+# チェック結果をPDＦで出力
+
+    # チェックリストを作成
+    logging.info("チェックリストを作成します")
+    make_chacklists(latest_application_data_date)
+    logging.info("チェックリストの作成が完了しました")
+
+    # チェックリストの更新・自動チェック
+    logging.info("チェックリストの更新・自動チェックを実行します")
+    automation_check_and_update_checklist()
+    logging.info("チェックリストの更新・自動チェックが完了しました")
+
+    # チェック状況に応じたメールの文面案の作成
+    logging.info("チェック状況に応じたメールの文面案を作成します")
+    make_email_templates()
+    logging.info("チェック状況に応じたメールの文面案の作成が完了しました")
+
+    # チェック結果をPDＦで出力
+    logging.info("チェック状況をPDFで出力します")
+    output_check_status_pdf()
+    logging.info("チェック状況のPDF出力が完了しました")
+
+    # ログファイルの保存（個別実行分と統合版の両方）
+    save_logs()
+
+
+# メインの処理を実行
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        logging.critical(f"予期せぬ致命的なエラーが発生しました: {e}", exc_info=True)
+        print(f"予期せぬ致命的なエラーが発生しました: {e}")
+
+'''一括で過去に書いたコードをコメントアウト
 def main():
     try:
         # 1. Excelのカラム名修正
@@ -57,7 +141,7 @@ def main():
             return
 
         # 4. 申請受付リストの最新ファイルを取得
-        folder_path = os.path.join('R7_登録申請処理','申請受付リスト')
+        folder_path = os.path.join('R7_登録申請処理','申請受付')
         try:
             os.makedirs(folder_path, exist_ok=True)
             files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.xlsx')]
@@ -73,13 +157,13 @@ def main():
             logging.error(f"申請受付リストの取得・読み込みでエラー: {e}", exc_info=True)
             return
 
-        # 5. チェックリスト作成状況ファイルの読み込みまたは新規作成
-        folder_of_checklist = os.path.join('R7_登録申請処理', '申請入力内容')
-        file_of_checklist_create_status = os.path.join(folder_of_checklist, 'クラブごとのチェックリスト作成状況.xlsx')
-        logging.info(f"チェックリスト作成状況ファイル: {file_of_checklist_create_status}")
+        # 5. 申請内容チェックリスト作成状況ファイルの読み込みまたは新規作成
+        folder_of_checklist = os.path.join('R7_登録申請処理', '申請内容チェック')
+        file_of_checklist_create_status = os.path.join(folder_of_checklist, '申請内容チェックリスト.xlsx')
+        logging.info(f"申請内容チェックリストファイル: {file_of_checklist_create_status}")
         try:
             os.makedirs(folder_of_checklist, exist_ok=True)
-            logging.info(f"チェックリスト作成状況フォルダ: {folder_of_checklist} を作成しました")
+            logging.info(f"申請内容チェックリスト作成状況フォルダ: {folder_of_checklist} を作成しました")
             if os.path.exists(file_of_checklist_create_status):
                 checklist_status_df = pd.read_excel(file_of_checklist_create_status)
                 for col in ['クラブ名', '申請日時', 'チェックリスト作成日時']:
@@ -205,3 +289,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+'''
