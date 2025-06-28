@@ -82,6 +82,10 @@ def make_documents_checklists(latest_reception_data_date):
     make_document05_plan_checklist(latest_reception_data_date)
     logging.info("書類05の計画書チェックリストを作成しました")
 
+    # 作業memo
+    # 書類5_計画は作業途中
+    # jsonファイルの作成が未完了
+
     # 書類5の予算書チェックリストを作成
     logging.info("書類05の予算書チェックリストを作成します")
     make_document05_budget_checklist(latest_reception_data_date)
