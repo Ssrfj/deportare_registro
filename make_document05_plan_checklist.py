@@ -84,39 +84,39 @@ def make_document05_plan_checklist(latest_reception_data_date):
     logging.info("書類05_計画のチェックリストのデータフレームを作成します")
     document05_plan_checklist_df = pd.DataFrame(columns=document05_plan_checklist_columns['document05_plan_checklist_columns'].tolist())
     logging.info("書類05_計画のチェックリストのデータフレームを作成しました")
+
+    logging.info("競技種目のリストを読み込みます")
+    discipline_df = pd.read_excel('list_of_disciplines.xlsx')  
+    discipline = discipline_df['disciplines']
+    logging.info("競技種目のリストを読み込みました")
+
     # 書類05_planのチェックリストのデータフレームにクラブ情報を追加
     for index, row in club_reception_df.iterrows():
         club_name = row['クラブ名']
         document05_plan_checklist_df.loc[index, '申請日時'] = row['申請_タイムスタンプ']
         document05_plan_checklist_df.loc[index, 'クラブ名'] = club_name
-        document05_plan_checklist_df.loc[index, '地区名'] = row['地区名']
+        
+        # 競技種目数の取得   
+        # 種目のカラムを修正（'申請_種目_'を付記）
+        disciplines_columns = [f'申請_種目_{discipline}' for discipline in discipline]
+        extra_disciplines_column = row.get('申請_種目_その他_数(選択時必須)', 0)
+        count_of_disciplines = 0
+        # 各種目カラムをループし、「定期的に行っている」が選択されているかを確認
+        for col in disciplines_columns:
+            if col in row and row[col] == '定期的に行っている':
+                count_of_disciplines += 1
+        count_of_disciplines += extra_disciplines_column in row and row[extra_disciplines_column] != '' and row[extra_disciplines_column] != '0'
+        # 競技種目数が0の場合は、'0'と記載
+        if count_of_disciplines == 0:
+            count_of_disciplines = '0'
+        else:
+            count_of_disciplines = str(count_of_disciplines)
+        document05_plan_checklist_df.loc[index, '申請_活動種目数'] = count_of_disciplines
+
         # 書類チェックの結果を記載するカラムを指定
         document05_plan_check_result_columns = [
-            '書類チェック結果_議決権保有者名簿1_種類',
-            '書類チェック結果_議決権保有者名簿1_構成員',
-            '書類チェック結果_議決権保有者名簿1_記載人数',
-            '書類チェック結果_議決権保有者名簿1_近隣住民数',
-            '書類チェック結果_議決権保有者名簿1_その他',
-            '書類チェック結果_議決権保有者名簿2_種類',
-            '書類チェック結果_議決権保有者名簿2_構成員',
-            '書類チェック結果_議決権保有者名簿2_記載人数',
-            '書類チェック結果_議決権保有者名簿2_近隣住民数',
-            '書類チェック結果_議決権保有者名簿2_その他',
-            '書類チェック結果_議決権保有者名簿3_種類',
-            '書類チェック結果_議決権保有者名簿3_構成員',
-            '書類チェック結果_議決権保有者名簿3_記載人数',
-            '書類チェック結果_議決権保有者名簿3_近隣住民数',
-            '書類チェック結果_議決権保有者名簿3_その他',
-            '書類チェック結果_議決権保有者名簿4_種類',
-            '書類チェック結果_議決権保有者名簿4_構成員',
-            '書類チェック結果_議決権保有者名簿4_記載人数',
-            '書類チェック結果_議決権保有者名簿4_近隣住民数',
-            '書類チェック結果_議決権保有者名簿4_その他',
-            '書類チェック結果_議決権保有者名簿5_種類',
-            '書類チェック結果_議決権保有者名簿5_構成員',
-            '書類チェック結果_議決権保有者名簿5_記載人数',
-            '書類チェック結果_議決権保有者名簿5_近隣住民数',
-            '書類チェック結果_議決権保有者名簿5_その他'
+            '書類チェック結果_活動種目数',
+            '書類チェック結果_種目実施チェック',
         ]
         # 書類チェックの結果の初期状態は「書類未チェック」
         for col in document05_plan_check_result_columns:
@@ -127,11 +127,7 @@ def make_document05_plan_checklist(latest_reception_data_date):
         document05_plan_checklist_df.loc[index, 'チェックリスト作成日時'] = pd.to_datetime(get_jst_now()).strftime('%Y-%m-%d %H:%M:%S')
         # チェック項目のカラムを指定
         check_columns = [
-            'チェック項目_議決権保有者名簿1',
-            'チェック項目_議決権保有者名簿2',
-            'チェック項目_議決権保有者名簿3',
-            'チェック項目_議決権保有者名簿4',
-            'チェック項目_議決権保有者名簿5'
+            'チェック項目_計画',
         ]
         # チェック項目の初期状態は「未チェック」
         for col in check_columns:
@@ -139,7 +135,7 @@ def make_document05_plan_checklist(latest_reception_data_date):
         # チェック項目_その他の初期状態は空文字列
         document05_plan_checklist_df.loc[index, 'チェック項目_その他'] = ''
         # チェック者名の初期状態は「チェックが完了していません」
-        document05_plan_checklist_df.loc[index, 'チェック者名_議決権保有者名簿'] = 'チェックが完了していません'
+        document05_plan_checklist_df.loc[index, 'チェック者名_計画'] = 'チェックが完了していません'
     logging.info("書類05_計画のチェックリストのデータフレームを作成しました")
 
     # 5. 書類05_計画のチェックリストのデータフレームを保存(ファイル名は「書類05_計画チェックリスト_受付{latest_reception_data_date}_作成{YYYYMMDDHHMMSS}.xlsx」)
