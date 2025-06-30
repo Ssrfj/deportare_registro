@@ -4,7 +4,7 @@ def setup_logging():
     """ロギングの設定"""
     import os
     import logging
-    from setting import log_folder_path
+    from setting_paths import log_folder_path
     if not os.path.exists(log_folder_path):
         os.makedirs(log_folder_path)
         logging.info(f"ログフォルダを作成しました: {log_folder_path}")
@@ -31,7 +31,7 @@ def save_logs():
     """個別実行ログと統合ログの両方を保存する"""
     import os
     import logging
-    from setting import output_main_folder, log_folder_name
+    from setting_paths import output_main_folder, log_folder_name
     from utils import get_jst_now
     
     logging.info("ログファイルの保存を開始します")

@@ -20,9 +20,13 @@ def make_consistency_checklists(latest_reception_data_date):
     import logging
     import pandas as pd
 
-    from setting import content_check_folder_path
+    from setting_paths import content_check_folder_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
+
+    from make_consistency_checklist_members_and_voting_rights import make_consistency_checklist_members_and_voting_rights
+    from make_consistency_checklist_disciplines import make_consistency_checklist_disciplines
+    from make_consistency_checklist_signatures import make_consistency_checklist_signatures
 
     # ロギングの設定
     setup_logging()
@@ -57,215 +61,21 @@ def make_consistency_checklists(latest_reception_data_date):
     # 2. 一貫性のチェックリストを作成
     logging.info("一貫性のチェックリストを作成します")
     
-    # 書類01を軸とした一貫性チェックリストを作成
-    logging.info("書類01のチェックリストを作成します")
-    # 書類01to02_2のチェックリストを作成
-    logging.info("書類01と書類02-2の一貫性チェックリストを作成します")
-    make_consistency_checklist_01_to_02_2(latest_reception_data_date)
-    logging.info("書類01と書類02-2の一貫性チェックリストを作成しました")
+    # 会員と議決権保有者の一貫性チェックリストを作成 #02-1と05、06の人数（会費収入）との一貫性をチェック
+    logging.info("会員と議決権保有者の一貫性チェックリストを作成します")
+    make_consistency_checklist_members_and_voting_rights(latest_reception_data_date)
+    logging.info("会員と議決権保有者の一貫性チェックリストを作成しました")
 
-    # 書類01to03のチェックリストを作成
-    logging.info("書類01と書類03の一貫性チェックリストを作成します")
-    make_consistency_checklist_01_to_03(latest_reception_data_date)
-    logging.info("書類01と書類03の一貫性チェックリストを作成しました")
+    # 活動種目の一貫性チェックリストを作成 # 02-2と05、06の活動種目との一貫性をチェック
+    logging.info("活動種目の一貫性チェックリストを作成します")
+    make_consistency_checklist_disciplines(latest_reception_data_date)
+    logging.info("活動種目の一貫性チェックリストを作成しました")
 
-    # 書類01to07のチェックリストを作成
-    logging.info("書類01と書類07の一貫性チェックリストを作成します")
-    make_consistency_checklist_01_to_07(latest_reception_data_date)
-    logging.info("書類01と書類07の一貫性チェックリストを作成しました")
+    # 議事録への署名の一貫性チェックリストを作成 # 03と08の議事録への署名との一貫性をチェック
+    logging.info("議事録への署名の一貫性チェックリストを作成します")
+    make_consistency_checklist_signatures(latest_reception_data_date)
+    logging.info("議事録への署名の一貫性チェックリストを作成しました")
 
-    # 書類01to08のチェックリストを作成
-    logging.info("書類01と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_01_to_08(latest_reception_data_date)
-    logging.info("書類01と書類08の一貫性チェックリストを作成しました")
+    logging.info("一貫性のチェックリストを作成しました")
 
-    # 書類01to09のチェックリストを作成
-    logging.info("書類01と書類09の一貫性チェックリストを作成します")
-    make_consistency_checklist_01_to_09(latest_reception_data_date)
-    logging.info("書類01と書類09の一貫性チェックリストを作成しました")
-
-    # 書類01to10のチェックリストを作成
-    logging.info("書類01と書類10の一貫性チェックリストを作成します")
-    make_consistency_checklist_01_to_10(latest_reception_data_date)
-    logging.info("書類01と書類10の一貫性チェックリストを作成しました")
-
-    logging.info("書類01を軸とした一貫性チェックリストを作成しました")
-
-    # 書類02_1を軸とした一貫性チェックリストを作成
-    logging.info("書類02-1を軸とした一貫性チェックリストを作成します")
-
-    # 書類02_1to03のチェックリストを作成
-    logging.info("書類02-1と書類03の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_1_to_03(latest_reception_data_date)
-    logging.info("書類02-1と書類03の一貫性チェックリストを作成しました")
-
-    # 書類02_1to04のチェックリストを作成
-    logging.info("書類02-1と書類04の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_1_to_04(latest_reception_data_date)
-    logging.info("書類02-1と書類04の一貫性チェックリストを作成しました")
-
-    # 書類02_1to05_planのチェックリストを作成
-    logging.info("書類02-1と書類05の計画書の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_1_to_05_plan(latest_reception_data_date)
-    logging.info("書類02-1と書類05の計画書の一貫性チェックリストを作成しました")
-
-    # 書類02_1to05_budgetのチェックリストを作成
-    logging.info("書類02-1と書類05の予算書の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_1_to_05_budget(latest_reception_data_date)
-    logging.info("書類02-1と書類05の予算書の一貫性チェックリストを作成しました")
-
-    # 書類02_1to06_reportのチェックリストを作成
-    logging.info("書類02-1と書類06の報告書の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_1_to_06_report(latest_reception_data_date)
-    logging.info("書類02-1と書類06の報告書の一貫性チェックリストを作成しました")
-
-    # 書類02_1to06_financial_statementsのチェックリストを作成
-    logging.info("書類02-1と書類06の決算書の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_1_to_06_financial_statements(latest_reception_data_date)
-    logging.info("書類02-1と書類06の決算書の一貫性チェックリストを作成しました")
-
-    # 書類02_1to07のチェックリストを作成
-    logging.info("書類02-1と書類07の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_1_to_07(latest_reception_data_date)
-    logging.info("書類02-1と書類07の一貫性チェックリストを作成しました")
-
-    # 書類02_1to08のチェックリストを作成
-    logging.info("書類02-1と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_1_to_08(latest_reception_data_date)
-    logging.info("書類02-1と書類08の一貫性チェックリストを作成しました")
-
-    logging.info("書類02-1を軸とした一貫性チェックリストを作成しました")
-
-    # 書類02_2を軸とした一貫性チェックリストを作成
-    logging.info("書類02-2を軸とした一貫性チェックリストを作成します")
-
-    # 書類02_2to05_planのチェックリストを作成
-    logging.info("書類02-2と書類05の計画書の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_2_to_05_plan(latest_reception_data_date)
-    logging.info("書類02-2と書類05の計画書の一貫性チェックリストを作成しました")
-
-    # 書類02_2to05_budgetのチェックリストを作成
-    logging.info("書類02-2と書類05の予算書の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_2_to_05_budget(latest_reception_data_date)
-    logging.info("書類02-2と書類05の予算書の一貫性チェックリストを作成しました")
-
-    # 書類02_2to06_reportのチェックリストを作成
-    logging.info("書類02-2と書類06の報告書の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_2_to_06_report(latest_reception_data_date)
-    logging.info("書類02-2と書類06の報告書の一貫性チェックリストを作成しました")
-
-    # 書類02_2to06_financial_statementsのチェックリストを作成
-    logging.info("書類02-2と書類06の決算書の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_2_to_06_financial_statements(latest_reception_data_date)
-    logging.info("書類02-2と書類06の決算書の一貫性チェックリストを作成しました")
-
-    # 書類02_2to08のチェックリストを作成
-    logging.info("書類02-2と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_02_2_to_08(latest_reception_data_date)
-    logging.info("書類02-2と書類08の一貫性チェックリストを作成しました")
-
-    logging.info("書類02-2を軸とした一貫性チェックリストを作成しました")
-
-    # 書類03を軸とした一貫性チェックリストを作成
-    logging.info("書類03を軸とした一貫性チェックリストを作成します")
-
-    # 書類03to04のチェックリストを作成
-    logging.info("書類03と書類04の一貫性チェックリストを作成します")
-    make_consistency_checklist_03_to_04(latest_reception_data_date)
-    logging.info("書類03と書類04の一貫性チェックリストを作成しました")
-
-    # 書類03to08のチェックリストを作成
-    logging.info("書類03と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_03_to_08(latest_reception_data_date)
-    logging.info("書類03と書類08の一貫性チェックリストを作成しました")
-
-    # 書類03to09のチェックリストを作成
-    logging.info("書類03と書類09の一貫性チェックリストを作成します")
-    make_consistency_checklist_03_to_09(latest_reception_data_date)
-    logging.info("書類03と書類09の一貫性チェックリストを作成しました")
-
-    logging.info("書類03を軸とした一貫性チェックリストを作成しました")
-
-    # 書類04を軸とした一貫性チェックリストを作成
-    logging.info("書類04を軸とした一貫性チェックリストを作成します")
-
-    # 書類04to08のチェックリストを作成
-    logging.info("書類04と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_04_to_08(latest_reception_data_date)
-    logging.info("書類04と書類08の一貫性チェックリストを作成しました")
-
-    logging.info("書類04を軸とした一貫性チェックリストを作成しました")
-
-    # 書類05_planを軸とした一貫性チェックリストを作成
-    logging.info("書類05の計画書を軸とした一貫性チェックリストを作成します")
-    # 書類05_planto05_budgetのチェックリストを作成
-    logging.info("書類05の計画書と予算書の一貫性チェックリストを作成します")
-    make_consistency_checklist_05_plan_to_05_budget(latest_reception_data_date)
-    logging.info("書類05の計画書と予算書の一貫性チェックリストを作成しました")
-
-    # 書類05_planto06_reportのチェックリストを作成
-    logging.info("書類05の計画書と報告書の一貫性チェックリストを作成します")
-    make_consistency_checklist_05_plan_to_06_report(latest_reception_data_date)
-    logging.info("書類05の計画書と報告書の一貫性チェックリストを作成しました")
-
-    # 書類05_planto06_financial_statementsのチェックリストを作成
-    logging.info("書類05の計画書と決算書の一貫性チェックリストを作成します")
-    make_consistency_checklist_05_plan_to_06_financial_statements(latest_reception_data_date)
-    logging.info("書類05の計画書と決算書の一貫性チェックリストを作成しました")
-
-    # 書類05_planto08のチェックリストを作成
-    logging.info("書類05の計画書と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_05_plan_to_08(latest_reception_data_date)
-    logging.info("書類05の計画書と書類08の一貫性チェックリストを作成しました")
-
-    logging.info("書類05の計画書を軸とした一貫性チェックリストを作成しました")
-
-    # 書類05_budgetを軸とした一貫性チェックリストを作成
-    logging.info("書類05の予算書を軸とした一貫性チェックリストを作成します")
-    # 書類05_budgetto06_reportのチェックリストを作成
-    logging.info("書類05の予算書と報告書の一貫性チェックリストを作成します")
-    make_consistency_checklist_05_budget_to_06_report(latest_reception_data_date)
-    logging.info("書類05の予算書と報告書の一貫性チェックリストを作成しました")
-
-    # 書類05_budgetto06_financial_statementsのチェックリストを作成
-    logging.info("書類05の予算書と決算書の一貫性チェックリストを作成します")
-    make_consistency_checklist_05_budget_to_06_financial_statements(latest_reception_data_date)
-    logging.info("書類05の予算書と決算書の一貫性チェックリストを作成しました")
-
-    # 書類05_budgetto08のチェックリストを作成
-    logging.info("書類05の予算書と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_05_budget_to_08(latest_reception_data_date)
-    logging.info("書類05の予算書と書類08の一貫性チェックリストを作成しました")
-
-    logging.info("書類05の予算書を軸とした一貫性チェックリストを作成しました")
-
-    # 書類06_reportを軸とした一貫性チェックリストを作成
-    logging.info("書類06の報告書を軸とした一貫性チェックリストを作成します")
-    # 書類06_reportto06_financial_statementsのチェックリストを作成
-    logging.info("書類06の報告書と決算書の一貫性チェックリストを作成します")
-    make_consistency_checklist_06_report_to_06_financial_statements(latest_reception_data_date)
-    logging.info("書類06の報告書と決算書の一貫性チェックリストを作成しました")
-
-    # 書類06_reportto08のチェックリストを作成
-    logging.info("書類06の報告書と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_06_report_to_08(latest_reception_data_date)
-    logging.info("書類06の報告書と書類08の一貫性チェックリストを作成しました")
-
-    logging.info("書類06の報告書を軸とした一貫性チェックリストを作成しました")
-
-    # 書類06_financial_statementsを軸とした一貫性チェックリストを作成
-    logging.info("書類06の決算書を軸とした一貫性チェックリストを作成します")
-    # 書類06_financial_statementsto07のチェックリストを作成
-    logging.info("書類06の決算書と書類07の一貫性チェックリストを作成します")
-    make_consistency_checklist_06_financial_statements_to_07(latest_reception_data_date)
-    logging.info("書類06の決算書と書類07の一貫性チェックリストを作成しました")
-
-    # 書類06_financial_statementsto08のチェックリストを作成
-    logging.info("書類06の決算書と書類08の一貫性チェックリストを作成します")
-    make_consistency_checklist_06_financial_statements_to_08(latest_reception_data_date)
-    logging.info("書類06の決算書と書類08の一貫性チェックリストを作成しました")
-
-    logging.info("書類06の決算書を軸とした一貫性チェックリストを作成しました")
     
-    logging.info("書類09を軸とした一貫性チェックリストを作成しました")
-    logging.info("書類ごとの一貫性チェックリストを作成しました")

@@ -2,7 +2,7 @@ def reception_statues(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from setting import application_statues_folder_path, processed_reception_data_folder_path, club_info_data_path
+    from setting_paths import application_statues_folder_path, processed_reception_data_folder_path, club_info_data_path
     from make_folders import setup_logging, create_folders
     from utils import get_jst_now
     

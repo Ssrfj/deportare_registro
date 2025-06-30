@@ -2,12 +2,12 @@ def make_chacklists(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from setting import content_check_folder_path, reception_statues_folder_path
+    from setting_paths import content_check_folder_path, reception_statues_folder_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
     from make_overall_checklist import make_overall_checklist
     from make_documents_checklists import make_documents_checklists
-
+    from make_consistency_checklists import make_consistency_checklists
 
     # ロギングの設定
     setup_logging()
@@ -67,6 +67,5 @@ def make_chacklists(latest_reception_data_date):
 一貫性のチェックリスト
 基準に適合しているかのチェックリスト
 クラブごと＊書類ごとの詳細なデータ
-クラブごと*一貫性のデータ
 ※ファイルについては処理ごとに、また別のPythonファイルを作る
 '''

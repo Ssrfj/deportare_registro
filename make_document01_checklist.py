@@ -2,7 +2,7 @@ def make_document01_checklist(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from setting import content_check_folder_path, document01_checklist_folder_path
+    from setting_paths import content_check_folder_path, document01_checklist_folder_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
     from make_overall_checklist import make_overall_checklist

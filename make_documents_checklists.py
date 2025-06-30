@@ -3,7 +3,7 @@ def make_documents_checklists(latest_reception_data_date):
     import logging
     import pandas as pd
 
-    from setting import content_check_folder_path
+    from setting_paths import content_check_folder_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
     from make_document01_checklist import make_document01_checklist

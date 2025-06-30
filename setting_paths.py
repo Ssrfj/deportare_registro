@@ -48,3 +48,11 @@ document09_checklist_folder_name = '書類09チェックリスト'
 document09_checklist_folder_path = os.path.join(content_check_folder_path, document09_checklist_folder_name)
 document10_checklist_folder_name = '書類10チェックリスト'
 document10_checklist_folder_path = os.path.join(content_check_folder_path, document10_checklist_folder_name)
+
+# 一貫性チェックリストのフォルダ
+consistency_checklist_members_and_voting_rights_folder_name = '会員と議決権保有者の一貫性チェックリスト'
+consistency_checklist_members_and_voting_rights_folder_path = os.path.join(content_check_folder_path, consistency_checklist_members_and_voting_rights_folder_name)
+consistency_checklist_disciplines_folder_name = '活動種目の一貫性チェックリスト'
+consistency_checklist_disciplines_folder_path = os.path.join(content_check_folder_path, consistency_checklist_disciplines_folder_name)
+consistency_checklist_signatures_folder_name = '議事録への署名の一貫性チェックリスト'
+consistency_checklist_signatures_folder_path = os.path.join(content_check_folder_path, consistency_checklist_signatures_folder_name)

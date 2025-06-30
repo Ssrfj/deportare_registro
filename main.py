@@ -10,7 +10,7 @@ from load_latest_club_data import load_latest_club_data
 from merge_and_save_apcption_data import merge_and_save_apcption_data
 from make_checklist_for_each_club import make_checklist_for_each_club
 from make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
-from setting import (
+from setting_paths import (
     output_main_folder,
     log_folder_name,
     log_folder_path,

@@ -2,7 +2,7 @@ def make_document06_financial_statements_checklist(latest_reception_data_date=No
     import os
     import pandas as pd
     import logging
-    from setting import content_check_folder_path, document06_financial_statements_checklist_folder_path
+    from setting_paths import content_check_folder_path, document06_financial_statements_checklist_folder_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
 
@@ -94,6 +94,7 @@ def make_document06_financial_statements_checklist(latest_reception_data_date=No
         # 書類チェックの結果を記載するカラムを指定
         document06_financial_statements_check_result_columns = [
             '書類チェック結果_収入の記載',
+            '書類チェック結果_会費の会員数',
             '書類チェック結果_支出の記載',
             '書類チェック結果_科目の記載',
             '書類チェック結果_摘要の記載',

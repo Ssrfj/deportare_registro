@@ -1,7 +1,7 @@
 import os
 import logging
 
-from setting import (
+from setting_paths import (
     output_main_folder,
     log_folder_path,
     reception_data_folder_path,

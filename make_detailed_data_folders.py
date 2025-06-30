@@ -2,7 +2,7 @@ def make_detailed_data_folders():
     import os
     import pandas as pd
     import logging
-    from setting import reception_statues_folder_path, clubs_reception_data_path, content_check_folder_path
+    from setting_paths import reception_statues_folder_path, clubs_reception_data_path, content_check_folder_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
 

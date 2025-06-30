@@ -2,7 +2,7 @@ def processing_reception_data():
     import os
     import logging
     import pandas as pd
-    from setting import (
+    from setting_paths import (
         reception_data_folder_path,
         processed_reception_data_folder_path,
     )
