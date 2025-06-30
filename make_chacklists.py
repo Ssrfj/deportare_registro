@@ -57,11 +57,16 @@ def make_chacklists(latest_reception_data_date):
     make_documents_checklists(latest_reception_data_date)
     logging.info("書類ごとのチェックリストを作成しました")
 
+    # 6. 書類間の一貫性チェックリストの作成
+    logging.info("書類間の一貫性チェックリストを作成します")
+    make_consistency_checklists(latest_reception_data_date)
+    logging.info("書類間の一貫性チェックリストを作成しました")
+
 '''今後の作業memo
 作るファイル
-書類ごとのチェックリスト(1~4は済,5_planは途中（jsonの作成が未完))
 一貫性のチェックリスト
 基準に適合しているかのチェックリスト
 クラブごと＊書類ごとの詳細なデータ
+クラブごと*一貫性のデータ
 ※ファイルについては処理ごとに、また別のPythonファイルを作る
 '''
