@@ -12,12 +12,10 @@ def make_detailed_club_data(club_reception_df):
     create_folders()
     logging.info("フォルダを作成しました")
 
-    # 機能のメモ（最新のクラブ情報付き受付データファイルのクラブごとに処理）
-    # 1. クラブごとの詳細データ保存するためのフォルダを作成
-    # 2. データの種類ごとに処理
-    # 2.1. 最新のクラブ情報付き受付データのカラム’申請日時’を基に新たにデータを作る必要があるかを判断
-    # 2.2. クラブごとの詳細データを作成
-    # 2.3. クラブごとの詳細データを保存
+    # discipline_dfの読み込み
+    discipline_df = pd.read_excel('list_of_disciplines.xlsx')
+    disciplines = discipline_df['disciplines'].tolist()
+
 
     # クラブごとに処理
     club_names = club_reception_df['クラブ名'].unique()
@@ -69,9 +67,9 @@ def make_detailed_club_data(club_reception_df):
                 for age in ages:
                     col_name = detailed_member_columns[age][gender]
                     value = 0
-                    if col_name in row and not pd.isna(row[col_name]):
+                    if col_name in club_reception_df and not pd.isna(club_reception_df[col_name]):
                         try:
-                            value = int(row[col_name])
+                            value = int(club_reception_df[col_name])
                         except ValueError:
                             pass
                     row_gender[age] = value
@@ -127,24 +125,47 @@ def make_detailed_club_data(club_reception_df):
         
         # 2.3. 種目のリストを作成
         logging.info(f"クラブ名: {club_name} の種目の詳細データを作成します")
+        # 2.3.1. 種目のリストを作成する必要があるかを判断（ファイル名「{club_name}_申請{application_date}_種目詳細データ.xlsx」の申請日時と同じなら作成しない）
+        club_disciplines_file_name = f"{club_name}_申請{application_date}_種目詳細データ.xlsx"
+        club_disciplines_file_path = os.path.join(club_detail_data_folder_path, club_disciplines_file_name)
+        if not os.path.exists(club_disciplines_file_path):
+            # 2.3.2. 種目のリストを作成
+            detailed_disciplines_df = []
+            for discipline in disciplines:
+                row_dict = {}
+                row_dict['種目'] = discipline
 
+                # 実施有無
+                col_name = f'申請_種目_{discipline}'
+                if col_name in club_reception_df:
+                    # 例: '定期的に行っている' など
+                    row_dict['実施有無'] = club_reception_df[col_name]
+                else:
+                    row_dict['実施有無'] = ''
+                detailed_disciplines_df.append(row_dict)
+                    # 「その他」種目の追加
+            # 「その他」種目の行を追加
+            other_rows = {'申請_種目_その他': club_reception_df['申請_種目_その他'].iloc[0],
+                          '申請_種目_その他_数(選択時必須)': club_reception_df['申請_種目_その他_数(選択時必須)'].iloc[0],
+                          '申請_種目_その他_テキスト(選択時必須)': club_reception_df['申請_種目_その他_テキスト(選択時必須)'].iloc[0]}
+            detailed_disciplines_df.append(other_rows)
+            # 種目数のカウント（row_dict['実施有無']が「実施している」の数と'申請_種目_その他_数(選択時必須)'の数値を合計）
+            total_discipline_count = sum(1 for row in detailed_disciplines_df if row.get('実施有無') == '実施している')
+            if '申請_種目_その他_数(選択時必須)' in club_reception_df.columns:
+                try:
+                    other_count = int(club_reception_df['申請_種目_その他_数(選択時必須)'].iloc[0])
+                    total_discipline_count += other_count
+                except ValueError:
+                    logging.warning(f"クラブ名: {club_name} の「その他」種目の数値が不正です: {club_reception_df['申請_種目_その他_数(選択時必須)'].iloc[0]}")
+            else:
+                other_count = 0
+            # 種目数のカウントを追加
+            row_dict['種目数合計'] = total_discipline_count
+            detailed_disciplines_df = pd.DataFrame(detailed_disciplines_df)
+            # 2.3.3. 種目のリストを保存
+            detailed_disciplines_df.to_excel(club_disciplines_file_path, index=False)
+            logging.info(f"クラブ名: {club_name} の種目の詳細データを保存しました: {club_disciplines_file_path}")
+        else:
+            logging.info(f"クラブ名: {club_name} の種目の詳細データは既に存在します: {club_disciplines_file_path}")
 
-
-
-        # memo:作る必要があるデータ
-        # 種目のリスト（2-2）
-        # 議決権保有者の基準チェック
-        # 途中で、書類のチェックリストの役割が変化している（単純なチェックとキーポイントの記入だけにする）今は3以降の書類では、別の書類チェックシートが必要になっている
-        # 一貫性チェックも要修正
-        # 計画と報告のチェックリストは、書類のチェックリストに実装する必要がある種目ごとの記載有無を0・1で入力するimage
-
-
-
-
-        # クラブごとの詳細データファイル名を作成
-        club_detail_data_file_name = f"{club_name}_詳細データ.xlsx"
-        club_detail_data_file_path = os.path.join(club_detail_data_folder_path, club_detail_data_file_name)
-        # クラブごとの詳細データを保存
-        club_data.to_excel(club_detail_data_file_path, index=False)
-        logging.info(f"クラブ名: {club_name} の詳細データを保存しました: {club_detail_data_file_path}")
     logging.info("全てのクラブの詳細データを処理しました")

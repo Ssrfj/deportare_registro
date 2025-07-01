@@ -78,12 +78,6 @@ def main():
     make_detailed_data_folders()
     logging.info("受付内容チェック用のフォルダを作成しました")
 
-# 今後の作業memo
-# チェックリストの作成処理
-# チェックリストの更新・自動チェック
-# チェック状況に応じたメールの文面案の作成
-# チェック結果をPDＦで出力
-
     # チェックリストを作成
     logging.info("チェックリストを作成します")
     make_chacklists(latest_reception_data_date)
@@ -93,6 +87,11 @@ def main():
     logging.info("チェックリストの更新・自動チェックを実行します")
     automation_check_and_update_checklist()
     logging.info("チェックリストの更新・自動チェックが完了しました")
+
+    # 今後の作業memo
+    # チェックリストの更新・自動チェック
+    # チェック状況に応じたメールの文面案の作成
+    # チェック結果をPDＦで出力
     # めも：書類間の整合性は、ある程度自動化できるかも…
 
     # チェック状況に応じたメールの文面案の作成

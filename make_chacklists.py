@@ -66,9 +66,13 @@ def make_chacklists(latest_reception_data_date):
     # 7. クラブごとの詳細なデータを保存
     logging.info("クラブごとの詳細なデータを保存します")
     make_detailed_club_data(club_reception_df)
+    logging.info("クラブごとの詳細なデータを保存しました")
 
-'''今後の作業memo
-作るファイル
-クラブごと＊書類ごとの詳細なデータ
-※ファイルについては処理ごとに、また別のPythonファイルを作る
-'''
+    # 8. 最新のクラブ情報付き受付データファイルの更新日時を記録
+    logging.info("最新のクラブ情報付き受付データファイルの更新日時を記録します")
+    latest_reception_data_date = get_jst_now()
+    latest_reception_data_file_path = os.path.join(reception_statues_folder_path, 'latest_reception_data_date.txt')
+    with open(latest_reception_data_file_path, 'w') as f:
+        f.write(latest_reception_data_date.strftime('%Y-%m-%d %H:%M:%S'))
+    logging.info(f"最新のクラブ情報付き受付データファイルの更新日時を記録しました: {latest_reception_data_date}")
+    logging.info("チェックリストの作成が完了しました")
