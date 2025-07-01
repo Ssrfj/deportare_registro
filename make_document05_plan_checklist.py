@@ -115,8 +115,8 @@ def make_document05_plan_checklist(latest_reception_data_date):
 
         # 書類チェックの結果を記載するカラムを指定
         document05_plan_check_result_columns = [
-            '書類チェック結果_活動種目数',
-            '書類チェック結果_種目実施チェック',
+            '担当者入力_活動種目数',
+            '担当者入力_種目実施チェック',
         ]
         # 書類チェックの結果の初期状態は「書類未チェック」
         for col in document05_plan_check_result_columns:

@@ -26,7 +26,7 @@ def make_consistency_checklists(latest_reception_data_date):
 
     from make_consistency_checklist_members_and_voting_rights import make_consistency_checklist_members_and_voting_rights
     from make_consistency_checklist_disciplines import make_consistency_checklist_disciplines
-    from make_consistency_checklist_signatures import make_consistency_checklist_signatures
+    from make_consistency_checklist_meeting_minutes import make_consistency_checklist_meeting_minutes
 
     # ロギングの設定
     setup_logging()
@@ -71,10 +71,10 @@ def make_consistency_checklists(latest_reception_data_date):
     make_consistency_checklist_disciplines(latest_reception_data_date)
     logging.info("活動種目の一貫性チェックリストを作成しました")
 
-    # 議事録への署名の一貫性チェックリストを作成 # 03と08の議事録への署名との一貫性をチェック
-    logging.info("議事録への署名の一貫性チェックリストを作成します")
-    make_consistency_checklist_signatures(latest_reception_data_date)
-    logging.info("議事録への署名の一貫性チェックリストを作成しました")
+    # 議事録の一貫性チェックリストを作成 # 03と08の議事録の一貫性をチェック
+    logging.info("議事録の一貫性チェックリストを作成します")
+    make_consistency_checklist_meeting_minutes(latest_reception_data_date)
+    logging.info("議事録の一貫性チェックリストを作成しました")
 
     logging.info("一貫性のチェックリストを作成しました")
 

@@ -54,5 +54,9 @@ consistency_checklist_members_and_voting_rights_folder_name = '会員と議決�
 consistency_checklist_members_and_voting_rights_folder_path = os.path.join(content_check_folder_path, consistency_checklist_members_and_voting_rights_folder_name)
 consistency_checklist_disciplines_folder_name = '活動種目の一貫性チェックリスト'
 consistency_checklist_disciplines_folder_path = os.path.join(content_check_folder_path, consistency_checklist_disciplines_folder_name)
-consistency_checklist_signatures_folder_name = '議事録への署名の一貫性チェックリスト'
-consistency_checklist_signatures_folder_path = os.path.join(content_check_folder_path, consistency_checklist_signatures_folder_name)
+consistency_checklist_meeting_minutes_folder_name = '議事録の一貫性チェックリスト'
+consistency_checklist_meeting_minutes_folder_path = os.path.join(content_check_folder_path, consistency_checklist_meeting_minutes_folder_name)
+
+# 書類チェック・一貫性チェックに使うクラブごとの詳細データ保存フォルダ
+clubs_details_data_folder_name = 'クラブごとの詳細データ'
+clubs_details_data_folder_path = os.path.join(content_check_folder_path, clubs_details_data_folder_name)

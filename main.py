@@ -93,6 +93,7 @@ def main():
     logging.info("チェックリストの更新・自動チェックを実行します")
     automation_check_and_update_checklist()
     logging.info("チェックリストの更新・自動チェックが完了しました")
+    # めも：書類間の整合性は、ある程度自動化できるかも…
 
     # チェック状況に応じたメールの文面案の作成
     logging.info("チェック状況に応じたメールの文面案を作成します")

@@ -83,146 +83,16 @@ def make_consistency_checklist_disciplines(latest_reception_data_date):
         club_name = row['クラブ名']
         consistency_checklist_disciplines_df.loc[index, '申請日時'] = row['申請_タイムスタンプ']
         consistency_checklist_disciplines_df.loc[index, 'クラブ名'] = club_name
-        # 入力内容を基に会員数を算出
-        columns_of_number_of_members = [
-            '申請_会員_未就_男_数',
-            '申請_会員_未就_女_数',
-            '申請_会員_未就_不_数',
-            '申請_会員_小_男_数',
-            '申請_会員_小_女_数',
-            '申請_会員_小_不_数',
-            '申請_会員_中_男_数',
-            '申請_会員_中_女_数',
-            '申請_会員_中_不_数',
-            '申請_会員_高_男_数',
-            '申請_会員_高_女_数',
-            '申請_会員_高_不_数',
-            '申請_会員_20s_男_数',
-            '申請_会員_20s_女_数',
-            '申請_会員_20s_不_数',
-            '申請_会員_30s_男_数',
-            '申請_会員_30s_女_数',
-            '申請_会員_30s_不_数',
-            '申請_会員_40s_男_数',
-            '申請_会員_40s_女_数',
-            '申請_会員_40s_不_数',
-            '申請_会員_50s_男_数',
-            '申請_会員_50s_女_数',
-            '申請_会員_50s_不_数',
-            '申請_会員_60s_男_数',
-            '申請_会員_60s_女_数',
-            '申請_会員_60s_不_数',
-            '申請_会員_70s_男_数',
-            '申請_会員_70s_女_数',
-            '申請_会員_70s_不_数'
-        ]
-        warning_issued = set()
-        number_of_members = 0
-        # 各列の値を足し合わせて会員数を算出
-        for column in columns_of_number_of_members:
-            if column in row and not pd.isna(row[column]):
-                try:
-                    number_of_members += int(row[column])
-                except ValueError:
-                    key = (club_name, column)
-                    if key not in warning_issued:
-                        logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
-                        warning_issued.add(key)
-                    number_of_members += 0
-        # 会員数が0の場合は、'0'と記載
-        if number_of_members == 0:
-            number_of_members = '0'
-        else:
-            number_of_members = str(number_of_members)
-        consistency_checklist_disciplines_df.loc[index, '会員数の合計'] = number_of_members
-
-        # 入力内容を基に年会費を払っている会員数を算出
-        columns_of_annual_fee_members = [
-            '申請_年会_未就_男_数',
-            '申請_年会_未就_女_数',
-            '申請_年会_未就_不_数',
-            '申請_年会_小_男_数',
-            '申請_年会_小_女_数',
-            '申請_年会_小_不_数',
-            '申請_年会_中_男_数',
-            '申請_年会_中_女_数',
-            '申請_年会_中_不_数',
-            '申請_年会_高_男_数',
-            '申請_年会_高_女_数',
-            '申請_年会_高_不_数',
-            '申請_年会_20s_男_数',
-            '申請_年会_20s_女_数',
-            '申請_年会_20s_不_数',
-            '申請_年会_30s_男_数',
-            '申請_年会_30s_女_数',
-            '申請_年会_30s_不_数',
-            '申請_年会_40s_男_数',
-            '申請_年会_40s_女_数',
-            '申請_年会_40s_不_数',
-            '申請_年会_50s_男_数',
-            '申請_年会_50s_女_数',
-            '申請_年会_50s_不_数',
-            '申請_年会_60s_男_数',
-            '申請_年会_60s_女_数',
-            '申請_年会_60s_不_数',
-            '申請_年会_70s_男_数',
-            '申請_年会_70s_女_数',
-            '申請_年会_70s_不_数'
-        ]
-        number_of_annual_fee_members = 0
-        # 各列の値を足し合わせて年会費を払っている会員数を算出
-        for column in columns_of_annual_fee_members:
-                if column in row and not pd.isna(row[column]):
-                    try:
-                        number_of_annual_fee_members += int(row[column])
-                    except ValueError:
-                        key = (club_name, column)
-                        if key not in warning_issued:
-                            logging.warning(f"クラブ '{club_name}' の列 '{column}' の値が整数に変換できません: {row[column]}")
-                            warning_issued.add(key)
-                        number_of_annual_fee_members += 0
-        # 年会費を払っている会員数が0の場合は、'0'と記載
-        if number_of_annual_fee_members == 0:
-            number_of_annual_fee_members = '0'
-        else:
-            number_of_annual_fee_members = str(number_of_annual_fee_members)
-        consistency_checklist_disciplines_df.loc[index, '年会費を払っている会員数の合計'] = number_of_annual_fee_members
-        consistency_checklist_disciplines_df.loc[index, '申請_法人格'] = row['申請_法人格']
+        
         
         # 書類チェックの結果を記載するカラムを指定
-        documents_check_result_columns = [
-            "書類チェック結果_規約等_法人格",
-            "書類チェック結果_規約等_会員資格",
-            "書類チェック結果_規約等_規約等の改廃意思決定機関の議決権保有者",
-            "書類チェック結果_規約等_事業計画の意思決定機関の議決権保有者",
-            "書類チェック結果_規約等_予算の意思決定機関の議決権保有者",
-            "書類チェック結果_規約等_事業報告の意思決定機関の議決権保有者",
-            "書類チェック結果_規約等_決算の意思決定機関の議決権保有者",
-            "書類チェック結果_議決権保有者名簿1_構成員",
-            "書類チェック結果_議決権保有者名簿1_記載人数",
-            "書類チェック結果_議決権保有者名簿2_構成員",
-            "書類チェック結果_議決権保有者名簿2_記載人数",
-            "書類チェック結果_議決権保有者名簿3_構成員",
-            "書類チェック結果_議決権保有者名簿3_記載人数",
-            "書類チェック結果_議決権保有者名簿4_構成員",
-            "書類チェック結果_議決権保有者名簿4_記載人数",
-            "書類チェック結果_議決権保有者名簿5_構成員",
-            "書類チェック結果_議決権保有者名簿5_記載人数",
-            "書類チェック結果_予算_会費の会員数",
-            "書類チェック結果_決算_会費の会員数",      
-            "書類チェック_議事録_規約等_議決権保有者数",
-            "書類チェック_議事録_規約等_議決権行使者数",
-            "書類チェック_議事録_事業計画_議決権保有者数",
-            "書類チェック_議事録_事業計画_議決権行使者数",
-            "書類チェック_議事録_予算_議決権保有者数",
-            "書類チェック_議事録_予算_議決権行使者数",
-            "書類チェック_議事録_事業報告_議決権保有者数",
-            "書類チェック_議事録_事業報告_議決権行使者数",
-            "書類チェック_議事録_決算_議決権保有者数",
-            "書類チェック_議事録_決算_議決権行使者数"
+        automatic_check_result_columns = [
+            "自動_チェック項目_活動種目_02_2_計画",
+            "自動_チェック項目_活動種目_02_2_報告",
+            "自動_チェック項目_活動種目_計画_報告"
         ]
         # 書類チェックの結果の初期状態は「書類未チェック」
-        for col in documents_check_result_columns:
+        for col in automatic_check_result_columns:
             consistency_checklist_disciplines_df.loc[index, col] = '書類未チェック'
         # 受付日時のカラムはlatest_reception_data_dateを使用
         consistency_checklist_disciplines_df.loc[index, '受付日時'] = pd.to_datetime(latest_reception_data_date, format='%Y%m%d%H%M%S').strftime('%Y-%m-%d %H:%M:%S')
@@ -231,8 +101,7 @@ def make_consistency_checklist_disciplines(latest_reception_data_date):
 
         # チェック項目のカラムを指定
         check_columns = [
-            'チェック項目_会員',
-            'チェック項目_議決権保有者'
+            'チェック項目_活動種目'
         ]
         # チェック項目の初期状態は「未チェック」
         for col in check_columns:
@@ -240,7 +109,7 @@ def make_consistency_checklist_disciplines(latest_reception_data_date):
         # チェック項目_その他の初期状態は空文字列
         consistency_checklist_disciplines_df.loc[index, 'チェック項目_その他'] = ''
         # チェック者名の初期状態は「チェックが完了していません」
-        consistency_checklist_disciplines_df.loc[index, 'チェック者名_活動種目'] = 'チェックが完了していません'
+        consistency_checklist_disciplines_df.loc[index, 'チェック者名_一貫性_活動種目'] = 'チェックが完了していません'
     logging.info("活動種目の一貫性のチェックリストのデータフレームを作成しました")
 
     # 5. 活動種目の一貫性のチェックリストのデータフレームを保存(ファイル名は「活動種目の一貫性チェックリスト_受付{latest_reception_data_date}_作成{YYYYMMDDHHMMSS}.xlsx」)

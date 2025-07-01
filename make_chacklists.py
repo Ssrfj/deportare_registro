@@ -8,6 +8,7 @@ def make_chacklists(latest_reception_data_date):
     from make_overall_checklist import make_overall_checklist
     from make_documents_checklists import make_documents_checklists
     from make_consistency_checklists import make_consistency_checklists
+    from make_detailed_club_data import make_detailed_club_data
 
     # ロギングの設定
     setup_logging()
@@ -62,10 +63,12 @@ def make_chacklists(latest_reception_data_date):
     make_consistency_checklists(latest_reception_data_date)
     logging.info("書類間の一貫性チェックリストを作成しました")
 
+    # 7. クラブごとの詳細なデータを保存
+    logging.info("クラブごとの詳細なデータを保存します")
+    make_detailed_club_data(club_reception_df)
+
 '''今後の作業memo
 作るファイル
-一貫性のチェックリスト
-基準に適合しているかのチェックリスト
 クラブごと＊書類ごとの詳細なデータ
 ※ファイルについては処理ごとに、また別のPythonファイルを作る
 '''
