@@ -1,26 +1,9 @@
-'''
-    #このファイルでは使わない関数（これを参考に新たな関数を作成する）
-    from make_document01_checklist import make_document01_checklist
-    from make_document02_1_checklist import make_document02_1_checklist
-    from make_document02_2_checklist import make_document02_2_checklist
-    from make_document03_checklist import make_document03_checklist
-    from make_document04_checklist import make_document04_checklist
-    from make_document05_plan_checklist import make_document05_plan_checklist
-    from make_document05_budget_checklist import make_document05_budget_checklist
-    from make_document06_report_checklist import make_document06_report_checklist
-    from make_document06_financial_statements_checklist import make_document06_financial_statements_checklist
-    from make_document07_checklist import make_document07_checklist
-    from make_document08_checklist import make_document08_checklist
-    from make_document09_checklist import make_document09_checklist
-    from make_document10_checklist import make_document10_checklist
-'''
-
 def make_consistency_checklists(latest_reception_data_date):
     import os
     import logging
     import pandas as pd
 
-    from setting_paths import content_check_folder_path
+    from setting_paths import content_check_folder_path, clubs_reception_data_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
 
@@ -44,18 +27,26 @@ def make_consistency_checklists(latest_reception_data_date):
         logging.error("最新の受付データの日付が指定されていません")
         return
     
+    logging.info(f"検索パス: {clubs_reception_data_path}")
+    logging.info(f"検索パターン: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
+    
+    # パスが存在するか確認
+    if not os.path.exists(clubs_reception_data_path):
+        logging.error(f"クラブ情報付き受付データのパスが存在しません: {clubs_reception_data_path}")
+        return
+    
     latest_club_reception_files = [
-        f for f in os.listdir(content_check_folder_path)
-        if os.path.isfile(os.path.join(content_check_folder_path, f)) and
-        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
+        f for f in os.listdir(clubs_reception_data_path)
+        if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
+        f.startswith(f'クラブ情報付き申請データ_申請{latest_reception_data_date}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
-    club_reception_df = pd.read_excel(os.path.join(content_check_folder_path, latest_club_reception_file))
+    club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))
     logging.info(f"最新のクラブ情報付き受付データを読み込みました: {latest_club_reception_file}")
 
     # 2. 一貫性のチェックリストを作成
@@ -77,5 +68,3 @@ def make_consistency_checklists(latest_reception_data_date):
     logging.info("議事録の一貫性チェックリストを作成しました")
 
     logging.info("一貫性のチェックリストを作成しました")
-
-    

@@ -2,7 +2,7 @@ def make_document02_1_checklist(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from setting_paths import content_check_folder_path, document02_1_checklist_folder_path
+    from setting_paths import content_check_folder_path, document02_1_checklist_folder_path, clubs_reception_data_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
 
@@ -26,17 +26,17 @@ def make_document02_1_checklist(latest_reception_data_date):
         logging.error("最新の受付データの日付が指定されていません")
         return    
     latest_club_reception_files = [
-        f for f in os.listdir(content_check_folder_path)
-        if os.path.isfile(os.path.join(content_check_folder_path, f)) and
-        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
+        f for f in os.listdir(clubs_reception_data_path)
+        if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
+        f.startswith(f'クラブ情報付き申請データ_申請{latest_reception_data_date}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
-    club_reception_df = pd.read_excel(os.path.join(content_check_folder_path, latest_club_reception_file))
+    club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))
     logging.info(f"最新のクラブ情報付き受付データを読み込みました: {latest_club_reception_file}")
 
     # 2. 書類02_1_のチェックリストを作成する必要があるか確認
@@ -73,7 +73,7 @@ def make_document02_1_checklist(latest_reception_data_date):
     logging.info("書類02_1_のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（document02_1_checklist_columns.jsonが必要）
     document02_1_checklist_columns_file_name = 'document02_1_checklist_columns.json'
-    document02_1_checklist_columns_file_path = os.path.join(content_check_folder_path, document02_1_checklist_columns_file_name)
+    document02_1_checklist_columns_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), document02_1_checklist_columns_file_name)
     if not os.path.exists(document02_1_checklist_columns_file_path):
         logging.error(f"書類02_1のチェックリストのカラム名ファイルが見つかりません: {document02_1_checklist_columns_file_path}")
         return

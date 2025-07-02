@@ -2,9 +2,9 @@ def reception_statues(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from setting_paths import application_statues_folder_path, processed_reception_data_folder_path, club_info_data_path
+    from setting_paths import application_statues_folder_path, processed_reception_data_folder_path
     from make_folders import setup_logging, create_folders
-    from utils import get_jst_now
+    from utils import get_jst_now, get_latest_club_info_file
     
     # ロギングの設定
     setup_logging()
@@ -20,23 +20,11 @@ def reception_statues(latest_reception_data_date):
     else:
         logging.info(f"クラブ情報付き受付データのフォルダは既に存在します: {application_statues_folder_path}")
 
-    # 2. 最新のクラブ情報を読み込む（クラブ名_YYYYMMDDHHMMSS.xlsx形式）
+    # 2. 最新のクラブ情報を読み込む（クラブ名_YYYYMMDD.xlsx形式）
     logging.info("最新のクラブ情報を読み込みます")
-    latest_club_info_files = [
-        f for f in os.listdir(club_info_data_path)
-        if os.path.isfile(os.path.join(club_info_data_path, f)) and
-        f.startswith('クラブ情報_') and f.endswith('.xlsx')
-    ]
-    latest_club_info_files.sort(reverse=True)
-    if not latest_club_info_files:
-        logging.error("クラブ情報ファイルが見つかりません")
+    club_info_df, latest_club_info_date = get_latest_club_info_file()
+    if club_info_df is None:
         return
-    latest_club_info_file = latest_club_info_files[0]
-    latest_club_info_date = latest_club_info_file.split('_')[1].split('.')[0]
-    latest_club_info_date = pd.to_datetime(latest_club_info_date, format='%Y%m%d%H%M%S')
-    logging.info(f"最新のクラブ情報ファイル: {latest_club_info_file}")
-    club_info_df = pd.read_excel(os.path.join(club_info_data_path, latest_club_info_file))
-    logging.info(f"最新のクラブ情報を読み込みました: {latest_club_info_file}")
 
     # 3. 最新のクラブ申請状況を読み込む（申請状況_YYYYMMDDHHMMSS.xlsx形式）
     logging.info("最新のクラブ申請状況を読み込みます")
@@ -50,14 +38,15 @@ def reception_statues(latest_reception_data_date):
         logging.info("申請状況ファイルが見つかりません")
         latest_application_statues_file = None
     else:
-        latest_application_statues_files = latest_application_statues_files[0]
-        logging.info(f"最新の申請状況ファイル: {latest_application_statues_files}")
-    if latest_application_statues_files:
-        latest_application_statues_date = latest_application_statues_files.split('_')[1].split('.')[0]
+        latest_application_statues_file = latest_application_statues_files[0]
+        logging.info(f"最新の申請状況ファイル: {latest_application_statues_file}")
+    if latest_application_statues_file:
+        latest_application_statues_date = latest_application_statues_file.split('_')[1].split('.')[0]
         latest_application_statues_date = pd.to_datetime(latest_application_statues_date, format='%Y%m%d%H%M%S')
         logging.info(f"最新の申請状況の作成日: {latest_application_statues_date}")
     else:
         logging.error("最新の申請状況ファイルが見つかりません")
+        latest_application_statues_date = None
 
     # 4. 最新の申請状況を作成する必要があるかを判断
     if latest_application_statues_date and latest_application_statues_date >= latest_reception_data_date:

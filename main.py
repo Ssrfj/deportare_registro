@@ -27,6 +27,7 @@ def read_log_with_detected_encoding(filepath):
 def main():
     # ログの設定
     setup_logging()
+    logging.info("プログラムを開始します")
     logging.info("ロギングを設定しました")
 
     # フォルダの作成
@@ -39,6 +40,9 @@ def main():
     latest_reception_data_date = processing_reception_data()
     if latest_reception_data_date is None:
         logging.error("受付データ処理に失敗しました。処理を終了します。")
+        return
+    elif latest_reception_data_date == "no_data":
+        logging.info("処理済みデータも申請データも見つからないため、処理を終了します。")
         return
     logging.info("受付データ処理の受付が完了しました")
     logging.info(f"最新の受付データの日付: {latest_reception_data_date}")

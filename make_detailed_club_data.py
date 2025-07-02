@@ -39,7 +39,7 @@ def make_detailed_club_data(club_reception_df):
 
         # 2. クラブごとの詳細データを作成  
         # 申請日時をYYYYMMDDHHMMSS形式に変換し、指定
-        application_date = pd.to_datetime(club_reception_df['申請_タイムスタンプ']).dt.strftime('%Y%m%d%H%M%S')
+        application_date = pd.to_datetime(club_data['申請_タイムスタンプ'].iloc[0]).strftime('%Y%m%d%H%M%S')
         # 2.1. 会員数のリストを作成
         logging.info(f"クラブ名: {club_name} の会員数の詳細データを作成します")
         # 2.1.1. 会員数のリストを作成する必要があるかを判断（ファイル名「{club_name}_申請{application_date}_会員数詳細データ.xlsx」の申請日時と同じなら作成しない）
@@ -67,9 +67,9 @@ def make_detailed_club_data(club_reception_df):
                 for age in ages:
                     col_name = detailed_member_columns[age][gender]
                     value = 0
-                    if col_name in club_reception_df and not pd.isna(club_reception_df[col_name]):
+                    if col_name in club_data.columns and not pd.isna(club_data[col_name].iloc[0]):
                         try:
-                            value = int(club_reception_df[col_name])
+                            value = int(club_data[col_name].iloc[0])
                         except ValueError:
                             pass
                     row_gender[age] = value
@@ -137,26 +137,26 @@ def make_detailed_club_data(club_reception_df):
 
                 # 実施有無
                 col_name = f'申請_種目_{discipline}'
-                if col_name in club_reception_df:
+                if col_name in club_data.columns:
                     # 例: '定期的に行っている' など
-                    row_dict['実施有無'] = club_reception_df[col_name]
+                    row_dict['実施有無'] = club_data[col_name].iloc[0]
                 else:
                     row_dict['実施有無'] = ''
                 detailed_disciplines_df.append(row_dict)
                     # 「その他」種目の追加
             # 「その他」種目の行を追加
-            other_rows = {'申請_種目_その他': club_reception_df['申請_種目_その他'].iloc[0],
-                          '申請_種目_その他_数(選択時必須)': club_reception_df['申請_種目_その他_数(選択時必須)'].iloc[0],
-                          '申請_種目_その他_テキスト(選択時必須)': club_reception_df['申請_種目_その他_テキスト(選択時必須)'].iloc[0]}
+            other_rows = {'申請_種目_その他': club_data['申請_種目_その他'].iloc[0],
+                          '申請_種目_その他_数(選択時必須)': club_data['申請_種目_その他_数(選択時必須)'].iloc[0],
+                          '申請_種目_その他_テキスト(選択時必須)': club_data['申請_種目_その他_テキスト(選択時必須)'].iloc[0]}
             detailed_disciplines_df.append(other_rows)
             # 種目数のカウント（row_dict['実施有無']が「実施している」の数と'申請_種目_その他_数(選択時必須)'の数値を合計）
             total_discipline_count = sum(1 for row in detailed_disciplines_df if row.get('実施有無') == '実施している')
-            if '申請_種目_その他_数(選択時必須)' in club_reception_df.columns:
+            if '申請_種目_その他_数(選択時必須)' in club_data.columns:
                 try:
-                    other_count = int(club_reception_df['申請_種目_その他_数(選択時必須)'].iloc[0])
+                    other_count = int(club_data['申請_種目_その他_数(選択時必須)'].iloc[0])
                     total_discipline_count += other_count
                 except ValueError:
-                    logging.warning(f"クラブ名: {club_name} の「その他」種目の数値が不正です: {club_reception_df['申請_種目_その他_数(選択時必須)'].iloc[0]}")
+                    logging.warning(f"クラブ名: {club_name} の「その他」種目の数値が不正です: {club_data['申請_種目_その他_数(選択時必須)'].iloc[0]}")
             else:
                 other_count = 0
             # 種目数のカウントを追加

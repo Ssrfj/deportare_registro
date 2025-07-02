@@ -2,9 +2,9 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from setting_paths import clubs_reception_data_path, processed_reception_data_folder_path, club_info_data_path
+    from setting_paths import clubs_reception_data_path, processed_reception_data_folder_path
     from make_folders import setup_logging, create_folders
-    from utils import get_jst_now
+    from utils import get_jst_now, get_latest_club_info_file
 
     # ロギングの設定
     setup_logging()
@@ -38,17 +38,19 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     # 最新のクラブ情報付き申請データの作成日を取得（ファイル名のYYYYMMDDHHMMSS形式から）
     if latest_club_reception_data_file:
         latest_club_reception_data_date = latest_club_reception_data_file.split('_')[2].split('.')[0]
+        # "作成20250702134214" から "作成" を除去
+        latest_club_reception_data_date = latest_club_reception_data_date.replace('作成', '')
         latest_club_reception_data_date = pd.to_datetime(latest_club_reception_data_date, format='%Y%m%d%H%M%S')
         logging.info(f"最新のクラブ情報付き申請データの作成日: {latest_club_reception_data_date}")
+        
+        # 3. 最新のクラブ情報付き申請データを作成する必要があるかを判断
+        if latest_club_reception_data_date >= latest_reception_data_date:
+            logging.info("最新のクラブ情報付き申請データは既に最新です。処理を終了します。")
+            return
     else:
-        logging.error("最新のクラブ情報付き申請データファイルが見つかりません")
-        return
-    
-    # 3. 最新のクラブ情報付き申請データを作成する必要があるかを判断
-    if latest_club_reception_data_date and latest_club_reception_data_date >= latest_reception_data_date:
-        logging.info("最新のクラブ情報付き申請データは既に最新です。処理を終了します。")
-        return
-    logging.info("最新のクラブ情報付き申請データを作成する必要があります。処理を続行します。")
+        logging.info("クラブ情報付き申請データファイルが見つからないため、新規作成します。")
+        latest_club_reception_data_date = None
+    logging.info("クラブ情報付き申請データを作成します。処理を続行します。")
 
     # 4. 最新の処理済み申請データを読み込む（処理済み申請データ_申請{latest_reception_data_date}_処理YYYYMMDDHHMMSS.xlsx形式）
     logging.info("最新の処理済み申請データを読み込みます")
@@ -66,7 +68,8 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     latest_processed_reception_data_file = processed_reception_data_files[0]
     logging.info(f"最新の処理済み申請データファイル: {latest_processed_reception_data_file}")
     # 最新の処理済み申請データの申請日を取得（ファイル名の申請YYYYMMDDHHMMSS形式から）
-    latest_processed_reception_data_date = latest_processed_reception_data_file.split('_')[2].split('.')[0]
+    # ファイル名形式: 処理済み申請データ_申請YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx
+    latest_processed_reception_data_date = latest_processed_reception_data_file.split('_')[1].replace('申請', '')
     latest_processed_reception_data_date = pd.to_datetime(latest_processed_reception_data_date, format='%Y%m%d%H%M%S')
     logging.info(f"最新の処理済み申請データの申請日: {latest_processed_reception_data_date}")
     # 最新の処理済み申請データを読み込む
@@ -75,23 +78,11 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     processed_reception_df = pd.read_excel(processed_reception_data_path)
     logging.info("最新の処理済み申請データを読み込みました")
 
-    # 5. 最新のクラブ情報を読み込む（クラブ名_YYYYMMDDHHMMSS.xlsx形式）
+    # 5. 最新のクラブ情報を読み込む（クラブ名_YYYYMMDD.xlsx形式）
     logging.info("最新のクラブ情報を読み込みます")
-    latest_club_info_files = [
-        f for f in os.listdir(club_info_data_path)
-        if os.path.isfile(os.path.join(club_info_data_path, f)) and
-        f.startswith('クラブ情報_') and f.endswith('.xlsx')
-    ]
-    latest_club_info_files.sort(reverse=True)
-    if not latest_club_info_files:
-        logging.error("クラブ情報ファイルが見つかりません")
+    club_info_df, latest_club_info_date = get_latest_club_info_file()
+    if club_info_df is None:
         return
-    latest_club_info_file = latest_club_info_files[0]
-    latest_club_info_date = latest_club_info_file.split('_')[1].split('.')[0]
-    latest_club_info_date = pd.to_datetime(latest_club_info_date, format='%Y%m%d%H%M%S')
-    logging.info(f"最新のクラブ情報ファイル: {latest_club_info_file}")
-    club_info_df = pd.read_excel(os.path.join(club_info_data_path, latest_club_info_file))
-    logging.info(f"最新のクラブ情報を読み込みました: {latest_club_info_file}")
 
     # 6. 最新のクラブ情報と処理済み申請データをマージ
     # 基本は、club_info_dfの'選択肢（地区名：クラブ名：クラブ名（カタカナ））'とprocessed_reception_dfの'申請_クラブ名_選択'をキーにしてマージ

@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 from datetime import datetime, date
-from setting_paths import content_check_folder_path, reception_statues_folder_path
+from setting_paths import content_check_folder_path, application_statues_folder_path
 from make_folders import setup_logging, create_folders
 
 def check_consistency_disciplines(row):

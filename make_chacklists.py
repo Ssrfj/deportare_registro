@@ -2,7 +2,7 @@ def make_chacklists(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from setting_paths import content_check_folder_path, reception_statues_folder_path
+    from setting_paths import content_check_folder_path, application_statues_folder_path, clubs_reception_data_path
     from utils import get_jst_now
     from make_folders import setup_logging, create_folders
     from make_overall_checklist import make_overall_checklist
@@ -20,19 +20,19 @@ def make_chacklists(latest_reception_data_date):
     # 1. 最新のクラブ情報付き受付データファイルを取得
     logging.info("最新のクラブ情報付き受付データファイルを取得します")
     latest_club_reception_files = [
-        f for f in os.listdir(content_check_folder_path)
-        if os.path.isfile(os.path.join(content_check_folder_path, f)) and
-        f.startswith('クラブ情報付き受付データ_') and f.endswith('.xlsx')
+        f for f in os.listdir(clubs_reception_data_path)
+        if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
+        f.startswith('クラブ情報付き申請データ_') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
         logging.error("クラブ情報付き受付データファイルが見つかりません")
         return
     latest_club_reception_file = latest_club_reception_files[0]
-    latest_club_reception_date = latest_club_reception_file.split('_')[1].split('.')[0]
+    latest_club_reception_date = latest_club_reception_file.split('_')[1].replace('申請', '')
     latest_club_reception_date = pd.to_datetime(latest_club_reception_date, format='%Y%m%d%H%M%S')
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
-    club_reception_df = pd.read_excel(os.path.join(content_check_folder_path, latest_club_reception_file))
+    club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))
     logging.info(f"最新のクラブ情報付き受付データを読み込みました: {latest_club_reception_file}")
 
     # 2. クラブごとの詳細データ保存するためのフォルダを作成
@@ -71,7 +71,7 @@ def make_chacklists(latest_reception_data_date):
     # 8. 最新のクラブ情報付き受付データファイルの更新日時を記録
     logging.info("最新のクラブ情報付き受付データファイルの更新日時を記録します")
     latest_reception_data_date = get_jst_now()
-    latest_reception_data_file_path = os.path.join(reception_statues_folder_path, 'latest_reception_data_date.txt')
+    latest_reception_data_file_path = os.path.join(application_statues_folder_path, 'latest_reception_data_date.txt')
     with open(latest_reception_data_file_path, 'w') as f:
         f.write(latest_reception_data_date.strftime('%Y-%m-%d %H:%M:%S'))
     logging.info(f"最新のクラブ情報付き受付データファイルの更新日時を記録しました: {latest_reception_data_date}")
