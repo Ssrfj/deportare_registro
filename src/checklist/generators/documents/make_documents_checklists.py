@@ -3,7 +3,7 @@ def make_documents_checklists(latest_reception_data_date):
     import logging
     import pandas as pd
 
-    from src.core.setting_paths import content_check_folder_path
+    from src.core.setting_paths import content_check_folder_path, clubs_reception_data_path
     from src.core.utils import get_jst_now
     from src.folder_management.make_folders import setup_logging, create_folders
     from src.checklist.generators.documents.make_document01_checklist import make_document01_checklist
@@ -27,27 +27,34 @@ def make_documents_checklists(latest_reception_data_date):
     create_folders()
     logging.info("フォルダを作成しました")
 
-    latest_reception_data_date = pd.to_datetime(latest_reception_data_date, format='%Y%m%d%H%M%S').strftime('%Y%m%d%H%M%S')
+    # latest_reception_data_dateが既にdatetimeオブジェクトの場合は文字列に変換
+    if isinstance(latest_reception_data_date, pd.Timestamp) or hasattr(latest_reception_data_date, 'strftime'):
+        latest_reception_data_date_str = latest_reception_data_date.strftime('%Y%m%d%H%M%S')
+    else:
+        # 文字列の場合はそのまま使用
+        latest_reception_data_date_str = str(latest_reception_data_date)
+    
+    logging.info(f"受付データの日付: {latest_reception_data_date_str}")
 
-    # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date}_*.xlsxを使用)
+    # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date_str}_*.xlsxを使用)
     logging.info("最新のクラブ情報付き受付データファイルを取得します")
     # 最新のクラブ情報付き受付データと同じ日付のファイルを取得
-    if not latest_reception_data_date:
+    if not latest_reception_data_date_str:
         logging.error("最新の受付データの日付が指定されていません")
         return
     
     latest_club_reception_files = [
-        f for f in os.listdir(content_check_folder_path)
-        if os.path.isfile(os.path.join(content_check_folder_path, f)) and
-        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
+        f for f in os.listdir(clubs_reception_data_path)
+        if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
+        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date_str}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date_str}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
-    club_reception_df = pd.read_excel(os.path.join(content_check_folder_path, latest_club_reception_file))
+    club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))
     logging.info(f"最新のクラブ情報付き受付データを読み込みました: {latest_club_reception_file}")
 
     # 2. 書類ごとのチェックリストを作成

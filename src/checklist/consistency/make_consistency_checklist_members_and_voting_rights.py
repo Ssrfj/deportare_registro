@@ -22,11 +22,11 @@ def make_consistency_checklist_members_and_voting_rights(latest_reception_data_d
     latest_club_reception_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith(f'クラブ情報付き申請データ_申請{latest_reception_data_date}') and f.endswith('.xlsx')
+        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")

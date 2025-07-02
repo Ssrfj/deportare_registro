@@ -22,14 +22,14 @@ def make_chacklists(latest_reception_data_date):
     latest_club_reception_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith('クラブ情報付き申請データ_') and f.endswith('.xlsx')
+        f.startswith('クラブ情報付き受付データ_') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
         logging.error("クラブ情報付き受付データファイルが見つかりません")
         return
     latest_club_reception_file = latest_club_reception_files[0]
-    latest_club_reception_date = latest_club_reception_file.split('_')[1].replace('申請', '')
+    latest_club_reception_date = latest_club_reception_file.split('_')[1].replace('受付', '')
     latest_club_reception_date = pd.to_datetime(latest_club_reception_date, format='%Y%m%d%H%M%S')
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
     club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))

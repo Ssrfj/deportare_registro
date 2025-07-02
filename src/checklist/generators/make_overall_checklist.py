@@ -3,7 +3,7 @@ def make_overall_checklist(latest_reception_data_date):
     import pandas as pd
     import logging
     from src.core.setting_paths import content_check_folder_path, settting_folder_path, overall_checklist_folder_path, clubs_reception_data_path
-    from src.core.utils import get_jst_now
+    from src.core.utils import get_jst_now, normalize_reception_date
     from src.folder_management.make_folders import setup_logging, create_folders
 
 
@@ -14,16 +14,17 @@ def make_overall_checklist(latest_reception_data_date):
     create_folders()
     logging.info("フォルダを作成しました")
 
-    # 受付データの日付を取得
+    # 受付データの日付を正規化
     if not latest_reception_data_date:
         logging.error("最新の受付データの日付が指定されていません")
         return
-    latest_reception_data_date = pd.to_datetime(latest_reception_data_date, format='%Y%m%d%H%M%S').strftime('%Y%m%d%H%M%S')
+    latest_reception_data_date_str = normalize_reception_date(latest_reception_data_date)
+    logging.info(f"受付データの日付: {latest_reception_data_date_str}")
 
     # 1. 最新のクラブ情報付き受付データファイルを取得
     logging.info("最新のクラブ情報付き受付データファイルを取得します")
     logging.info(f"検索パス: {clubs_reception_data_path}")
-    logging.info(f"検索パターン: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
+    logging.info(f"検索パターン: クラブ情報付き受付データ_受付{latest_reception_data_date_str}*.xlsx")
     
     # パスが存在するか確認
     if not os.path.exists(clubs_reception_data_path):
@@ -47,11 +48,11 @@ def make_overall_checklist(latest_reception_data_date):
     latest_club_reception_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
+        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date_str}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date_str}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
@@ -104,7 +105,7 @@ def make_overall_checklist(latest_reception_data_date):
     # 5. 総合チェックリストのファイルを保存（ファイル名は「総合チェックリスト_受付{YYYYMMDDHHMMSS}_更新{YYYYMMDDHHMMSS}.xlsx」）
     logging.info("総合チェックリストのファイルを保存します")
     now_jst = get_jst_now()
-    overall_checklist_file_name = f'総合チェックリスト_受付{latest_reception_data_date}_更新{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
+    overall_checklist_file_name = f'総合チェックリスト_受付{latest_reception_data_date_str}_更新{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
     overall_checklist_file_path = os.path.join(overall_checklist_folder_path, overall_checklist_file_name)
     overall_checklist_df.to_excel(overall_checklist_file_path, index=False)
     logging.info(f"総合チェックリストのファイルを保存しました: {overall_checklist_file_path}")

@@ -29,11 +29,11 @@ def make_document01_checklist(latest_reception_data_date):
     latest_club_reception_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith(f'クラブ情報付き申請データ_申請{latest_reception_data_date}') and f.endswith('.xlsx')
+        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
@@ -101,11 +101,11 @@ def make_document01_checklist(latest_reception_data_date):
         document01_checklist_df.loc[index, '区市町村名'] = row['申請_区市町村名']
         document01_checklist_df.loc[index, '申請_住所'] = row['申請_住所']
         document01_checklist_df.loc[index, '申請_建物名(任意)'] = row['申請_建物名(任意)']
-        document01_checklist_df.loc[index, '申請_担当者名'] = row['申請_担当者名']
-        document01_checklist_df.loc[index, '申請_担当者役職名'] = row['申請_担当者役職名']
+        document01_checklist_df.loc[index, '申請_担当者名'] = row['申請_申請担当者名']
+        document01_checklist_df.loc[index, '申請_担当者役職名'] = row['申請_申請担当者役職']
         document01_checklist_df.loc[index, '申請_メールアドレス'] = row['申請_メールアドレス']
-        document01_checklist_df.loc[index, '申請_電話番号'] = row['申請_電話番号']
-        document01_checklist_df.loc[index, '申請_FAX番号'] = row['申請_FAX番号']
+        document01_checklist_df.loc[index, '申請_電話番号'] = row['申請_TEL']
+        document01_checklist_df.loc[index, '申請_FAX番号'] = row['申請_FAX(任意)']
         document01_checklist_df.loc[index, '申請_適合状況(1)①'] = row['申請_適合状況(1)①']
         document01_checklist_df.loc[index, '申請_適合状況(1)②'] = row['申請_適合状況(1)②']
         document01_checklist_df.loc[index, '申請_適合状況(1)③'] = row['申請_適合状況(1)③']

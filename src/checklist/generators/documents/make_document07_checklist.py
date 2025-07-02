@@ -36,7 +36,7 @@ def make_document07_checklist(latest_reception_data_date=None):
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
-    club_reception_df = pd.read_excel(os.path.join(content_check_folder_path, latest_club_reception_file))
+    club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))
     logging.info(f"最新のクラブ情報付き受付データを読み込みました: {latest_club_reception_file}")
 
     # 2. 書類07_のチェックリストを作成する必要があるか確認
@@ -122,7 +122,7 @@ def make_document07_checklist(latest_reception_data_date=None):
     logging.info("書類07のチェックリストのデータフレームを保存します")
     now_jst = get_jst_now()
     document07_checklist_file_name = f'書類07チェックリスト_受付{latest_reception_data_date}_作成{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
-    document07_checklist_file_path = os.path.join(document07_checklist_df, document07_checklist_file_name)
+    document07_checklist_file_path = os.path.join(document07_checklist_folder_path, document07_checklist_file_name)
     document07_checklist_df.to_excel(document07_checklist_file_path, index=False)
     logging.info(f"書類07のチェックリストのデータフレームを保存しました: {document07_checklist_file_path}")
 

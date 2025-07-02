@@ -36,7 +36,7 @@ def make_document06_financial_statements_checklist(latest_reception_data_date=No
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
-    club_reception_df = pd.read_excel(os.path.join(content_check_folder_path, latest_club_reception_file))
+    club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))
     logging.info(f"最新のクラブ情報付き受付データを読み込みました: {latest_club_reception_file}")
 
     # 2. 書類06_決算_のチェックリストを作成する必要があるか確認
@@ -125,7 +125,7 @@ def make_document06_financial_statements_checklist(latest_reception_data_date=No
     logging.info("書類06_決算のチェックリストのデータフレームを保存します")
     now_jst = get_jst_now()
     document06_financial_statements_checklist_file_name = f'書類06_決算チェックリスト_受付{latest_reception_data_date}_作成{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
-    document06_financial_statements_checklist_file_path = os.path.join(document06_financial_statements_checklist_df, document06_financial_statements_checklist_file_name)
+    document06_financial_statements_checklist_file_path = os.path.join(document06_financial_statements_checklist_folder_path, document06_financial_statements_checklist_file_name)
     document06_financial_statements_checklist_df.to_excel(document06_financial_statements_checklist_file_path, index=False)
     logging.info(f"書類06_決算のチェックリストのデータフレームを保存しました: {document06_financial_statements_checklist_file_path}")
 

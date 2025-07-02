@@ -9,6 +9,61 @@ def get_jst_now():
     """
     return datetime.now(timezone(timedelta(hours=9)))
 
+def ensure_date_string(date_input):
+    """
+    日付を文字列形式（YYYYMMDDHHMMSS）に変換する。
+    
+    Args:
+        date_input: datetime、pandas.Timestamp、または文字列
+        
+    Returns:
+        str: YYYYMMDDHHMMSS形式の文字列
+    """
+    if isinstance(date_input, (pd.Timestamp, datetime)):
+        return date_input.strftime('%Y%m%d%H%M%S')
+    elif isinstance(date_input, str):
+        # 既に文字列の場合は、必要に応じて変換
+        try:
+            # 文字列がYYYYMMDDHHMMSS形式かチェック
+            if len(date_input) == 14 and date_input.isdigit():
+                return date_input
+            # その他の形式の場合はパースして変換
+            parsed_date = pd.to_datetime(date_input)
+            return parsed_date.strftime('%Y%m%d%H%M%S')
+        except:
+            logging.warning(f"日付の変換に失敗しました: {date_input}")
+            return str(date_input)
+    else:
+        logging.warning(f"未対応の日付形式です: {type(date_input)} - {date_input}")
+        return str(date_input)
+
+def normalize_reception_date_for_display(reception_date):
+    """
+    受付日を表示用形式（YYYY-MM-DD HH:MM:SS）に正規化する。
+    
+    Args:
+        reception_date: datetime、pandas.Timestamp、または文字列
+        
+    Returns:
+        str: YYYY-MM-DD HH:MM:SS形式の文字列
+    """
+    if isinstance(reception_date, (pd.Timestamp, datetime)):
+        return reception_date.strftime('%Y-%m-%d %H:%M:%S')
+    elif isinstance(reception_date, str):
+        try:
+            if len(reception_date) == 14 and reception_date.isdigit():
+                parsed_date = pd.to_datetime(reception_date, format='%Y%m%d%H%M%S')
+                return parsed_date.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                parsed_date = pd.to_datetime(reception_date)
+                return parsed_date.strftime('%Y-%m-%d %H:%M:%S')
+        except:
+            logging.warning(f"日付の変換に失敗しました: {reception_date}")
+            return str(reception_date)
+    else:
+        logging.warning(f"未対応の日付形式です: {type(reception_date)} - {reception_date}")
+        return str(reception_date)
+
 def make_checklist_filename(club_name, reception_date_str):
     """
     クラブ名・受付日・作成日からチェックリスト用のファイル名を生成する。
@@ -73,3 +128,29 @@ def get_config_file_path(relative_path):
     """
     project_root = get_project_root()
     return os.path.join(project_root, relative_path)
+
+def normalize_reception_date(latest_reception_data_date):
+    """
+    受付データの日付を正規化する関数
+    datetime オブジェクトまたは文字列を受け取り、YYYYMMDDHHMMSS 形式の文字列を返す
+    """
+    import pandas as pd
+    from datetime import datetime
+    
+    if latest_reception_data_date is None:
+        return None
+        
+    if isinstance(latest_reception_data_date, str):
+        # 既に文字列の場合は、そのまま返す（YYYYMMDDHHMMSS 形式と想定）
+        return latest_reception_data_date
+    elif isinstance(latest_reception_data_date, datetime):
+        # datetime オブジェクトの場合は YYYYMMDDHHMMSS 形式に変換
+        return latest_reception_data_date.strftime('%Y%m%d%H%M%S')
+    else:
+        # その他の場合は pandas.to_datetime を使って変換を試みる
+        try:
+            date_obj = pd.to_datetime(latest_reception_data_date)
+            return date_obj.strftime('%Y%m%d%H%M%S')
+        except Exception as e:
+            logging.error(f"日付の正規化に失敗しました: {latest_reception_data_date}, エラー: {e}")
+            return None

@@ -12,12 +12,12 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     # フォルダの作成
     create_folders()
     logging.info("フォルダを作成しました")
-    # 1. クラブ情報付き申請データのフォルダを作成
+    # 1. クラブ情報付き受付データのフォルダを作成
     if not os.path.exists(clubs_reception_data_path):
         os.makedirs(clubs_reception_data_path)
-        logging.info(f"クラブ情報付き申請データのフォルダを作成しました: {clubs_reception_data_path}")
+        logging.info(f"クラブ情報付き受付データのフォルダを作成しました: {clubs_reception_data_path}")
     else:
-        logging.info(f"クラブ情報付き申請データのフォルダは既に存在します: {clubs_reception_data_path}")
+        logging.info(f"クラブ情報付き受付データのフォルダは既に存在します: {clubs_reception_data_path}")
 
     # 2. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付YYYYMMDDHHMMSS_作成YYYYMMDDHHMMSS.xlsx)
     logging.info("最新のクラブ情報付き受付データファイルを取得しています")
@@ -43,40 +43,40 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
         latest_club_reception_data_date = pd.to_datetime(latest_club_reception_data_date, format='%Y%m%d%H%M%S')
         logging.info(f"最新のクラブ情報付き受付データの作成日: {latest_club_reception_data_date}")
         
-        # 3. 最新のクラブ情報付き申請データを作成する必要があるかを判断
+        # 3. 最新のクラブ情報付き受付データを作成する必要があるかを判断
         if latest_club_reception_data_date >= latest_reception_data_date:
-            logging.info("最新のクラブ情報付き申請データは既に最新です。処理を終了します。")
+            logging.info("最新のクラブ情報付き受付データは既に最新です。処理を終了します。")
             return
     else:
-        logging.info("クラブ情報付き申請データファイルが見つからないため、新規作成します。")
+        logging.info("クラブ情報付き受付データファイルが見つからないため、新規作成します。")
         latest_club_reception_data_date = None
-    logging.info("クラブ情報付き申請データを作成します。処理を続行します。")
+    logging.info("クラブ情報付き受付データを作成します。処理を続行します。")
 
-    # 4. 最新の処理済み申請データを読み込む（処理済み申請データ_申請{latest_reception_data_date}_処理YYYYMMDDHHMMSS.xlsx形式）
-    logging.info("最新の処理済み申請データを読み込みます")
+    # 4. 最新の処理済み受付データを読み込む（処理済み受付データ_受付{latest_reception_data_date}_処理YYYYMMDDHHMMSS.xlsx形式）
+    logging.info("最新の処理済み受付データを読み込みます")
     processed_reception_data_files = [
         f for f in os.listdir(processed_reception_data_folder_path)
         if os.path.isfile(os.path.join(processed_reception_data_folder_path, f)) and
-        f.startswith('処理済み申請データ_申請') and f.endswith('.xlsx')
+        f.startswith('処理済み受付データ_受付') and f.endswith('.xlsx')
     ]
-    # ファイル名の形式は「処理済み申請データ_申請YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx」
-    # 処理済み申請データファイルを見つけたら、ファイル名の申請のYYYYMMDDHHMMSS形式でソート
+    # ファイル名の形式は「処理済み受付データ_受付YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx」
+    # 処理済み受付データファイルを見つけたら、ファイル名の受付のYYYYMMDDHHMMSS形式でソート
     processed_reception_data_files.sort(reverse=True)
     if not processed_reception_data_files:
-        logging.error("処理済み申請データファイルが見つかりません")
+        logging.error("処理済み受付データファイルが見つかりません")
         return
     latest_processed_reception_data_file = processed_reception_data_files[0]
-    logging.info(f"最新の処理済み申請データファイル: {latest_processed_reception_data_file}")
-    # 最新の処理済み申請データの申請日を取得（ファイル名の申請YYYYMMDDHHMMSS形式から）
-    # ファイル名形式: 処理済み申請データ_申請YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx
-    latest_processed_reception_data_date = latest_processed_reception_data_file.split('_')[1].replace('申請', '')
+    logging.info(f"最新の処理済み受付データファイル: {latest_processed_reception_data_file}")
+    # 最新の処理済み受付データの受付日を取得（ファイル名の受付YYYYMMDDHHMMSS形式から）
+    # ファイル名形式: 処理済み受付データ_受付YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx
+    latest_processed_reception_data_date = latest_processed_reception_data_file.split('_')[1].replace('受付', '')
     latest_processed_reception_data_date = pd.to_datetime(latest_processed_reception_data_date, format='%Y%m%d%H%M%S')
-    logging.info(f"最新の処理済み申請データの申請日: {latest_processed_reception_data_date}")
-    # 最新の処理済み申請データを読み込む
+    logging.info(f"最新の処理済み受付データの受付日: {latest_processed_reception_data_date}")
+    # 最新の処理済み受付データを読み込む
     processed_reception_data_path = os.path.join(processed_reception_data_folder_path, latest_processed_reception_data_file)
-    logging.info(f"最新の処理済み申請データを読み込みます: {processed_reception_data_path}")
+    logging.info(f"最新の処理済み受付データを読み込みます: {processed_reception_data_path}")
     processed_reception_df = pd.read_excel(processed_reception_data_path)
-    logging.info("最新の処理済み申請データを読み込みました")
+    logging.info("最新の処理済み受付データを読み込みました")
 
     # 5. 最新のクラブ情報を読み込む（クラブ名_YYYYMMDD.xlsx形式）
     logging.info("最新のクラブ情報を読み込みます")
@@ -84,12 +84,12 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     if club_info_df is None:
         return
 
-    # 6. 最新のクラブ情報と処理済み申請データをマージ
+    # 6. 最新のクラブ情報と処理済み受付データをマージ
     # 基本は、club_info_dfの'選択肢（地区名：クラブ名：クラブ名（カタカナ））'とprocessed_reception_dfの'申請_クラブ名_選択'をキーにしてマージ
     # ただし、processed_reception_dfの'申請_クラブ名_選択'が「選択肢にない」の場合は行を追加＋'申請_クラブ名_テキスト'を'クラブ名'にコピー
-    logging.info("最新のクラブ情報に処理済み申請データをマージします")
+    logging.info("最新のクラブ情報に処理済み受付データをマージします")
     
-    # まず、申請データのある行のみを対象とする（申請_クラブ名_選択が空でない行）
+    # まず、受付データのある行のみを対象とする（申請_クラブ名_選択が空でない行）
     reception_data = processed_reception_df[processed_reception_df['申請_クラブ名_選択'].notna() & 
                                                (processed_reception_df['申請_クラブ名_選択'] != '')].copy()
     

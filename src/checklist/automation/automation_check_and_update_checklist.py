@@ -25,14 +25,14 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     latest_club_reception_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith('クラブ情報付き申請データ_') and f.endswith('.xlsx')
+        f.startswith('クラブ情報付き受付データ_') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
         logging.error("クラブ情報付き受付データファイルが見つかりません")
         return
     latest_club_reception_file = latest_club_reception_files[0]
-    latest_club_reception_date = latest_club_reception_file.split('_')[1].replace('申請', '')
+    latest_club_reception_date = latest_club_reception_file.split('_')[1].replace('受付', '')
     latest_club_reception_date = pd.to_datetime(latest_club_reception_date, format='%Y%m%d%H%M%S')
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
     club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))
@@ -54,11 +54,11 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     overall_checklist_df = pd.read_excel(latest_overall_checklist_path)
     logging.info(f"最新の総合チェックリストを読み込みました: {latest_overall_checklist_file}")
 
-    # 3. 申請データの自動チェックを実行
-    logging.info("申請データの自動チェックを実行します")
-    # 申請データの自動チェックを実行するための関数を呼び出す
+    # 3. 受付データの自動チェックを実行
+    logging.info("受付データの自動チェックを実行します")
+    # 受付データの自動チェックを実行するための関数を呼び出す
     overall_checklist_df, checklist_file_path = auto_check(club_reception_df, overall_checklist_df, latest_reception_data_date=latest_club_reception_date)
-    logging.info("申請データの自動チェックが完了しました")
+    logging.info("受付データの自動チェックが完了しました")
 
     # 5. 書類チェック状況を総合チェックリストに反映
     logging.info("書類チェック状況を総合チェックリストに反映します")

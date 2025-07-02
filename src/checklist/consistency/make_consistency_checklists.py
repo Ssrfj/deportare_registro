@@ -28,7 +28,7 @@ def make_consistency_checklists(latest_reception_data_date):
         return
     
     logging.info(f"検索パス: {clubs_reception_data_path}")
-    logging.info(f"検索パターン: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
+    logging.info(f"検索パターン: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
     
     # パスが存在するか確認
     if not os.path.exists(clubs_reception_data_path):
@@ -38,11 +38,11 @@ def make_consistency_checklists(latest_reception_data_date):
     latest_club_reception_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith(f'クラブ情報付き申請データ_申請{latest_reception_data_date}') and f.endswith('.xlsx')
+        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
