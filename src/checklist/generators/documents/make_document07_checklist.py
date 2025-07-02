@@ -3,7 +3,7 @@ def make_document07_checklist(latest_reception_data_date=None):
     import pandas as pd
     import logging
     from src.core.setting_paths import content_check_folder_path, document07_checklist_folder_path, clubs_reception_data_path
-    from src.core.utils import get_jst_now
+    from src.core.utils import get_jst_now, ensure_date_string, get_config_file_path
     from src.folder_management.make_folders import setup_logging, create_folders
 
     # ロギングの設定
@@ -17,22 +17,22 @@ def make_document07_checklist(latest_reception_data_date=None):
     if not latest_reception_data_date:
         logging.error("最新の受付データの日付が指定されていません")
         return
-    latest_reception_data_date = pd.to_datetime(latest_reception_data_date, format='%Y%m%d%H%M%S').strftime('%Y%m%d%H%M%S')
+    
+    # 日付の正規化
+    latest_reception_data_date_str = ensure_date_string(latest_reception_data_date)
+    logging.info(f"受付データの日付: {latest_reception_data_date_str}")
 
-    # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date}_*.xlsxを使用)
+    # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date_str}_*.xlsxを使用)
     logging.info("最新のクラブ情報付き受付データファイルを取得します")
     # 最新のクラブ情報付き受付データと同じ日付のファイルを取得
-    if not latest_reception_data_date:
-        logging.error("最新の受付データの日付が指定されていません")
-        return    
     latest_club_reception_files = [
-        f for f in os.listdir(content_check_folder_path)
-        if os.path.isfile(os.path.join(content_check_folder_path, f)) and
-        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
+        f for f in os.listdir(clubs_reception_data_path)
+        if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
+        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date_str}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date_str}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
@@ -72,12 +72,12 @@ def make_document07_checklist(latest_reception_data_date=None):
     # 3. 書類07_のチェックリストのカラム名を取得
     logging.info("書類07_のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（document07_checklist_columns.jsonが必要）
-    document07_checklist_columns_file_name = 'config/checklist_columns/document07_checklist_columns.json'
-    document07_checklist_columns_file_path = os.path.join(content_check_folder_path, document07_checklist_columns_file_name)
+    document07_checklist_columns_file_path = get_config_file_path('config/checklist_columns/document07_checklist_columns.json')
     if not os.path.exists(document07_checklist_columns_file_path):
         logging.error(f"書類07のチェックリストのカラム名ファイルが見つかりません: {document07_checklist_columns_file_path}")
         return
     document07_checklist_columns = pd.read_json(document07_checklist_columns_file_path, orient='records')
+    logging.info(f"チェックリストのカラム名を読み込みました: {document07_checklist_columns_file_path}")
     logging.info(f"チェックリストのカラム名を読み込みました: {document07_checklist_columns_file_path}")
 
     # 4. 書類07のチェックリストのデータフレームを作成
@@ -118,10 +118,10 @@ def make_document07_checklist(latest_reception_data_date=None):
         document07_checklist_df.loc[index, 'チェック者名_自己点検・評価'] = 'チェックが完了していません'
     logging.info("書類07のチェックリストのデータフレームを作成しました")
 
-    # 5. 書類07のチェックリストのデータフレームを保存(ファイル名は「書類07チェックリスト_受付{latest_reception_data_date}_作成{YYYYMMDDHHMMSS}.xlsx」)
+    # 5. 書類07のチェックリストのデータフレームを保存(ファイル名は「書類07チェックリスト_受付{latest_reception_data_date_str}_作成{YYYYMMDDHHMMSS}.xlsx」)
     logging.info("書類07のチェックリストのデータフレームを保存します")
     now_jst = get_jst_now()
-    document07_checklist_file_name = f'書類07チェックリスト_受付{latest_reception_data_date}_作成{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
+    document07_checklist_file_name = f'書類07チェックリスト_受付{latest_reception_data_date_str}_作成{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
     document07_checklist_file_path = os.path.join(document07_checklist_folder_path, document07_checklist_file_name)
     document07_checklist_df.to_excel(document07_checklist_file_path, index=False)
     logging.info(f"書類07のチェックリストのデータフレームを保存しました: {document07_checklist_file_path}")

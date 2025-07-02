@@ -17,22 +17,22 @@ def make_document02_2_checklist(latest_reception_data_date):
     if not latest_reception_data_date:
         logging.error("最新の受付データの日付が指定されていません")
         return
-    latest_reception_data_date = ensure_date_string(latest_reception_data_date)
+    latest_reception_data_date_str = ensure_date_string(latest_reception_data_date)
 
-    # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date}_*.xlsxを使用)
+    # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date_str}_*.xlsxを使用)
     logging.info("最新のクラブ情報付き受付データファイルを取得します")
     # 最新のクラブ情報付き受付データと同じ日付のファイルを取得
-    if not latest_reception_data_date:
+    if not latest_reception_data_date_str:
         logging.error("最新の受付データの日付が指定されていません")
         return    
     latest_club_reception_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
+        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date_str}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date_str}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
@@ -156,10 +156,10 @@ def make_document02_2_checklist(latest_reception_data_date):
         logging.info(f"クラブ名: {club_name} のチェックリストを作成しました")
     logging.info("書類02_2のチェックリストのデータフレームを作成しました")
 
-    # 5. 書類02_2のチェックリストのデータフレームを保存(ファイル名は「書類02_2チェックリスト_受付{latest_reception_data_date}_作成{YYYYMMDDHHMMSS}.xlsx」)
+    # 5. 書類02_2のチェックリストのデータフレームを保存(ファイル名は「書類02_2チェックリスト_受付{latest_reception_data_date_str}_作成{YYYYMMDDHHMMSS}.xlsx」)
     logging.info("書類02_2のチェックリストのデータフレームを保存します")
     now_jst = get_jst_now()
-    document02_2_checklist_file_name = f'書類02_2チェックリスト_受付{latest_reception_data_date}_作成{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
+    document02_2_checklist_file_name = f'書類02_2チェックリスト_受付{latest_reception_data_date_str}_作成{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
     document02_2_checklist_file_path = os.path.join(document02_2_checklist_folder_path, document02_2_checklist_file_name)
     document02_2_checklist_df.to_excel(document02_2_checklist_file_path, index=False)
     logging.info(f"書類02_2のチェックリストのデータフレームを保存しました: {document02_2_checklist_file_path}")

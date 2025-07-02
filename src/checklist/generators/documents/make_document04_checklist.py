@@ -3,7 +3,7 @@ def make_document04_checklist(latest_reception_data_date):
     import pandas as pd
     import logging
     from src.core.setting_paths import content_check_folder_path, document04_checklist_folder_path, clubs_reception_data_path
-    from src.core.utils import get_jst_now, ensure_date_string
+    from src.core.utils import get_jst_now, ensure_date_string, get_config_file_path
     from src.folder_management.make_folders import setup_logging, create_folders
 
     # ロギングの設定
@@ -68,7 +68,7 @@ def make_document04_checklist(latest_reception_data_date):
     logging.info("書類04_のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（document04_checklist_columns.jsonが必要）
     document04_checklist_columns_file_name = 'config/checklist_columns/document04_checklist_columns.json'
-    document04_checklist_columns_file_path = os.path.join(content_check_folder_path, document04_checklist_columns_file_name)
+    document04_checklist_columns_file_path = get_config_file_path(document04_checklist_columns_file_name)
     if not os.path.exists(document04_checklist_columns_file_path):
         logging.error(f"書類04のチェックリストのカラム名ファイルが見つかりません: {document04_checklist_columns_file_path}")
         return

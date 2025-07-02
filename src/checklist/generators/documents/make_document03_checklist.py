@@ -19,7 +19,7 @@ def make_document03_checklist(latest_reception_data_date):
         return
     latest_reception_data_date_str = ensure_date_string(latest_reception_data_date)
 
-    # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date}_*.xlsxを使用)
+    # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date_str}_*.xlsxを使用)
     logging.info("最新のクラブ情報付き受付データファイルを取得します")
     # 最新のクラブ情報付き受付データと同じ日付のファイルを取得
     if not latest_reception_data_date_str:
@@ -153,7 +153,7 @@ def make_document03_checklist(latest_reception_data_date):
         document03_checklist_df.loc[index, 'チェック者名_活動内容'] = 'チェックが完了していません'
     logging.info("書類03のチェックリストのデータフレームを作成しました")
 
-    # 5. 書類03のチェックリストのデータフレームを保存(ファイル名は「書類03チェックリスト_受付{latest_reception_data_date}_作成{YYYYMMDDHHMMSS}.xlsx」)
+    # 5. 書類03のチェックリストのデータフレームを保存(ファイル名は「書類03チェックリスト_受付{latest_reception_data_date_str}_作成{YYYYMMDDHHMMSS}.xlsx」)
     logging.info("書類03のチェックリストのデータフレームを保存します")
     now_jst = get_jst_now()
     document03_checklist_file_name = f'書類03チェックリスト_受付{latest_reception_data_date_str}_作成{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
