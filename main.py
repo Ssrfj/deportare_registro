@@ -3,24 +3,6 @@ import pandas as pd
 import logging
 import chardet
 
-from auto_check import perform_automatic_checks
-from utils import get_jst_now
-from column_name_change import column_name_change
-from load_latest_club_data import load_latest_club_data
-from merge_and_save_apcption_data import merge_and_save_apcption_data
-from make_checklist_for_each_club import make_checklist_for_each_club
-from make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
-from setting_paths import (
-    output_main_folder,
-    log_folder_name,
-    log_folder_path,
-    reception_data_folder_name,
-    reception_data_folder_path,
-    reception_data_with_club_info_folder_name,
-    reception_data_with_club_info_folder_path,
-    Content_check_folder_name,
-    Content_check_folder_path
-)
 from make_folders import create_folders
 from logginng import setup_logging, save_logs
 from processing_reception_data import processing_reception_data
@@ -29,8 +11,6 @@ from reception_statues import reception_statues
 from make_detailed_data_folders import make_detailed_data_folders
 from make_chacklists import make_chacklists
 from automation_check_and_update_checklist import automation_check_and_update_checklist
-from make_email_templates import make_email_templates
-from output_check_status_pdf import output_check_status_pdf
 
 # ログファイルのエンコーディングを自動検出して読み込む関数
 # 作業のログを実行ごとにtxtファイルに保存するための関数
@@ -89,7 +69,6 @@ def main():
     logging.info("チェックリストの更新・自動チェックが完了しました")
 
     # 今後の作業memo
-    # チェックリストの更新・自動チェック
     # チェック状況に応じたメールの文面案の作成
     # チェック結果をPDＦで出力
     # めも：書類間の整合性は、ある程度自動化できるかも…
@@ -111,7 +90,10 @@ def main():
 # メインの処理を実行
 if __name__ == "__main__":
     try:
+        print("プログラムを開始します")
         main()
+        print("プログラムが正常に終了しました")
+        
     except Exception as e:
         logging.critical(f"予期せぬ致命的なエラーが発生しました: {e}", exc_info=True)
         print(f"予期せぬ致命的なエラーが発生しました: {e}")
