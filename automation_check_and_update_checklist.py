@@ -11,6 +11,7 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     from make_detailed_club_data import make_detailed_club_data
     from auto_check import auto_check
     from update_document_check_status import update_document_check_status
+    from update_consistency_check_status import update_consistency_check_status
 
     # ロギングの設定
     setup_logging()
