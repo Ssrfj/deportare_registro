@@ -19,29 +19,29 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     else:
         logging.info(f"クラブ情報付き申請データのフォルダは既に存在します: {clubs_reception_data_path}")
 
-    # 2. 最新のクラブ情報付き申請データファイルを取得(クラブ情報付き申請データ_申請YYYYMMDDHHMMSS_作成YYYYMMDDHHMMSS.xlsx)
-    logging.info("最新のクラブ情報付き申請データファイルを取得しています")
+    # 2. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付YYYYMMDDHHMMSS_作成YYYYMMDDHHMMSS.xlsx)
+    logging.info("最新のクラブ情報付き受付データファイルを取得しています")
     club_reception_data_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith('クラブ情報付き申請データ_申請') and f.endswith('.xlsx')
+        f.startswith('クラブ情報付き受付データ_受付') and f.endswith('.xlsx')
     ]
-    # ファイル名の形式は「クラブ情報付き申請データ_申請YYYYMMDDHHMMSS_作成YYYYMMDDHHMMSS.xlsx」
-    # クラブ情報付き申請データファイルを見つけたら、ファイル名の申請のYYYYMMDDHHMMSS形式でソート
+    # ファイル名の形式は「クラブ情報付き受付データ_受付YYYYMMDDHHMMSS_作成YYYYMMDDHHMMSS.xlsx」
+    # クラブ情報付き受付データファイルを見つけたら、ファイル名の受付のYYYYMMDDHHMMSS形式でソート
     club_reception_data_files.sort(reverse=True)
     if not club_reception_data_files:
-        logging.info("クラブ情報付き申請データファイルが見つかりません")
+        logging.info("クラブ情報付き受付データファイルが見つかりません")
         latest_club_reception_data_file = None
     else:
         latest_club_reception_data_file = club_reception_data_files[0]
-        logging.info(f"最新のクラブ情報付き申請データファイル: {latest_club_reception_data_file}")
-    # 最新のクラブ情報付き申請データの作成日を取得（ファイル名のYYYYMMDDHHMMSS形式から）
+        logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_data_file}")
+    # 最新のクラブ情報付き受付データの作成日を取得（ファイル名のYYYYMMDDHHMMSS形式から）
     if latest_club_reception_data_file:
         latest_club_reception_data_date = latest_club_reception_data_file.split('_')[2].split('.')[0]
         # "作成20250702134214" から "作成" を除去
         latest_club_reception_data_date = latest_club_reception_data_date.replace('作成', '')
         latest_club_reception_data_date = pd.to_datetime(latest_club_reception_data_date, format='%Y%m%d%H%M%S')
-        logging.info(f"最新のクラブ情報付き申請データの作成日: {latest_club_reception_data_date}")
+        logging.info(f"最新のクラブ情報付き受付データの作成日: {latest_club_reception_data_date}")
         
         # 3. 最新のクラブ情報付き申請データを作成する必要があるかを判断
         if latest_club_reception_data_date >= latest_reception_data_date:
@@ -134,8 +134,8 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     timestamp = current_time.strftime('%Y%m%d%H%M%S')
     reception_timestamp = latest_processed_reception_data_date.strftime('%Y%m%d%H%M%S')
     
-    clubs_reception_data_file_name = f"クラブ情報付き申請データ_申請{reception_timestamp}_作成{timestamp}.xlsx"
+    clubs_reception_data_file_name = f"クラブ情報付き受付データ_受付{reception_timestamp}_作成{timestamp}.xlsx"
     clubs_reception_data_file_path = os.path.join(clubs_reception_data_path, clubs_reception_data_file_name)
     
     clubs_reception_data_df.to_excel(clubs_reception_data_file_path, index=False)
-    logging.info(f"クラブ情報付き申請データを保存しました: {clubs_reception_data_file_path}")
+    logging.info(f"クラブ情報付き受付データを保存しました: {clubs_reception_data_file_path}")

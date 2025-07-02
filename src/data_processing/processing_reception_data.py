@@ -54,35 +54,35 @@ def processing_reception_data():
 
     # 2. 最新の申請データの作成日から、申請データを読み込み処理を必要があるかを判断
     logging.info("最新の申請データの作成日から、申請データを読み込む必要があるかを判断しています")
-    # 処理後のデータのフォルダパス(processed_reception_data_folder_path)に保存されている最新の申請データを特定
-    # ファイル名は「処理済み申請データ_申請YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx」
+    # 処理後のデータのフォルダパス(processed_reception_data_folder_path)に保存されている最新の受付データを特定
+    # ファイル名は「処理済み受付データ_受付YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx」
     reception_data_files = [
         f for f in os.listdir(processed_reception_data_folder_path)
         if os.path.isfile(os.path.join(processed_reception_data_folder_path, f)) and
-        f.startswith('処理済み申請データ_申請') and f.endswith('.xlsx')
+        f.startswith('処理済み受付データ_受付') and f.endswith('.xlsx')
     ]
-    # ファイル名の形式は「処理済み申請データ_申請YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx」
-    # 処理済み申請データファイルを見つけたら、ファイル名の申請のYYYYMMDDHHMMSS形式でソート
+    # ファイル名の形式は「処理済み受付データ_受付YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx」
+    # 処理済み受付データファイルを見つけたら、ファイル名の受付のYYYYMMDDHHMMSS形式でソート
     reception_data_files.sort(reverse=True)
     if not reception_data_files:
-        logging.info("処理済み申請データファイルが見つかりません")
+        logging.info("処理済み受付データファイルが見つかりません")
     # 見つかったら、見つかったファイルの数をログに記録
     else:
-        logging.info(f"見つかった処理済み申請データファイルの数: {len(reception_data_files)}")
-    # 最新の処理済み申請データファイルを特定
-    logging.info(f"最新の処理済み申請データファイルを特定しています")
+        logging.info(f"見つかった処理済み受付データファイルの数: {len(reception_data_files)}")
+    # 最新の処理済み受付データファイルを特定
+    logging.info(f"最新の処理済み受付データファイルを特定しています")
     latest_processed_reception_data_file = reception_data_files[0] if reception_data_files else None
-    logging.info(f"最新の処理済み申請データファイル: {latest_processed_reception_data_file}")
-    # 最新の処理済み申請データの申請日を取得（ファイル名の申請YYYYMMDDHHMMSS形式から）
+    logging.info(f"最新の処理済み受付データファイル: {latest_processed_reception_data_file}")
+    # 最新の処理済み受付データの受付日を取得（ファイル名の受付YYYYMMDDHHMMSS形式から）
     if latest_processed_reception_data_file:
-        # 申請日時を取得: "申請20250401000000" から "申請" を除去
-        latest_processed_reception_data_date = latest_processed_reception_data_file.split('_')[1].replace('申請', '')
+        # 受付日時を取得: "受付20250401000000" から "受付" を除去
+        latest_processed_reception_data_date = latest_processed_reception_data_file.split('_')[1].replace('受付', '')
         latest_processed_reception_data_date = pd.to_datetime(latest_processed_reception_data_date, format='%Y%m%d%H%M%S')
-        logging.info(f"最新の処理済み申請データの申請日: {latest_processed_reception_data_date}")
+        logging.info(f"最新の処理済み受付データの受付日: {latest_processed_reception_data_date}")
     else:
-        logging.error("最新の処理済み申請データファイルが見つかりません")
+        logging.error("最新の処理済み受付データファイルが見つかりません")
         latest_processed_reception_data_date = None
-    # 最新の申請データの作成日と最新の処理済み申請データの申請日を比較
+    # 最新の申請データの作成日と最新の処理済み受付データの受付日を比較
     if latest_reception_data_file and latest_processed_reception_data_file:
         if latest_reception_data_date > latest_processed_reception_data_date:
             logging.info("最新の申請データを読み込む必要があります")
@@ -101,7 +101,7 @@ def processing_reception_data():
     if not latest_reception_data_file:
         logging.info("申請データを読み込む必要がないため、既存の処理済みデータを使用します")
         if latest_processed_reception_data_date:
-            logging.info(f"最新の処理済み申請データの日付: {latest_processed_reception_data_date}")
+            logging.info(f"最新の処理済み受付データの日付: {latest_processed_reception_data_date}")
             return latest_processed_reception_data_date
         else:
             logging.info("処理済みデータも申請データも見つからないため、処理をスキップします")
@@ -124,20 +124,20 @@ def processing_reception_data():
         logging.error("カラム名の変更に失敗しました")
         return
     logging.info("申請データのカラム名を変更しました")
-    # 処理済み申請データのフォルダが存在しない場合は作成
+    # 処理済み受付データのフォルダが存在しない場合は作成
     if not os.path.exists(processed_reception_data_folder_path):
         os.makedirs(processed_reception_data_folder_path)
-        logging.info(f"処理済み申請データのフォルダを作成しました: {processed_reception_data_folder_path}")
-    # 処理済み申請データのファイル名を指定（処理済み申請データ_申請YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx）
+        logging.info(f"処理済み受付データのフォルダを作成しました: {processed_reception_data_folder_path}")
+    # 処理済み受付データのファイル名を指定（処理済み受付データ_受付YYYYMMDDHHMMSS_処理YYYYMMDDHHMMSS.xlsx）
     processed_reception_data_date = get_jst_now().strftime('%Y%m%d%H%M%S')
-    processed_reception_data_file_name = f"処理済み申請データ_申請{latest_reception_data_date.strftime('%Y%m%d%H%M%S')}_処理{processed_reception_data_date}.xlsx"
+    processed_reception_data_file_name = f"処理済み受付データ_受付{latest_reception_data_date.strftime('%Y%m%d%H%M%S')}_処理{processed_reception_data_date}.xlsx"
     processed_reception_data_file_path = os.path.join(processed_reception_data_folder_path, processed_reception_data_file_name)
-    # 処理済み申請データを保存
+    # 処理済み受付データを保存
     try:
         processed_reception_data_df.to_excel(processed_reception_data_file_path, index=False)
-        logging.info(f"処理済み申請データを保存しました: {processed_reception_data_file_path}")
+        logging.info(f"処理済み受付データを保存しました: {processed_reception_data_file_path}")
     except Exception as e:
-        logging.error(f"処理済み申請データの保存に失敗しました: {e}", exc_info=True)
+        logging.error(f"処理済み受付データの保存に失敗しました: {e}", exc_info=True)
         return
     # latest_reception_data_dateを返す
     return latest_reception_data_date

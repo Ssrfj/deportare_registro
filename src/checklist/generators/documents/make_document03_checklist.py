@@ -72,13 +72,13 @@ def make_document03_checklist(latest_reception_data_date):
     # 3. 書類03_のチェックリストのカラム名を取得
     logging.info("書類03_のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（document03_checklist_columns.jsonが必要）
-    document03_checklist_columns_file_name = 'config/checklist_columns/document03_checklist_columns.json'
-    document03_checklist_columns_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), document03_checklist_columns_file_name)
+    from src.core.utils import get_config_file_path
+    document03_checklist_columns_file_path = get_config_file_path('config/checklist_columns/document03_checklist_columns.json')
     if not os.path.exists(document03_checklist_columns_file_path):
         logging.error(f"書類03のチェックリストのカラム名ファイルが見つかりません: {document03_checklist_columns_file_path}")
         return
     document03_checklist_columns = pd.read_json(document03_checklist_columns_file_path, orient='records')
-    logging.info(f"書類03のチェックリストのカラム名を読み込みました: {document03_checklist_columns_file_name}")
+    logging.info(f"チェックリストのカラム名を読み込みました: {document03_checklist_columns_file_path}")
 
     # 4. 書類03のチェックリストのデータフレームを作成
     logging.info("書類03のチェックリストのデータフレームを作成します")

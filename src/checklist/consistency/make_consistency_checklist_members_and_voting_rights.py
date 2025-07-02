@@ -3,7 +3,7 @@ def make_consistency_checklist_members_and_voting_rights(latest_reception_data_d
     import pandas as pd
     import logging
     from src.core.setting_paths import consistency_checklist_members_and_voting_rights_folder_path, clubs_reception_data_path
-    from src.core.utils import get_jst_now
+    from src.core.utils import get_jst_now, get_config_file_path
     from src.folder_management.make_folders import setup_logging, create_folders
 
     # ロギングの設定
@@ -67,7 +67,7 @@ def make_consistency_checklist_members_and_voting_rights(latest_reception_data_d
     logging.info("会員と議決権保有者の一貫性のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（consistency_checklist_members_and_voting_rights_columns.jsonが必要）
     consistency_checklist_members_and_voting_rights_columns_file_name = 'consistency_checklist_members_and_voting_rights_columns.json'
-    consistency_checklist_members_and_voting_rights_columns_file_path = consistency_checklist_members_and_voting_rights_columns_file_name
+    consistency_checklist_members_and_voting_rights_columns_file_path = get_config_file_path(f'checklist_columns/{consistency_checklist_members_and_voting_rights_columns_file_name}')
     if not os.path.exists(consistency_checklist_members_and_voting_rights_columns_file_path):
         logging.error(f"会員と議決権保有者の一貫性のチェックリストのカラム名ファイルが見つかりません: {consistency_checklist_members_and_voting_rights_columns_file_path}")
         return

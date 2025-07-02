@@ -13,7 +13,8 @@ def make_detailed_club_data(club_reception_df):
     logging.info("フォルダを作成しました")
 
     # discipline_dfの読み込み
-    discipline_df = pd.read_excel('list_of_disciplines.xlsx')
+    discipline_file_path = os.path.join(os.getcwd(), 'config', 'reference_data', 'list_of_disciplines.xlsx')
+    discipline_df = pd.read_excel(discipline_file_path)
     disciplines = discipline_df['disciplines'].tolist()
 
 

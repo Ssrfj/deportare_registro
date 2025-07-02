@@ -2,7 +2,7 @@ def make_chacklists(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from src.core.setting_paths import content_check_folder_path, application_statues_folder_path, clubs_reception_data_path
+    from src.core.setting_paths import clubs_details_data_folder_path, application_statues_folder_path, clubs_reception_data_path
     from src.core.utils import get_jst_now
     from src.folder_management.make_folders import setup_logging, create_folders
     from src.checklist.generators.make_overall_checklist import make_overall_checklist
@@ -40,7 +40,7 @@ def make_chacklists(latest_reception_data_date):
     club_names = club_reception_df['クラブ名'].unique()
     for club_name in club_names:
         club_folder_name = f"{club_name}_詳細データ"
-        club_folder_path = os.path.join(content_check_folder_path, club_folder_name)
+        club_folder_path = os.path.join(clubs_details_data_folder_path, club_folder_name)
         if not os.path.exists(club_folder_path):
             os.makedirs(club_folder_path)
             logging.info(f"クラブフォルダを作成しました: {club_folder_path}")

@@ -18,15 +18,21 @@ def make_checklist_filename(club_name, reception_date_str):
 
 def get_latest_club_info_file():
     """
-    プロジェクトのルートディレクトリからクラブ名_YYYYMMDD.xlsx形式の最新ファイルを取得する。
+    data/clubsディレクトリからクラブ名_YYYYMMDD.csv形式の最新ファイルを取得する。
     """
     root_path = os.getcwd()
+    clubs_folder = os.path.join(root_path, 'data', 'clubs')
     
-    # クラブ名_YYYYMMDD.xlsx形式のファイルを探す
+    # フォルダが存在しない場合は空のリストを返す
+    if not os.path.exists(clubs_folder):
+        logging.error(f"クラブ情報フォルダが見つかりません: {clubs_folder}")
+        return None, None
+    
+    # クラブ名_YYYYMMDD.csv形式のファイルを探す
     club_info_files = [
-        f for f in os.listdir(root_path)
-        if os.path.isfile(os.path.join(root_path, f)) and
-        f.startswith('クラブ名_') and f.endswith('.xlsx')
+        f for f in os.listdir(clubs_folder)
+        if os.path.isfile(os.path.join(clubs_folder, f)) and
+        f.startswith('クラブ名_') and f.endswith('.csv')
     ]
     
     if not club_info_files:
@@ -38,16 +44,32 @@ def get_latest_club_info_file():
     latest_club_info_file = club_info_files[0]
     
     try:
-        # ファイル名から日付を抽出 (クラブ名_YYYYMMDD.xlsx)
+        # ファイル名から日付を抽出 (クラブ名_YYYYMMDD.csv)
         date_str = latest_club_info_file.split('_')[1].split('.')[0]
         latest_club_info_date = pd.to_datetime(date_str, format='%Y%m%d')
         logging.info(f"最新のクラブ情報ファイル: {latest_club_info_file}")
         
         # ファイルを読み込む
-        club_info_df = pd.read_excel(os.path.join(root_path, latest_club_info_file))
+        club_info_df = pd.read_csv(os.path.join(clubs_folder, latest_club_info_file))
         logging.info(f"最新のクラブ情報を読み込みました: {latest_club_info_file}")
         
         return club_info_df, latest_club_info_date
     except Exception as e:
         logging.error(f"クラブ情報ファイルの読み込みに失敗しました: {e}")
         return None, None
+
+def get_project_root():
+    """
+    プロジェクトルートディレクトリのパスを取得する。
+    """
+    # このファイル（utils.py）からプロジェクトルートまでは2階層上
+    current_file = os.path.abspath(__file__)
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+    return project_root
+
+def get_config_file_path(relative_path):
+    """
+    プロジェクトルートからの相対パスで設定ファイルのパスを取得する。
+    """
+    project_root = get_project_root()
+    return os.path.join(project_root, relative_path)

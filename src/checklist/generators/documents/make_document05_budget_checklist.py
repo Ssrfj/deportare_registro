@@ -78,7 +78,7 @@ def make_document05_budget_checklist(latest_reception_data_date):
         logging.error(f"書類05_予算のチェックリストのカラム名ファイルが見つかりません: {document05_budget_checklist_columns_file_path}")
         return
     document05_budget_checklist_columns = pd.read_json(document05_budget_checklist_columns_file_path, orient='records')
-    logging.info(f"書類05_予算のチェックリストのカラム名を読み込みました: {document05_budget_checklist_columns_file_name}")
+    logging.info(f"チェックリストのカラム名を読み込みました: {document05_budget_checklist_columns_file_path}")
 
     # 4. 書類05_予算のチェックリストのデータフレームを作成
     logging.info("書類05_予算のチェックリストのデータフレームを作成します")

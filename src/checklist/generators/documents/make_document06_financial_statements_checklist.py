@@ -78,7 +78,7 @@ def make_document06_financial_statements_checklist(latest_reception_data_date=No
         logging.error(f"書類06_決算のチェックリストのカラム名ファイルが見つかりません: {document06_financial_statements_checklist_columns_file_path}")
         return
     document06_financial_statements_checklist_columns = pd.read_json(document06_financial_statements_checklist_columns_file_path, orient='records')
-    logging.info(f"書類06_決算のチェックリストのカラム名を読み込みました: {document06_financial_statements_checklist_columns_file_name}")
+    logging.info(f"チェックリストのカラム名を読み込みました: {document06_financial_statements_checklist_columns_file_path}")
 
     # 4. 書類06_決算のチェックリストのデータフレームを作成
     logging.info("書類06_決算のチェックリストのデータフレームを作成します")

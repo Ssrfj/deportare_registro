@@ -78,7 +78,7 @@ def make_document08_checklist(latest_reception_data_date):
         logging.error(f"書類08のチェックリストのカラム名ファイルが見つかりません: {document08_checklist_columns_file_path}")
         return
     document08_checklist_columns = pd.read_json(document08_checklist_columns_file_path, orient='records')
-    logging.info(f"書類08のチェックリストのカラム名を読み込みました: {document08_checklist_columns_file_name}")
+    logging.info(f"チェックリストのカラム名を読み込みました: {document08_checklist_columns_file_path}")
 
     # 4. 書類08のチェックリストのデータフレームを作成
     logging.info("書類08のチェックリストのデータフレームを作成します")

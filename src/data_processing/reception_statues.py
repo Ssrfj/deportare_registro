@@ -70,7 +70,7 @@ def reception_statues(latest_reception_data_date):
     latest_processed_reception_data_file = processed_reception_data_files[0]
     logging.info(f"最新の処理済み受付データファイル: {latest_processed_reception_data_file}")
     # 最新の処理済み受付データの受付日を取得（ファイル名の受付YYYYMMDDHHMMSS形式から）
-    latest_processed_reception_data_date = latest_processed_reception_data_file.split('_')[2].split('.')[0]
+    latest_processed_reception_data_date = latest_processed_reception_data_file.split('_')[1].replace('受付', '')
     latest_processed_reception_data_date = pd.to_datetime(latest_processed_reception_data_date, format='%Y%m%d%H%M%S')
     logging.info(f"最新の処理済み受付データの受付日: {latest_processed_reception_data_date}")
     # 最新の処理済み受付データを読み込む
@@ -90,7 +90,7 @@ def reception_statues(latest_reception_data_date):
     logging.info("処理済み受付データから申請があったクラブのデータを抽出します")   
     # processed_reception_dfの各行について処理
     for index, row in processed_reception_df.iterrows():
-        club_name = row['クラブ名']
+        club_name = row['申請_クラブ名_選択']
         reception_timestamp = row['申請_タイムスタンプ']
         
         # reception_statues_dfでクラブ名が一致する行を検索

@@ -23,7 +23,7 @@ def make_overall_checklist(latest_reception_data_date):
     # 1. 最新のクラブ情報付き受付データファイルを取得
     logging.info("最新のクラブ情報付き受付データファイルを取得します")
     logging.info(f"検索パス: {clubs_reception_data_path}")
-    logging.info(f"検索パターン: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
+    logging.info(f"検索パターン: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
     
     # パスが存在するか確認
     if not os.path.exists(clubs_reception_data_path):
@@ -36,8 +36,8 @@ def make_overall_checklist(latest_reception_data_date):
         logging.info(f"パス内のファイル数: {len(all_files)}")
         xlsx_files = [f for f in all_files if f.endswith('.xlsx')]
         logging.info(f"Excelファイル数: {len(xlsx_files)}")
-        club_info_files = [f for f in xlsx_files if 'クラブ情報付き申請データ' in f]
-        logging.info(f"クラブ情報付き申請データファイル数: {len(club_info_files)}")
+        club_info_files = [f for f in xlsx_files if 'クラブ情報付き受付データ' in f]
+        logging.info(f"クラブ情報付き受付データファイル数: {len(club_info_files)}")
         for f in club_info_files:
             logging.info(f"見つかったファイル: {f}")
     except Exception as e:
@@ -47,11 +47,11 @@ def make_overall_checklist(latest_reception_data_date):
     latest_club_reception_files = [
         f for f in os.listdir(clubs_reception_data_path)
         if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
-        f.startswith(f'クラブ情報付き申請データ_申請{latest_reception_data_date}') and f.endswith('.xlsx')
+        f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
     if not latest_club_reception_files:
-        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き申請データ_申請{latest_reception_data_date}*.xlsx")
+        logging.error(f"クラブ情報付き受付データファイルが見つかりません: クラブ情報付き受付データ_受付{latest_reception_data_date}*.xlsx")
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
@@ -61,13 +61,13 @@ def make_overall_checklist(latest_reception_data_date):
     # 2. 総合チェックリストのカラム名を取得
     logging.info("総合チェックリストのカラム名を取得します")
     # jsonファイルを読み込む（overall_checklist_columns.jsonが必要）
-    overall_checklist_columns_file_name = 'config/checklist_columns/overall_checklist_columns.json'
-    overall_checklist_columns_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), overall_checklist_columns_file_name)
+    from src.core.utils import get_config_file_path
+    overall_checklist_columns_file_path = get_config_file_path('config/checklist_columns/overall_checklist_columns.json')
     if not os.path.exists(overall_checklist_columns_file_path):
         logging.error(f"総合チェックリストのカラム名ファイルが見つかりません: {overall_checklist_columns_file_path}")
         return
     overall_checklist_columns = pd.read_json(overall_checklist_columns_file_path, orient='records')
-    logging.info(f"総合チェックリストのカラム名を読み込みました: {overall_checklist_columns_file_name}")
+    logging.info(f"総合チェックリストのカラム名を読み込みました: {overall_checklist_columns_file_path}")
 
     # 3. 総合チェックリストのデータフレームを作成
     logging.info("総合チェックリストのデータフレームを作成します")

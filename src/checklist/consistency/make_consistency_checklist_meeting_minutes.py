@@ -3,7 +3,7 @@ def make_consistency_checklist_meeting_minutes(latest_reception_data_date):
     import pandas as pd
     import logging
     from src.core.setting_paths import content_check_folder_path, consistency_checklist_meeting_minutes_folder_path
-    from src.core.utils import get_jst_now
+    from src.core.utils import get_jst_now, get_config_file_path
     from src.folder_management.make_folders import setup_logging, create_folders
 
     # ロギングの設定
@@ -67,7 +67,7 @@ def make_consistency_checklist_meeting_minutes(latest_reception_data_date):
     logging.info("議事録の一貫性のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（consistency_checklist_meeting_minutes_columns.jsonが必要）
     consistency_checklist_meeting_minutes_columns_file_name = 'consistency_checklist_meeting_minutes_columns.json'
-    consistency_checklist_meeting_minutes_columns_file_path = os.path.join(content_check_folder_path, consistency_checklist_meeting_minutes_columns_file_name)
+    consistency_checklist_meeting_minutes_columns_file_path = get_config_file_path(f'checklist_columns/{consistency_checklist_meeting_minutes_columns_file_name}')
     if not os.path.exists(consistency_checklist_meeting_minutes_columns_file_path):
         logging.error(f"議事録の一貫性のチェックリストのカラム名ファイルが見つかりません: {consistency_checklist_meeting_minutes_columns_file_path}")
         return

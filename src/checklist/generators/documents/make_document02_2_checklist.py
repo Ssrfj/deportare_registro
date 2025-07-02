@@ -72,13 +72,13 @@ def make_document02_2_checklist(latest_reception_data_date):
     # 3. 書類02_2_のチェックリストのカラム名を取得
     logging.info("書類02_2_のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（document02_2_checklist_columns.jsonが必要）
-    document02_2_checklist_columns_file_name = 'config/checklist_columns/document02_2_checklist_columns.json'
-    document02_2_checklist_columns_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), document02_2_checklist_columns_file_name)
+    from src.core.utils import get_config_file_path
+    document02_2_checklist_columns_file_path = get_config_file_path('config/checklist_columns/document02_2_checklist_columns.json')
     if not os.path.exists(document02_2_checklist_columns_file_path):
         logging.error(f"書類02_2のチェックリストのカラム名ファイルが見つかりません: {document02_2_checklist_columns_file_path}")
         return
     document02_2_checklist_columns = pd.read_json(document02_2_checklist_columns_file_path, orient='records')
-    logging.info(f"書類02_2のチェックリストのカラム名を読み込みました: {document02_2_checklist_columns_file_name}")
+    logging.info(f"チェックリストのカラム名を読み込みました: {document02_2_checklist_columns_file_path}")
 
     # 4. 書類02_2のチェックリストのデータフレームを作成
     logging.info("書類02_2のチェックリストのデータフレームを作成します")
