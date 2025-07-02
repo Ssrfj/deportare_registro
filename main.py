@@ -3,14 +3,14 @@ import pandas as pd
 import logging
 import chardet
 
-from make_folders import create_folders
-from logginng import setup_logging, save_logs
-from processing_reception_data import processing_reception_data
-from marge_reception_data_with_club_info import marge_reception_data_with_club_info
-from reception_statues import reception_statues
-from make_detailed_data_folders import make_detailed_data_folders
-from make_chacklists import make_chacklists
-from automation_check_and_update_checklist import automation_check_and_update_checklist
+from src.folder_management.make_folders import create_folders
+from src.core.logginng import setup_logging, save_logs
+from src.data_processing.processing_reception_data import processing_reception_data
+from src.data_processing.marge_reception_data_with_club_info import marge_reception_data_with_club_info
+from src.data_processing.reception_statues import reception_statues
+from src.folder_management.make_detailed_data_folders import make_detailed_data_folders
+from src.checklist.generators.make_chacklists import make_chacklists
+from src.checklist.automation.automation_check_and_update_checklist import automation_check_and_update_checklist
 
 # ログファイルのエンコーディングを自動検出して読み込む関数
 # 作業のログを実行ごとにtxtファイルに保存するための関数
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     try:
         print("プログラムを開始します")
         main()
-        print("プログラムが正常に終了しました")
+        print("プログラムが終了しました")
         
     except Exception as e:
         logging.critical(f"予期せぬ致命的なエラーが発生しました: {e}", exc_info=True)
@@ -127,7 +127,7 @@ def main():
             return
 
         # 4. 受付受付リストの最新ファイルを取得
-        folder_path = os.path.join('R7_登録受付処理','受付受付')
+        folder_path = os.path.join('output/R7_登録受付処理','受付受付')
         try:
             os.makedirs(folder_path, exist_ok=True)
             files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.xlsx')]
@@ -144,7 +144,7 @@ def main():
             return
 
         # 5. 受付内容チェックリスト作成状況ファイルの読み込みまたは新規作成
-        folder_of_checklist = os.path.join('R7_登録受付処理', '受付内容チェック')
+        folder_of_checklist = os.path.join('output/R7_登録受付処理', '受付内容チェック')
         file_of_checklist_create_status = os.path.join(folder_of_checklist, '受付内容チェックリスト.xlsx')
         logging.info(f"受付内容チェックリストファイル: {file_of_checklist_create_status}")
         try:
@@ -258,7 +258,7 @@ def main():
         return
     
     # logをtxtファイルに保存
-    log_file_path = os.path.join('R7_登録受付処理', 'logs', f'log_{get_jst_now().strftime("%Y%m%d%H%M%S")}.txt')
+    log_file_path = os.path.join('output/R7_登録受付処理', 'logs', f'log_{get_jst_now().strftime("%Y%m%d%H%M%S")}.txt')
     os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
 
     # ログファイルを出力する箇所で

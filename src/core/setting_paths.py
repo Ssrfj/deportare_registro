@@ -1,6 +1,6 @@
 import os
 
-output_main_folder_name = 'R7_登録受付処理'
+output_main_folder_name = 'output/R7_登録受付処理'
 output_main_folder_path = os.path.join(os.getcwd(), output_main_folder_name)
 settting_folder_name = 'setting'
 settting_folder_path = os.path.join(output_main_folder_path, settting_folder_name)

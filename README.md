@@ -6,6 +6,57 @@
 ※ただし、こちらが想定する形式でクラブに受付を求めるというイレギュラーな運用を前提にしています。
 また、某京都での運用を前提にしています。
 
+## プロジェクト構造
+
+```
+deportare_registro/
+├── main.py                    # メインエントリーポイント
+├── requirements.txt           # 依存関係
+├── README.md                  # プロジェクトドキュメント
+├── .gitignore                 # Git除外設定
+├── src/                       # ソースコード
+│   ├── core/                  # コア機能
+│   │   ├── logginng.py        # ログ設定
+│   │   ├── setting_paths.py   # パス設定
+│   │   └── utils.py           # ユーティリティ関数
+│   ├── data_processing/       # データ処理関連
+│   │   ├── processing_reception_data.py
+│   │   ├── marge_reception_data_with_club_info.py
+│   │   ├── reception_statues.py
+│   │   ├── column_name_change.py
+│   │   └── make_detailed_club_data.py
+│   ├── folder_management/     # フォルダ管理
+│   │   ├── make_folders.py
+│   │   └── make_detailed_data_folders.py
+│   ├── checklist/            # チェックリスト関連
+│   │   ├── generators/       # チェックリスト生成
+│   │   │   ├── checklist_generator.py
+│   │   │   ├── make_chacklists.py
+│   │   │   ├── make_overall_checklist.py
+│   │   │   └── documents/    # 各種書類チェックリスト生成
+│   │   │       └── make_document*.py
+│   │   ├── consistency/      # 整合性チェック
+│   │   │   └── make_consistency_*.py
+│   │   └── automation/       # 自動チェック
+│   │       ├── automation_check_and_update_checklist.py
+│   │       ├── auto_check.py
+│   │       ├── check_functions.py
+│   │       └── documents_check_functions.py
+│   └── human_interface/      # 人間用インターフェース
+│       └── make_and_write_documents_checklist_for_human.py
+├── config/                   # 設定ファイル
+│   ├── checklist_columns/   # チェックリスト設定
+│   │   └── *.json
+│   └── reference_data/      # 参照データ
+│       └── *.csv, *.xlsx
+├── data/                    # データファイル
+│   ├── clubs/               # クラブデータ
+│   └── applications/        # 申請データ
+├── output/                  # 出力ファイル
+│   └── R7_登録受付処理/     # 処理結果
+└── test/                    # テストファイル
+```
+
 ## 主な機能
 
 - クラブごとのフォルダをスキャンし、提出書類を自動判定

@@ -2,13 +2,13 @@ def processing_reception_data():
     import os
     import logging
     import pandas as pd
-    from setting_paths import (
+    from src.core.setting_paths import (
         reception_data_folder_path,
         processed_reception_data_folder_path,
     )
-    from make_folders import setup_logging, create_folders
-    from utils import get_jst_now
-    from column_name_change import column_name_change
+    from src.folder_management.make_folders import setup_logging, create_folders
+    from src.core.utils import get_jst_now
+    from src.data_processing.column_name_change import column_name_change
 
     # ロギングの設定
     setup_logging()
@@ -18,13 +18,20 @@ def processing_reception_data():
 
     # 1. 最新の申請データを探す
     logging.info("申請データを探しています")
-    # 申請データはプロジェクトルート（main.pyと同じフォルダ）にある
+    # 申請データはdata/applicationsフォルダにある
     project_root = os.getcwd()
-    reception_data_files = [
-        f for f in os.listdir(project_root)
-        if os.path.isfile(os.path.join(project_root, f)) and
-        f.startswith('申請データ_') and f.endswith('.xlsx')
-    ]
+    applications_folder = os.path.join(project_root, 'data', 'applications')
+    
+    # フォルダが存在しない場合は空のリストを返す
+    if not os.path.exists(applications_folder):
+        logging.error(f"申請データフォルダが見つかりません: {applications_folder}")
+        reception_data_files = []
+    else:
+        reception_data_files = [
+            f for f in os.listdir(applications_folder)
+            if os.path.isfile(os.path.join(applications_folder, f)) and
+            f.startswith('申請データ_') and f.endswith('.xlsx')
+        ]
     # ファイル名の形式は「申請データ_YYYYMMDDHHMMSS.xlsx」
     # 申請データファイルを見つけたら、ファイル名のYYYYMMDDHHMMSS形式でソート
     reception_data_files.sort(reverse=True)
@@ -74,18 +81,19 @@ def processing_reception_data():
         logging.info(f"最新の処理済み申請データの申請日: {latest_processed_reception_data_date}")
     else:
         logging.error("最新の処理済み申請データファイルが見つかりません")
+        latest_processed_reception_data_date = None
     # 最新の申請データの作成日と最新の処理済み申請データの申請日を比較
     if latest_reception_data_file and latest_processed_reception_data_file:
         if latest_reception_data_date > latest_processed_reception_data_date:
             logging.info("最新の申請データを読み込む必要があります")
-            latest_reception_data_file = os.path.join(project_root, latest_reception_data_file)
+            latest_reception_data_file = os.path.join(applications_folder, latest_reception_data_file)
         else:
             logging.info("最新の申請データを読み込む必要はありません")
             latest_reception_data_file = None
     elif latest_reception_data_file and not latest_processed_reception_data_file:
         # 処理済みデータがない場合は初回実行として処理
         logging.info("処理済みデータが見つからないため、初回実行として申請データを処理します")
-        latest_reception_data_file = os.path.join(project_root, latest_reception_data_file)
+        latest_reception_data_file = os.path.join(applications_folder, latest_reception_data_file)
     else:
         logging.error("申請データファイルが見つかりません")
         latest_reception_data_file = None
