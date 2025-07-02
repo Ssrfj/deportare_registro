@@ -85,7 +85,7 @@ def main():
 
     # チェックリストの更新・自動チェック
     logging.info("チェックリストの更新・自動チェックを実行します")
-    automation_check_and_update_checklist()
+    automation_check_and_update_checklist(latest_reception_data_date)
     logging.info("チェックリストの更新・自動チェックが完了しました")
 
     # 今後の作業memo
@@ -95,14 +95,14 @@ def main():
     # めも：書類間の整合性は、ある程度自動化できるかも…
 
     # チェック状況に応じたメールの文面案の作成
-    logging.info("チェック状況に応じたメールの文面案を作成します")
-    make_email_templates()
-    logging.info("チェック状況に応じたメールの文面案の作成が完了しました")
+    # logging.info("チェック状況に応じたメールの文面案を作成します")
+    # make_email_templates()
+    # logging.info("チェック状況に応じたメールの文面案の作成が完了しました")
 
-    # チェック結果をPDＦで出力
-    logging.info("チェック状況をPDFで出力します")
-    output_check_status_pdf()
-    logging.info("チェック状況のPDF出力が完了しました")
+    # # チェック結果をPDＦで出力
+    # logging.info("チェック状況をPDFで出力します")
+    # output_check_status_pdf()
+    # logging.info("チェック状況のPDF出力が完了しました")
 
     # ログファイルの保存（個別実行分と統合版の両方）
     save_logs()
