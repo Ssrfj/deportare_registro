@@ -45,7 +45,7 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
         if '.' in apried_date_str:
             apried_date_str = apried_date_str.split('.')[0]
         if 'チェックリスト作成日時' not in row.index:
-            logging.error(f"'チェックリスト作成日時' カラムが存在しません。rowのカラム: {row.index.tolist()}")
+            logging.warning(f"'チェックリスト作成日時' カラムが存在しません。rowのカラム: {row.index.tolist()}")
             # カラムが存在しない場合は、現在時刻を使用
             checklist_creation_time = get_jst_now()
         else:

@@ -53,6 +53,19 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     latest_overall_checklist_path = os.path.join(overall_checklist_folder_path, latest_overall_checklist_file)
     overall_checklist_df = pd.read_excel(latest_overall_checklist_path)
     logging.info(f"最新の総合チェックリストを読み込みました: {latest_overall_checklist_file}")
+    
+    # 「チェックリスト作成日時」カラムが存在しない場合は追加
+    if 'チェックリスト作成日時' not in overall_checklist_df.columns:
+        logging.warning("総合チェックリストに'チェックリスト作成日時'カラムが存在しないため、追加します")
+        # 受付日時をベースにチェックリスト作成日時を設定
+        overall_checklist_df['チェックリスト作成日時'] = overall_checklist_df['受付日時']
+        logging.info("'チェックリスト作成日時'カラムを追加しました")
+    
+    # 「チェックリスト作成日時」カラムが空の場合は受付日時で補完
+    checklist_creation_mask = overall_checklist_df['チェックリスト作成日時'].isnull() | (overall_checklist_df['チェックリスト作成日時'] == '')
+    if checklist_creation_mask.any():
+        overall_checklist_df.loc[checklist_creation_mask, 'チェックリスト作成日時'] = overall_checklist_df.loc[checklist_creation_mask, '受付日時']
+        logging.info("空の'チェックリスト作成日時'を受付日時で補完しました")
 
     # 3. 受付データの自動チェックを実行
     logging.info("受付データの自動チェックを実行します")

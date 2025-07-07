@@ -90,6 +90,8 @@ def make_overall_checklist(latest_reception_data_date):
         overall_checklist_df.loc[index, 'メールアドレス'] = row['申請_メールアドレス']
         overall_checklist_df.loc[index, '電話番号'] = row['申請_TEL']
         overall_checklist_df.loc[index, 'FAX番号'] = row['申請_FAX(任意)']
+        # チェックリスト作成日時のカラムは現在のJST日時を使用
+        overall_checklist_df.loc[index, 'チェックリスト作成日時'] = now_jst.strftime('%Y-%m-%d %H:%M:%S')
         # 結果のカラムは未チェックとする
         overall_checklist_df.loc[index, '自動チェック結果'] = '未チェック'
         overall_checklist_df.loc[index, '書類チェック結果'] = '未チェック'
