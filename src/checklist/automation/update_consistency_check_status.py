@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, date
 from src.core.setting_paths import content_check_folder_path, application_statues_folder_path
 from src.folder_management.make_folders import setup_logging, create_folders
+from src.core.utils import ensure_date_string
 
 def check_consistency_disciplines(row):
     # ロギングの設定
@@ -247,7 +248,7 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
         if '.' in apried_date_str:
             apried_date_str = apried_date_str.split('.')[0]
         if 'チェックリスト作成日時' not in row.index:
-            logging.error(f"'チェックリスト作成日時' カラムが存在しません。rowのカラム: {row.index.tolist()}")
+            logging.warning(f"'チェックリスト作成日時' カラムが存在しません。クラブ '{club_name}' をスキップします。rowのカラム: {row.index.tolist()}")
             continue
         # 処理開始のメッセージを表示
         logging.info(f"クラブ名: {club_name} の一貫性自動チェックを開始します")
@@ -331,7 +332,8 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
     # 総合チェックリストのファイルを保存（ファイル名は「総合チェックリスト_受付{YYYYMMDDHHMMSS}_更新{YYYYMMDDHHMMSS}.xlsx」）
     logging.info("総合チェックリストのファイルを保存します")
     now_jst = get_jst_now()
-    overall_checklist_file_name = f'総合チェックリスト_受付{latest_reception_data_date}_更新{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
+    reception_date_str = ensure_date_string(latest_reception_data_date)
+    overall_checklist_file_name = f'総合チェックリスト_受付{reception_date_str}_更新{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
     overall_checklist_file_path = os.path.join(overall_checklist_folder_path, overall_checklist_file_name)
     overall_checklist_df.to_excel(overall_checklist_file_path, index=False)
     logging.info(f"総合チェックリストのファイルを保存しました: {overall_checklist_file_path}")
