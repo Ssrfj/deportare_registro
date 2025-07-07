@@ -5,7 +5,7 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
     from datetime import datetime, timezone, timedelta
     from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.setting_paths import overall_checklist_folder_path
-    from src.core.utils import get_jst_now
+    from src.core.utils import get_jst_now, ensure_date_string
     from src.checklist.automation.documents_check_functions import (
         check_document_1, check_document_2_1, check_document_2_2, check_document_3,
         check_document_4, check_document_5_plan, check_document_5_budget,
@@ -46,7 +46,17 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
             apried_date_str = apried_date_str.split('.')[0]
         if 'チェックリスト作成日時' not in row.index:
             logging.error(f"'チェックリスト作成日時' カラムが存在しません。rowのカラム: {row.index.tolist()}")
-            continue
+            # カラムが存在しない場合は、現在時刻を使用
+            checklist_creation_time = get_jst_now()
+        else:
+            checklist_creation_time_str = str(row.get('チェックリスト作成日時')).strip()
+            if checklist_creation_time_str and checklist_creation_time_str != 'nan':
+                try:
+                    checklist_creation_time = pd.to_datetime(checklist_creation_time_str)
+                except:
+                    checklist_creation_time = get_jst_now()
+            else:
+                checklist_creation_time = get_jst_now()
         # 処理開始のメッセージを表示
         logging.info(f"クラブ名: {club_name} の自動チェックを開始します")
         # 保存されているチェックリストを読み込み、チェックを実行
@@ -139,7 +149,8 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
     # 総合チェックリストのファイルを保存（ファイル名は「総合チェックリスト_受付{YYYYMMDDHHMMSS}_更新{YYYYMMDDHHMMSS}.xlsx」）
     logging.info("総合チェックリストのファイルを保存します")
     now_jst = get_jst_now()
-    overall_checklist_file_name = f'総合チェックリスト_受付{latest_reception_data_date}_更新{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
+    latest_reception_data_date_str = ensure_date_string(latest_reception_data_date)
+    overall_checklist_file_name = f'総合チェックリスト_受付{latest_reception_data_date_str}_更新{now_jst.strftime("%Y%m%d%H%M%S")}.xlsx'
     overall_checklist_file_path = os.path.join(overall_checklist_folder_path, overall_checklist_file_name)
     overall_checklist_df.to_excel(overall_checklist_file_path, index=False)
     logging.info(f"総合チェックリストのファイルを保存しました: {overall_checklist_file_path}")

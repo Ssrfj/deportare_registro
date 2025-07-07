@@ -2,7 +2,7 @@ def make_consistency_checklist_disciplines(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from src.core.setting_paths import content_check_folder_path, consistency_checklist_disciplines_folder_path
+    from src.core.setting_paths import content_check_folder_path, consistency_checklist_disciplines_folder_path, clubs_reception_data_path
     from src.core.utils import get_jst_now, get_config_file_path
     from src.folder_management.make_folders import setup_logging, create_folders
 
@@ -20,8 +20,8 @@ def make_consistency_checklist_disciplines(latest_reception_data_date):
         logging.error("最新の受付データの日付が指定されていません")
         return    
     latest_club_reception_files = [
-        f for f in os.listdir(content_check_folder_path)
-        if os.path.isfile(os.path.join(content_check_folder_path, f)) and
+        f for f in os.listdir(clubs_reception_data_path)
+        if os.path.isfile(os.path.join(clubs_reception_data_path, f)) and
         f.startswith(f'クラブ情報付き受付データ_受付{latest_reception_data_date}') and f.endswith('.xlsx')
     ]
     latest_club_reception_files.sort(reverse=True)
@@ -30,7 +30,7 @@ def make_consistency_checklist_disciplines(latest_reception_data_date):
         return
     latest_club_reception_file = latest_club_reception_files[0]
     logging.info(f"最新のクラブ情報付き受付データファイル: {latest_club_reception_file}")
-    club_reception_df = pd.read_excel(os.path.join(content_check_folder_path, latest_club_reception_file))
+    club_reception_df = pd.read_excel(os.path.join(clubs_reception_data_path, latest_club_reception_file))
     logging.info(f"最新のクラブ情報付き受付データを読み込みました: {latest_club_reception_file}")
 
     # 2. 活動種目の一貫性チェックリストを作成する必要があるか確認
@@ -67,7 +67,7 @@ def make_consistency_checklist_disciplines(latest_reception_data_date):
     logging.info("活動種目の一貫性のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（consistency_checklist_disciplines_columns.jsonが必要）
     consistency_checklist_disciplines_columns_file_name = 'consistency_checklist_disciplines_columns.json'
-    consistency_checklist_disciplines_columns_file_path = get_config_file_path(f'checklist_columns/{consistency_checklist_disciplines_columns_file_name}')
+    consistency_checklist_disciplines_columns_file_path = get_config_file_path(f'config/checklist_columns/{consistency_checklist_disciplines_columns_file_name}')
     if not os.path.exists(consistency_checklist_disciplines_columns_file_path):
         logging.error(f"活動種目の一貫性のチェックリストのカラム名ファイルが見つかりません: {consistency_checklist_disciplines_columns_file_path}")
         return

@@ -67,7 +67,7 @@ def make_consistency_checklist_members_and_voting_rights(latest_reception_data_d
     logging.info("会員と議決権保有者の一貫性のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（consistency_checklist_members_and_voting_rights_columns.jsonが必要）
     consistency_checklist_members_and_voting_rights_columns_file_name = 'consistency_checklist_members_and_voting_rights_columns.json'
-    consistency_checklist_members_and_voting_rights_columns_file_path = get_config_file_path(f'checklist_columns/{consistency_checklist_members_and_voting_rights_columns_file_name}')
+    consistency_checklist_members_and_voting_rights_columns_file_path = get_config_file_path(f'config/checklist_columns/{consistency_checklist_members_and_voting_rights_columns_file_name}')
     if not os.path.exists(consistency_checklist_members_and_voting_rights_columns_file_path):
         logging.error(f"会員と議決権保有者の一貫性のチェックリストのカラム名ファイルが見つかりません: {consistency_checklist_members_and_voting_rights_columns_file_path}")
         return

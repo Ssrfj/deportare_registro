@@ -2,7 +2,7 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
-    from src.core.setting_paths import content_check_folder_path, application_statues_folder_path, clubs_reception_data_path
+    from src.core.setting_paths import content_check_folder_path, application_statues_folder_path, clubs_reception_data_path, overall_checklist_folder_path
     from src.core.utils import get_jst_now
     from src.folder_management.make_folders import setup_logging, create_folders
     from src.checklist.generators.make_overall_checklist import make_overall_checklist
@@ -41,8 +41,8 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     # 2. 最新の総合チェックリストの読み込み（overall_checklist_folder_path、ファイル名は「総合チェックリスト_受付{YYYYMMDDHHMMSS}_更新{YYYYMMDDHHMMSS}.xlsx」）
     logging.info("総合チェックリストのファイルを読み込みます")
     overall_checklist_files = [
-        f for f in os.listdir(content_check_folder_path)
-        if os.path.isfile(os.path.join(content_check_folder_path, f)) and
+        f for f in os.listdir(overall_checklist_folder_path)
+        if os.path.isfile(os.path.join(overall_checklist_folder_path, f)) and
         f.startswith('総合チェックリスト_受付') and f.endswith('.xlsx')
     ]
     overall_checklist_files.sort(reverse=True)
@@ -50,7 +50,7 @@ def automation_check_and_update_checklist(latest_reception_data_date):
         logging.error("総合チェックリストのファイルが見つかりません")
         return
     latest_overall_checklist_file = overall_checklist_files[0]
-    latest_overall_checklist_path = os.path.join(content_check_folder_path, latest_overall_checklist_file)
+    latest_overall_checklist_path = os.path.join(overall_checklist_folder_path, latest_overall_checklist_file)
     overall_checklist_df = pd.read_excel(latest_overall_checklist_path)
     logging.info(f"最新の総合チェックリストを読み込みました: {latest_overall_checklist_file}")
 
@@ -68,7 +68,7 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     # 作業memo（今後の作業）
     # 6. 整合性チェック状況を総合チェックリストに反映
     logging.info("整合性チェック状況を総合チェックリストに反映します")
-    update_consistency_check_status(overall_checklist_df, club_reception_df)
+    update_consistency_check_status(overall_checklist_df, checklist_file_path, club_reception_df, latest_club_reception_date)
     logging.info("整合性チェック状況の反映が完了しました")
 
     logging.info("チェックリストの更新・自動チェックが完了しました")

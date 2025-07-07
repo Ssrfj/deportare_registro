@@ -72,7 +72,7 @@ def make_document10_checklist(latest_reception_data_date):
     # 3. 書類10_のチェックリストのカラム名を取得
     logging.info("書類10_のチェックリストのカラム名を取得します")
     # jsonファイルを読み込む（document10_checklist_columns.jsonが必要）
-    document10_checklist_columns_file_path = get_config_file_path('checklist_columns/document10_checklist_columns.json')
+    document10_checklist_columns_file_path = get_config_file_path('config/checklist_columns/document10_checklist_columns.json')
     if not os.path.exists(document10_checklist_columns_file_path):
         logging.error(f"書類10のチェックリストのカラム名ファイルが見つかりません: {document10_checklist_columns_file_path}")
         return
