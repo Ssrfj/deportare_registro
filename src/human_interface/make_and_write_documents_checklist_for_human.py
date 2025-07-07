@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import logging
+from src.core.setting_paths import application_input_content_folder_path
 from src.checklist.generators.checklist_generator import (
     make_document1_checklist_for_human,
     make_document2_1_checklist_for_human,
@@ -52,7 +53,7 @@ def make_documents_checklist_for_human(checklist_status_df, applied_club_df):
     try:
         logging.info("人間が確認する用のチェックリストを作成しています...")
         # --- ここから元の処理 ---
-        folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
+        folder_path = application_input_content_folder_path
         for index, row in applied_club_df.iterrows():
             club_name = str(row['クラブ名']).strip()
             apried_date_str = str(row.get('申請日時')).strip()

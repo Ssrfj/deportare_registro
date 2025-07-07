@@ -16,6 +16,8 @@ clubs_reception_data_folder_name = 'クラブ情報付き受付データ'
 clubs_reception_data_path = os.path.join(output_main_folder_path, clubs_reception_data_folder_name)
 application_statues_folder_name = '申請状況'
 application_statues_folder_path = os.path.join(output_main_folder_path, application_statues_folder_name)
+application_input_content_folder_name = '申請入力内容'
+application_input_content_folder_path = os.path.join(output_main_folder_path, application_input_content_folder_name)
 content_check_folder_name = '受付内容チェック'
 content_check_folder_path = os.path.join(output_main_folder_path, content_check_folder_name)
 

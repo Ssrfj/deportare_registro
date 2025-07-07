@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 from datetime import datetime, date
-from src.core.setting_paths import content_check_folder_path, application_statues_folder_path
+from src.core.setting_paths import content_check_folder_path, application_statues_folder_path, application_input_content_folder_path, clubs_details_data_folder_path
 from src.folder_management.make_folders import setup_logging, create_folders
 from src.core.utils import ensure_date_string
 
@@ -214,7 +214,8 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
     from datetime import datetime, timezone, timedelta
     from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.setting_paths import overall_checklist_folder_path
-    from src.core.utils import get_jst_now
+    from src.core.utils import get_jst_now, ensure_date_string
+    from src.core.load_latest_club_data import load_latest_club_reception_data, get_club_data_by_name_and_date
     
     # ロギングの設定
     setup_logging()
@@ -223,8 +224,12 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
     create_folders()
     logging.info("フォルダを作成しました")
 
-    # チェックリストのフォルダを指定
-    folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
+    # 統合されたクラブ情報付き受付データを読み込み
+    logging.info("統合されたクラブ情報付き受付データを読み込みます")
+    integrated_club_data = load_latest_club_reception_data()
+    if integrated_club_data is None:
+        logging.error("統合されたクラブ情報付き受付データの読み込みに失敗しました")
+        return overall_checklist_df
 
     # checklist_status_dfに 'クラブ名' と '申請日時' カラムが存在するか確認
     # overall_checklist_dfがDataFrameであることを確認
@@ -250,84 +255,62 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
         if 'チェックリスト作成日時' not in row.index:
             logging.warning(f"'チェックリスト作成日時' カラムが存在しません。クラブ '{club_name}' をスキップします。rowのカラム: {row.index.tolist()}")
             continue
+            
         # 処理開始のメッセージを表示
-        logging.info(f"クラブ名: {club_name} の一貫性自動チェックを開始します")
-        # 保存されているチェックリストを読み込み、チェックを実行
-        club_folder_path = os.path.join(folder_path, club_name)
-        if not os.path.exists(club_folder_path):
-            os.makedirs(club_folder_path, exist_ok=True)
-            logging.info(f"クラブ '{club_name}' のフォルダを新規作成しました。")
+        logging.info(f"クラブ名: {club_name} の一貫性チェックを開始します")
+        
+        # 統合されたクラブ情報付き受付データから該当行を取得
+        target_row = get_club_data_by_name_and_date(integrated_club_data, club_name, apried_date_str)
+        
+        if target_row.empty:
+            logging.warning(f"統合データに該当クラブのデータが見つかりません: {club_name}, {apried_date_str}")
             continue
-        checklist_file_name = f"{club_name}_申請{apried_date_str}.xlsx"
-        each_folder_path = os.path.join(folder_path, club_name)
-        checklist_file_path = os.path.join(each_folder_path, checklist_file_name)
-        # パスの正規化を追加
-        checklist_file_path = os.path.normpath(checklist_file_path)
-        logging.info(f"debug; checklist_file_path: {checklist_file_path}")
-        if not checklist_file_path or not os.path.exists(checklist_file_path):
-            # デバッグ用にeach_folder_pathにあるファイルをリストアップ
-            logging.info(f"debug; each_folder_path: {each_folder_path}")
-            logging.info(f"debug; each_folder_pathにあるファイル: {os.listdir(each_folder_path)}")
-            # チェックリストファイルが存在しない場合の処理
-            logging.warning(f"クラブ '{club_name}' のチェックリストファイルが存在しません。スキップします。")
-            continue
-
-        try:
-            checklist_df = pd.read_excel(checklist_file_path)
-            # チェックリストのカラム名を確認
-            logging.info(f"チェックリストファイル '{checklist_file_name}' を読み込みました。")
-        except Exception as e:
-            logging.error(f"チェックリストファイル '{checklist_file_name}' の読み込み中にエラーが発生しました: {e}")
-            continue
-        # チェックリストの自動チェックを実行する必要があるかを確認
-        mask = (checklist_df['申請時間'] == apried_date_str) & (checklist_df['一貫性自動チェック更新時間'].notna()) & (checklist_df['一貫性自動チェック更新時間'] != '')
-        if mask.any():
-            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は一貫性自動チェック済みです。スキップします。")
+        
+        # 一貫性チェックが既に実行済みかを確認（総合チェックリストで判断）
+        consistency_columns = [
+            '一貫性チェック_活動種目', '一貫性チェック_会議録', '一貫性チェック_会員情報と議決権'
+        ]
+        
+        # いずれかの一貫性チェック列に日時が入っていればスキップ
+        consistency_check_done = any(
+            pd.notna(overall_checklist_df.loc[index, col + '_更新日時']) and 
+            overall_checklist_df.loc[index, col + '_更新日時'] != ''
+            for col in consistency_columns if col + '_更新日時' in overall_checklist_df.columns
+        )
+        
+        if consistency_check_done:
+            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は一貫性チェック済みです。スキップします。")
             continue
         else:
-            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は一貫性自動チェックを実行します。")
-            error_dict = {}
-            jst_now = datetime.now(timezone(timedelta(hours=9)))
-            today_date = jst_now.date()
+            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は一貫性チェックを実行します。")
         
-        overall_checklist_df['クラブ名'] = overall_checklist_df['クラブ名'].astype(str).str.strip()
-        overall_checklist_df['受付日時'] = overall_checklist_df['受付日時'].astype(str).str.strip()
-        # overall_checklist_dfのクラブ名と受付日時をstr型に変換
-        # 申請内容から該当行を抽出
-        target_row = club_reception_df[
-            (club_reception_df['クラブ名'] == club_name) &
-            (club_reception_df['受付_タイムスタンプ'] == apried_date_str)
-        ]
-        logging.debug(club_reception_df[['クラブ名', '受付_タイムスタンプ']])
-        logging.debug(f"検索値: クラブ名={club_name}, 受付日時={apried_date_str}")
-        logging.debug(f"{repr(club_name)}, {repr(apried_date_str)}")
-        logging.debug(club_reception_df[['クラブ名', '受付_タイムスタンプ']].applymap(repr))
-        if target_row.empty:
-            logging.warning(f"申請内容に該当データがありません: {club_name}, {apried_date_str}")
-            continue
-        # 各チェック関数に row を渡す
-        error_dict.update(check_consistency_disciplines(target_row))
-        error_dict.update(check_consistency_members_and_voting_rights(target_row))
-        error_dict.update(check_consistency_meeting_minutes(target_row))
-
-        # チェック結果をチェックリストに反映
-        for key, value in error_dict.items():
-            if key in checklist_df.columns:
-                checklist_df.at[index, key] = value
-            else:
-                logging.warning(f"チェックリストに '{key}' カラムが存在しません。スキップします。")
-        # チェックリストの更新日時を設定
-        checklist_df.at[index, '一貫性自動チェック更新時間'] = jst_now.strftime('%Y-%m-%d %H:%M:%S')
-
-        # チェックリストを保存
+        jst_now = datetime.now(timezone(timedelta(hours=9)))
+        update_datetime = jst_now.strftime('%Y-%m-%d %H:%M:%S')
+        
+        # 各一貫性チェック関数を実行して結果を総合チェックリストに反映
         try:
-            checklist_df.to_excel(checklist_file_path, index=False)
-            logging.info(f"チェックリスト '{checklist_file_name}' を更新しました。")
+            # 活動種目の一貫性チェック
+            disciplines_result = check_consistency_disciplines(target_row)
+            overall_checklist_df.loc[index, '一貫性チェック_活動種目'] = 'チェック済み' if not disciplines_result else 'エラーあり'
+            overall_checklist_df.loc[index, '一貫性チェック_活動種目_更新日時'] = update_datetime
+            
+            # 会議録の一貫性チェック
+            meeting_minutes_result = check_consistency_meeting_minutes(target_row)
+            overall_checklist_df.loc[index, '一貫性チェック_会議録'] = 'チェック済み' if not meeting_minutes_result else 'エラーあり'
+            overall_checklist_df.loc[index, '一貫性チェック_会議録_更新日時'] = update_datetime
+            
+            # 会員情報と議決権の一貫性チェック
+            member_voting_result = check_consistency_members_and_voting_rights(target_row)
+            overall_checklist_df.loc[index, '一貫性チェック_会員情報と議決権'] = 'チェック済み' if not member_voting_result else 'エラーあり'
+            overall_checklist_df.loc[index, '一貫性チェック_会員情報と議決権_更新日時'] = update_datetime
+            
+            logging.info(f"クラブ名: {club_name} の一貫性チェックが完了しました")
+            
         except Exception as e:
-            logging.error(f"チェックリスト '{checklist_file_name}' の保存中にエラーが発生しました: {e}")
+            logging.error(f"クラブ '{club_name}' の一貫性チェック中にエラーが発生しました: {e}")
             continue
-    # チェックリストの更新が完了したことをログに記録
-    logging.info("一貫性チェック状況の更新が完了しました")
+            
+    logging.info("全てのクラブの一貫性チェックが完了しました。")
 
     # 総合チェックリストのファイルを保存（ファイル名は「総合チェックリスト_受付{YYYYMMDDHHMMSS}_更新{YYYYMMDDHHMMSS}.xlsx」）
     logging.info("総合チェックリストのファイルを保存します")
@@ -337,5 +320,5 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
     overall_checklist_file_path = os.path.join(overall_checklist_folder_path, overall_checklist_file_name)
     overall_checklist_df.to_excel(overall_checklist_file_path, index=False)
     logging.info(f"総合チェックリストのファイルを保存しました: {overall_checklist_file_path}")
-    logging.info("一貫性自動チェックが完了しました")
-    return overall_checklist_df, checklist_file_path
+    logging.info("一貫性チェックが完了しました")
+    return overall_checklist_df

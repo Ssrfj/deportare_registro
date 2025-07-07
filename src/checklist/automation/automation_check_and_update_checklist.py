@@ -70,18 +70,18 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     # 3. 受付データの自動チェックを実行
     logging.info("受付データの自動チェックを実行します")
     # 受付データの自動チェックを実行するための関数を呼び出す
-    overall_checklist_df, checklist_file_path = auto_check(club_reception_df, overall_checklist_df, latest_reception_data_date=latest_club_reception_date)
+    overall_checklist_df, overall_checklist_file_path = auto_check(club_reception_df, overall_checklist_df, latest_reception_data_date=latest_club_reception_date)
     logging.info("受付データの自動チェックが完了しました")
 
     # 5. 書類チェック状況を総合チェックリストに反映
     logging.info("書類チェック状況を総合チェックリストに反映します")
-    overall_checklist_df, checklist_file_path = update_document_check_status(overall_checklist_df, checklist_file_path, club_reception_df, latest_reception_data_date=latest_club_reception_date)
+    overall_checklist_df = update_document_check_status(overall_checklist_df, overall_checklist_file_path, club_reception_df, latest_reception_data_date=latest_club_reception_date)
     logging.info("書類チェック状況の反映が完了しました")
 
     # 作業memo（今後の作業）
     # 6. 整合性チェック状況を総合チェックリストに反映
     logging.info("整合性チェック状況を総合チェックリストに反映します")
-    update_consistency_check_status(overall_checklist_df, checklist_file_path, club_reception_df, latest_club_reception_date)
+    update_consistency_check_status(overall_checklist_df, overall_checklist_file_path, club_reception_df, latest_club_reception_date)
     logging.info("整合性チェック状況の反映が完了しました")
 
     logging.info("チェックリストの更新・自動チェックが完了しました")

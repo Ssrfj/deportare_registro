@@ -6,6 +6,7 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
     from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.setting_paths import overall_checklist_folder_path
     from src.core.utils import get_jst_now, ensure_date_string
+    from src.core.load_latest_club_data import load_latest_club_reception_data, get_club_data_by_name_and_date
     from src.checklist.automation.documents_check_functions import (
         check_document_1, check_document_2_1, check_document_2_2, check_document_3,
         check_document_4, check_document_5_plan, check_document_5_budget,
@@ -20,8 +21,12 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
     create_folders()
     logging.info("フォルダを作成しました")
 
-    # チェックリストのフォルダを指定
-    folder_path = os.path.join('R7_登録申請処理', '申請入力内容')
+    # 統合されたクラブ情報付き受付データを読み込み
+    logging.info("統合されたクラブ情報付き受付データを読み込みます")
+    integrated_club_data = load_latest_club_reception_data()
+    if integrated_club_data is None:
+        logging.error("統合されたクラブ情報付き受付データの読み込みに失敗しました")
+        return overall_checklist_df
 
     # checklist_status_dfに 'クラブ名' と '申請日時' カラムが存在するか確認
     # overall_checklist_dfがDataFrameであることを確認
@@ -57,94 +62,117 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
                     checklist_creation_time = get_jst_now()
             else:
                 checklist_creation_time = get_jst_now()
+                
         # 処理開始のメッセージを表示
-        logging.info(f"クラブ名: {club_name} の自動チェックを開始します")
-        # 保存されているチェックリストを読み込み、チェックを実行
-        club_folder_path = os.path.join(folder_path, club_name)
-        if not os.path.exists(club_folder_path):
-            os.makedirs(club_folder_path, exist_ok=True)
-            logging.info(f"クラブ '{club_name}' のフォルダを新規作成しました。")
+        logging.info(f"クラブ名: {club_name} の書類チェックを開始します")
+        
+        # 統合されたクラブ情報付き受付データから該当行を取得
+        target_row = get_club_data_by_name_and_date(integrated_club_data, club_name, apried_date_str)
+        
+        if target_row.empty:
+            logging.warning(f"統合データに該当クラブのデータが見つかりません: {club_name}, {apried_date_str}")
             continue
-        checklist_file_name = f"{club_name}_申請{apried_date_str}.xlsx"
-        each_folder_path = os.path.join(folder_path, club_name)
-        checklist_file_path = os.path.join(each_folder_path, checklist_file_name)
-        # パスの正規化を追加
-        checklist_file_path = os.path.normpath(checklist_file_path)
-        logging.info(f"debug; checklist_file_path: {checklist_file_path}")
-        if not checklist_file_path or not os.path.exists(checklist_file_path):
-            # デバッグ用にeach_folder_pathにあるファイルをリストアップ
-            logging.info(f"debug; each_folder_path: {each_folder_path}")
-            logging.info(f"debug; each_folder_pathにあるファイル: {os.listdir(each_folder_path)}")
-            # チェックリストファイルが存在しない場合の処理
-            logging.warning(f"クラブ '{club_name}' のチェックリストファイルが存在しません。スキップします。")
-            continue
-
-        try:
-            checklist_df = pd.read_excel(checklist_file_path)
-            # チェックリストのカラム名を確認
-            logging.info(f"チェックリストファイル '{checklist_file_name}' を読み込みました。")
-        except Exception as e:
-            logging.error(f"チェックリストファイル '{checklist_file_name}' の読み込み中にエラーが発生しました: {e}")
-            continue
-        # チェックリストの自動チェックを実行する必要があるかを確認
-        mask = (checklist_df['申請時間'] == apried_date_str) & (checklist_df['自動チェック更新時間'].notna()) & (checklist_df['自動チェック更新時間'] != '')
-        if mask.any():
-            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は自動チェック済みです。スキップします。")
+        
+        # 書類チェックが既に実行済みかを確認（総合チェックリストで判断）
+        document_columns = [
+            '書類01_クラブ基本情報', '書類02_1_役員名簿', '書類02_2_コーチ名簿', '書類03_会員名簿',
+            '書類04_規約', '書類05_事業計画書', '書類05_予算書', '書類06_事業報告書',
+            '書類06_財務諸表', '書類07_チェックリスト', '書類08_一覧表', '書類09_承認印申請書', '書類10_説明書'
+        ]
+        
+        # いずれかの書類チェック列に日時が入っていればスキップ
+        document_check_done = any(
+            pd.notna(overall_checklist_df.loc[index, col + '_更新日時']) and 
+            overall_checklist_df.loc[index, col + '_更新日時'] != ''
+            for col in document_columns if col + '_更新日時' in overall_checklist_df.columns
+        )
+        
+        if document_check_done:
+            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は書類チェック済みです。スキップします。")
             continue
         else:
-            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は自動チェックを実行します。")
-            error_dict = {}
-            jst_now = datetime.now(timezone(timedelta(hours=9)))
-            today_date = jst_now.date()
+            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は書類チェックを実行します。")
+        
+        jst_now = datetime.now(timezone(timedelta(hours=9)))
+        update_datetime = jst_now.strftime('%Y-%m-%d %H:%M:%S')
         
         overall_checklist_df['クラブ名'] = overall_checklist_df['クラブ名'].astype(str).str.strip()
         overall_checklist_df['受付日時'] = overall_checklist_df['受付日時'].astype(str).str.strip()
-        # overall_checklist_dfのクラブ名と受付日時をstr型に変換
-        # 申請内容から該当行を抽出
-        target_row = club_reception_df[
-            (club_reception_df['クラブ名'] == club_name) &
-            (club_reception_df['受付_タイムスタンプ'] == apried_date_str)
-        ]
-        logging.debug(club_reception_df[['クラブ名', '受付_タイムスタンプ']])
-        logging.debug(f"検索値: クラブ名={club_name}, 受付日時={apried_date_str}")
-        logging.debug(f"{repr(club_name)}, {repr(apried_date_str)}")
-        logging.debug(club_reception_df[['クラブ名', '受付_タイムスタンプ']].applymap(repr))
-        if target_row.empty:
-            logging.warning(f"申請内容に該当データがありません: {club_name}, {apried_date_str}")
-            continue
-        # 各チェック関数に row を渡す
-        error_dict.update(check_document_1(target_row))
-        error_dict.update(check_document_2_1(target_row))
-        error_dict.update(check_document_2_2(target_row))
-        error_dict.update(check_document_3(target_row))
-        error_dict.update(check_document_4(target_row))
-        error_dict.update(check_document_5_plan(target_row))
-        error_dict.update(check_document_5_budget(target_row))
-        error_dict.update(check_document_6_report(target_row))
-        error_dict.update(check_document_6_financial_statements(target_row))
-        error_dict.update(check_document_7(target_row))
-        error_dict.update(check_document_8(target_row))
-        error_dict.update(check_document_9(target_row))
-        error_dict.update(check_document_10(target_row))
-
-        # チェック結果をチェックリストに反映
-        for key, value in error_dict.items():
-            if key in checklist_df.columns:
-                checklist_df.at[index, key] = value
-            else:
-                logging.warning(f"チェックリストに '{key}' カラムが存在しません。スキップします。")
-        # チェックリストの更新日時を設定
-        checklist_df.at[index, '自動チェック更新時間'] = jst_now.strftime('%Y-%m-%d %H:%M:%S')
-
-        # チェックリストを保存
+        
+        # 各書類チェック関数を実行して結果を総合チェックリストに反映
         try:
-            checklist_df.to_excel(checklist_file_path, index=False)
-            logging.info(f"チェックリスト '{checklist_file_name}' を更新しました。")
+            # 書類01: クラブ基本情報
+            doc1_result = check_document_1(target_row)
+            overall_checklist_df.loc[index, '書類01_クラブ基本情報'] = 'チェック済み' if doc1_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類01_クラブ基本情報_更新日時'] = update_datetime
+            
+            # 書類02_1: 役員名簿
+            doc2_1_result = check_document_2_1(target_row)
+            overall_checklist_df.loc[index, '書類02_1_役員名簿'] = 'チェック済み' if doc2_1_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類02_1_役員名簿_更新日時'] = update_datetime
+            
+            # 書類02_2: コーチ名簿
+            doc2_2_result = check_document_2_2(target_row)
+            overall_checklist_df.loc[index, '書類02_2_コーチ名簿'] = 'チェック済み' if doc2_2_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類02_2_コーチ名簿_更新日時'] = update_datetime
+            
+            # 書類03: 会員名簿
+            doc3_result = check_document_3(target_row)
+            overall_checklist_df.loc[index, '書類03_会員名簿'] = 'チェック済み' if doc3_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類03_会員名簿_更新日時'] = update_datetime
+            
+            # 書類04: 規約
+            doc4_result = check_document_4(target_row)
+            overall_checklist_df.loc[index, '書類04_規約'] = 'チェック済み' if doc4_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類04_規約_更新日時'] = update_datetime
+            
+            # 書類05: 事業計画書
+            doc5_plan_result = check_document_5_plan(target_row)
+            overall_checklist_df.loc[index, '書類05_事業計画書'] = 'チェック済み' if doc5_plan_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類05_事業計画書_更新日時'] = update_datetime
+            
+            # 書類05: 予算書
+            doc5_budget_result = check_document_5_budget(target_row)
+            overall_checklist_df.loc[index, '書類05_予算書'] = 'チェック済み' if doc5_budget_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類05_予算書_更新日時'] = update_datetime
+            
+            # 書類06: 事業報告書
+            doc6_report_result = check_document_6_report(target_row)
+            overall_checklist_df.loc[index, '書類06_事業報告書'] = 'チェック済み' if doc6_report_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類06_事業報告書_更新日時'] = update_datetime
+            
+            # 書類06: 財務諸表
+            doc6_financial_result = check_document_6_financial_statements(target_row)
+            overall_checklist_df.loc[index, '書類06_財務諸表'] = 'チェック済み' if doc6_financial_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類06_財務諸表_更新日時'] = update_datetime
+            
+            # 書類07: チェックリスト
+            doc7_result = check_document_7(target_row)
+            overall_checklist_df.loc[index, '書類07_チェックリスト'] = 'チェック済み' if doc7_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類07_チェックリスト_更新日時'] = update_datetime
+            
+            # 書類08: 一覧表
+            doc8_result = check_document_8(target_row)
+            overall_checklist_df.loc[index, '書類08_一覧表'] = 'チェック済み' if doc8_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類08_一覧表_更新日時'] = update_datetime
+            
+            # 書類09: 承認印申請書
+            doc9_result = check_document_9(target_row)
+            overall_checklist_df.loc[index, '書類09_承認印申請書'] = 'チェック済み' if doc9_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類09_承認印申請書_更新日時'] = update_datetime
+            
+            # 書類10: 説明書
+            doc10_result = check_document_10(target_row)
+            overall_checklist_df.loc[index, '書類10_説明書'] = 'チェック済み' if doc10_result else 'エラーあり'
+            overall_checklist_df.loc[index, '書類10_説明書_更新日時'] = update_datetime
+            
+            logging.info(f"クラブ名: {club_name} の書類チェックが完了しました")
+            
         except Exception as e:
-            logging.error(f"チェックリスト '{checklist_file_name}' の保存中にエラーが発生しました: {e}")
+            logging.error(f"クラブ '{club_name}' の書類チェック中にエラーが発生しました: {e}")
             continue
-    # チェックリストの更新が完了したことをログに記録
-    logging.info("書類チェック状況の更新が完了しました")
+    
+    logging.info("全てのクラブの書類チェックが完了しました。")
 
     # 総合チェックリストのファイルを保存（ファイル名は「総合チェックリスト_受付{YYYYMMDDHHMMSS}_更新{YYYYMMDDHHMMSS}.xlsx」）
     logging.info("総合チェックリストのファイルを保存します")
@@ -154,5 +182,7 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
     overall_checklist_file_path = os.path.join(overall_checklist_folder_path, overall_checklist_file_name)
     overall_checklist_df.to_excel(overall_checklist_file_path, index=False)
     logging.info(f"総合チェックリストのファイルを保存しました: {overall_checklist_file_path}")
-    logging.info("自動チェックが完了しました")
+    logging.info("書類チェックが完了しました")
+    
+    return overall_checklist_df
     return overall_checklist_df, checklist_file_path
