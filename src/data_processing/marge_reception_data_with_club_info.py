@@ -93,10 +93,21 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     reception_data = processed_reception_df[processed_reception_df['申請_クラブ名_選択'].notna() & 
                                                (processed_reception_df['申請_クラブ名_選択'] != '')].copy()
     
-    # 「選択肢にない」の場合と通常の選択肢の場合で処理を分ける
+    # 「選択肢にない」または「この中に無い」の場合と通常の選択肢の場合で処理を分ける
     # 通常の選択肢の場合：club_info_dfとマージ
-    normal_selection = reception_data[reception_data['申請_クラブ名_選択'] != '選択肢にない'].copy()
-    new_club_selection = reception_data[reception_data['申請_クラブ名_選択'] == '選択肢にない'].copy()
+    new_club_indicators = ['選択肢にない', 'この中に無い']
+    normal_selection = reception_data[~reception_data['申請_クラブ名_選択'].isin(new_club_indicators)].copy()
+    new_club_selection = reception_data[reception_data['申請_クラブ名_選択'].isin(new_club_indicators)].copy()
+    
+    logging.info(f"総受付データ行数: {len(reception_data)}")
+    logging.info(f"通常選択の行数: {len(normal_selection)}")
+    logging.info(f"新クラブ選択の行数: {len(new_club_selection)}")
+    
+    # 新クラブの詳細をログに出力
+    if len(new_club_selection) > 0:
+        logging.info("新クラブ申請の詳細:")
+        for _, row in new_club_selection.iterrows():
+            logging.info(f"  選択値: '{row['申請_クラブ名_選択']}', テキスト値: '{row['申請_クラブ名_テキスト']}'")
     
     # 通常の選択肢の場合のマージ
     clubs_reception_data_df = pd.merge(
@@ -108,24 +119,34 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     )
     logging.info(f"通常の選択肢でマージされた行数: {len(clubs_reception_data_df)}")
     
-    # 「選択肢にない」の場合の処理
+    # 「選択肢にない」または「この中に無い」の場合の処理
     if len(new_club_selection) > 0:
-        logging.info(f"「選択肢にない」申請の行数: {len(new_club_selection)}")
+        logging.info(f"新クラブ申請（「選択肢にない」または「この中に無い」）の行数: {len(new_club_selection)}")
         
         # 新しいクラブの行を作成
-        for _, row in new_club_selection.iterrows():
+        for index, row in new_club_selection.iterrows():
+            logging.info(f"新クラブの行を追加中: {row['申請_クラブ名_テキスト']}")
             new_row = row.copy()
             # クラブ情報の列は空またはデフォルト値を設定
             new_row['地区名'] = ''  # または適切なデフォルト値
             new_row['クラブ名'] = row['申請_クラブ名_テキスト']  # テキスト入力をクラブ名として使用
             new_row['クラブ名（カタカナ）'] = ''  # または適切なデフォルト値
-            new_row['選択肢（地区名：クラブ名：クラブ名（カタカナ））'] = '選択肢にない'
+            new_row['選択肢（地区名：クラブ名：クラブ名（カタカナ））'] = row['申請_クラブ名_選択']  # 元の選択値を保持
             new_row['R7年度登録クラブ'] = 0  # 新しいクラブなので0
+            
+            # DataFrameに追加する前の行数
+            before_count = len(clubs_reception_data_df)
             
             # DataFrameに追加
             clubs_reception_data_df = pd.concat([clubs_reception_data_df, new_row.to_frame().T], ignore_index=True)
+            
+            # DataFrameに追加した後の行数
+            after_count = len(clubs_reception_data_df)
+            logging.info(f"行追加前: {before_count}, 行追加後: {after_count}")
         
-        logging.info(f"「選択肢にない」申請を追加後の総行数: {len(clubs_reception_data_df)}")
+        logging.info(f"新クラブ申請を追加後の総行数: {len(clubs_reception_data_df)}")
+    else:
+        logging.info("新クラブ申請（「選択肢にない」または「この中に無い」）は見つかりませんでした")
     
     logging.info(f"マージ完了。最終的な行数: {len(clubs_reception_data_df)}")
     
