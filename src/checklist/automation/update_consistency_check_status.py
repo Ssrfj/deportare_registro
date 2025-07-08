@@ -1,186 +1,80 @@
 import pandas as pd
 import logging
+import json
+import os
+from datetime import datetime, timezone, timedelta
+
+def load_consistency_check_config():
+    """一貫性チェック設定ファイルを読み込む"""
+    config_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+        'config', 'checklist_columns', 'consistency_check_config.json'
+    )
+    
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        logging.info(f"一貫性チェック設定を読み込みました: {config_path}")
+        return config
+    except Exception as e:
+        logging.error(f"一貫性チェック設定の読み込みに失敗しました: {e}")
+        return None
+
+def check_consistency_with_config(row, consistency_type):
+    """設定ベースの一貫性チェック"""
+    error_dict = {}
+    
+    try:
+        # 設定を読み込み
+        config = load_consistency_check_config()
+        if not config or consistency_type not in config:
+            error_dict[f'e_config_001'] = f'{consistency_type}の設定が見つかりません'
+            return error_dict
+        
+        type_config = config[consistency_type]
+        check_columns = type_config.get('check_columns', [])
+        error_prefix = type_config.get('error_prefix', 'e_c')
+        display_name = type_config.get('display_name', consistency_type)
+        
+        # DataFrameの場合は最初の行を取得
+        if isinstance(row, pd.DataFrame):
+            if row.empty:
+                error_dict[f'{error_prefix}_001'] = f'{display_name}一貫性のデータが見つかりません'
+                return error_dict
+            row_data = row.iloc[0]
+        else:
+            row_data = row
+        
+        # 各チェック項目を確認
+        for i, check_column in enumerate(check_columns, 1):
+            if check_column in row_data.index:
+                check_value = row_data[check_column]
+                if pd.isna(check_value) or str(check_value).strip() == '' or str(check_value).strip() == '未チェック':
+                    error_dict[f'{error_prefix}_{i:03d}'] = f'{display_name}: {check_column.replace("チェック項目_", "")}が未チェックです'
+                elif str(check_value).strip() == '0':
+                    error_dict[f'{error_prefix}_{i:03d}'] = f'{display_name}: {check_column.replace("チェック項目_", "")}に問題があります'
+                # '1'の場合はエラーなし（何も追加しない）
+            else:
+                # チェック列が存在しない場合は「未チェック」として扱う
+                error_dict[f'{error_prefix}_{i:03d}'] = f'{display_name}: {check_column.replace("チェック項目_", "")}が未チェックです'
+                
+    except Exception as e:
+        logging.error(f"{display_name}一貫性のチェック状況の反映中にエラーが発生しました: {e}")
+        error_dict[f'{error_prefix}_099'] = f'{display_name}一貫性のチェック状況の反映中にエラーが発生しました: {str(e)}'
+    
+    return error_dict
 
 def check_consistency_disciplines(row):
-    error_dict = {}
-    
-    try:
-        # DataFrameの場合は最初の行を取得
-        if isinstance(row, pd.DataFrame):
-            if row.empty:
-                error_dict['e_c_d_001'] = '活動種目一貫性のデータが見つかりません'
-                return error_dict
-            row_data = row.iloc[0]
-        else:
-            row_data = row
-        
-        # 活動種目一貫性のチェック項目
-        check_columns_consistency_disciplines = [
-            'チェック項目_活動種目'
-        ]
-        # 活動種目一貫性のチェック担当者のカラム
-        person_in_charge_column_consistency_disciplines = 'チェック者名_一貫性_活動種目'
-        
-        # まず通常のチェック項目をチェック
-        for column in check_columns_consistency_disciplines:
-            if column in row_data.index:
-                # カラムが存在する場合、値のチェック
-                # 値がNaNまたは空文字列の場合、error_dictにf'{column}が未入力です'を追加
-                if pd.isna(row_data[column]) or str(row_data[column]).strip() == '':
-                    error_dict[f'e_c_d_{check_columns_consistency_disciplines.index(column) + 1:03d}'] = f'{column}が未入力です'
-                # 「0」であれば、error_dictにf'{column}に不備があります'を追加
-                elif str(row_data[column]).strip() == '0':
-                    error_dict[f'e_c_d_{check_columns_consistency_disciplines.index(column) + 1:03d}'] = f'{column}に不備があります'
-                # 「1」であれば、error_dictに追加しない
-                elif str(row_data[column]).strip() == '1':
-                    pass
-                # それ以外の値の場合、error_dictにf'{column}の値が不正です'を追加
-                else:
-                    error_dict[f'e_c_d_{check_columns_consistency_disciplines.index(column) + 1:03d}'] = f'{column}の値が不正です'
-            # カラムが存在しない場合、error_dictにf'{column}のカラムが見つかりません'を追加
-            else:
-                error_dict[f'e_c_d_{check_columns_consistency_disciplines.index(column) + 1:03d}'] = f'{column}のカラムが見つかりません'
-        
-        # チェック担当者のカラムを別途チェック
-        if person_in_charge_column_consistency_disciplines in row_data.index:
-            value = row_data[person_in_charge_column_consistency_disciplines]
-            # 値がNaNまたは空文字列の場合は何もしない
-            if not (pd.isna(value) or str(value).strip() == ''):
-                value_str = str(value).strip()
-                # 数字のみの場合は「不正です」エラーを返す
-                if value_str.isdigit():
-                    error_dict['e_c_d_003'] = '活動種目一貫性のチェック担当者欄に数字が入力されています。文字列を入力してください。'
-                # 文字列が入っている場合はerror_dictに担当者名を追加
-                else:
-                    error_dict['活動種目一貫性_チェック担当者'] = value_str
-        else:
-            error_dict[f'e_c_d_{len(check_columns_consistency_disciplines) + 1:03d}'] = f'{person_in_charge_column_consistency_disciplines}のカラムが見つかりません'
-            
-    except Exception as e:
-        logging.error(f"活動種目一貫性のチェック状況の反映中にエラーが発生しました: {e}")
-        error_dict['e_c_d_002'] = f'活動種目一貫性のチェック状況の反映中にエラーが発生しました: {str(e)}'  
-    return error_dict
+    """活動種目の一貫性チェック"""
+    return check_consistency_with_config(row, 'consistency_disciplines')
 
 def check_consistency_members_and_voting_rights(row):
-    error_dict = {}
-    
-    try:
-        # DataFrameの場合は最初の行を取得
-        if isinstance(row, pd.DataFrame):
-            if row.empty:
-                error_dict['e_c_m_001'] = '会員と議決権保有者一貫性のデータが見つかりません'
-                return error_dict
-            row_data = row.iloc[0]
-        else:
-            row_data = row
-        
-        # 会員と議決権保有者一貫性のチェック項目
-        check_columns_consistency_members = [
-            'チェック項目_会員',
-            'チェック項目_議決権保有者'
-        ]
-        # 会員と議決権保有者一貫性のチェック担当者のカラム
-        person_in_charge_column_consistency_members = 'チェック者名_一貫性_会員と議決権保有者'
-        
-        # まず通常のチェック項目をチェック
-        for column in check_columns_consistency_members:
-            if column in row_data.index:
-                # カラムが存在する場合、値のチェック
-                # 値がNaNまたは空文字列の場合、error_dictにf'{column}が未入力です'を追加
-                if pd.isna(row_data[column]) or str(row_data[column]).strip() == '':
-                    error_dict[f'e_c_m_{check_columns_consistency_members.index(column) + 1:03d}'] = f'{column}が未入力です'
-                # 「0」であれば、error_dictにf'{column}に不備があります'を追加
-                elif str(row_data[column]).strip() == '0':
-                    error_dict[f'e_c_m_{check_columns_consistency_members.index(column) + 1:03d}'] = f'{column}に不備があります'
-                # 「1」であれば、error_dictに追加しない
-                elif str(row_data[column]).strip() == '1':
-                    pass
-                # それ以外の値の場合、error_dictにf'{column}の値が不正です'を追加
-                else:
-                    error_dict[f'e_c_m_{check_columns_consistency_members.index(column) + 1:03d}'] = f'{column}の値が不正です'
-            # カラムが存在しない場合、error_dictにf'{column}のカラムが見つかりません'を追加
-            else:
-                error_dict[f'e_c_m_{check_columns_consistency_members.index(column) + 1:03d}'] = f'{column}のカラムが見つかりません'
-        
-        # チェック担当者のカラムを別途チェック
-        if person_in_charge_column_consistency_members in row_data.index:
-            value = row_data[person_in_charge_column_consistency_members]
-            # 値がNaNまたは空文字列の場合は何もしない
-            if not (pd.isna(value) or str(value).strip() == ''):
-                value_str = str(value).strip()
-                # 数字のみの場合は「不正です」エラーを返す
-                if value_str.isdigit():
-                    error_dict['e_c_m_003'] = '会員と議決権保有者一貫性のチェック担当者欄に数字が入力されています。文字列を入力してください。'
-                # 文字列が入っている場合はerror_dictに担当者名を追加
-                else:
-                    error_dict['会員と議決権保有者一貫性_チェック担当者'] = value_str
-        else:
-            error_dict[f'e_c_m_{len(check_columns_consistency_members) + 1:03d}'] = f'{person_in_charge_column_consistency_members}のカラムが見つかりません'
-            
-    except Exception as e:
-        logging.error(f"会員と議決権保有者一貫性のチェック状況の反映中にエラーが発生しました: {e}")
-        error_dict['e_c_m_002'] = f'会員と議決権保有者一貫性のチェック状況の反映中にエラーが発生しました: {str(e)}'  
-    return error_dict
+    """会員と議決権の一貫性チェック"""
+    return check_consistency_with_config(row, 'consistency_members_and_voting_rights')
 
 def check_consistency_meeting_minutes(row):
-    error_dict = {}
-    
-    try:
-        # DataFrameの場合は最初の行を取得
-        if isinstance(row, pd.DataFrame):
-            if row.empty:
-                error_dict['e_c_mt_001'] = '議事録一貫性のデータが見つかりません'
-                return error_dict
-            row_data = row.iloc[0]
-        else:
-            row_data = row
-        
-        # 議事録一貫性のチェック項目
-        check_columns_consistency_meeting = [
-            'チェック項目_一貫性_議決権'
-        ]
-        # 議事録一貫性のチェック担当者のカラム
-        person_in_charge_column_consistency_meeting = 'チェック者名_一貫性_議決権'
-        
-        # まず通常のチェック項目をチェック
-        for column in check_columns_consistency_meeting:
-            if column in row_data.index:
-                # カラムが存在する場合、値のチェック
-                # 値がNaNまたは空文字列の場合、error_dictにf'{column}が未入力です'を追加
-                if pd.isna(row_data[column]) or str(row_data[column]).strip() == '':
-                    error_dict[f'e_c_mt_{check_columns_consistency_meeting.index(column) + 1:03d}'] = f'{column}が未入力です'
-                # 「0」であれば、error_dictにf'{column}に不備があります'を追加
-                elif str(row_data[column]).strip() == '0':
-                    error_dict[f'e_c_mt_{check_columns_consistency_meeting.index(column) + 1:03d}'] = f'{column}に不備があります'
-                # 「1」であれば、error_dictに追加しない
-                elif str(row_data[column]).strip() == '1':
-                    pass
-                # それ以外の値の場合、error_dictにf'{column}の値が不正です'を追加
-                else:
-                    error_dict[f'e_c_mt_{check_columns_consistency_meeting.index(column) + 1:03d}'] = f'{column}の値が不正です'
-            # カラムが存在しない場合、error_dictにf'{column}のカラムが見つかりません'を追加
-            else:
-                error_dict[f'e_c_mt_{check_columns_consistency_meeting.index(column) + 1:03d}'] = f'{column}のカラムが見つかりません'
-        
-        # チェック担当者のカラムを別途チェック
-        if person_in_charge_column_consistency_meeting in row_data.index:
-            value = row_data[person_in_charge_column_consistency_meeting]
-            # 値がNaNまたは空文字列の場合は何もしない
-            if not (pd.isna(value) or str(value).strip() == ''):
-                value_str = str(value).strip()
-                # 数字のみの場合は「不正です」エラーを返す
-                if value_str.isdigit():
-                    error_dict['e_c_mt_003'] = '議事録一貫性のチェック担当者欄に数字が入力されています。文字列を入力してください。'
-                # 文字列が入っている場合はerror_dictに担当者名を追加
-                else:
-                    error_dict['議事録一貫性_チェック担当者'] = value_str
-        else:
-            error_dict[f'e_c_mt_{len(check_columns_consistency_meeting) + 1:03d}'] = f'{person_in_charge_column_consistency_meeting}のカラムが見つかりません'
-            
-    except Exception as e:
-        logging.error(f"議事録一貫性のチェック状況の反映中にエラーが発生しました: {e}")
-        error_dict['e_c_mt_002'] = f'議事録一貫性のチェック状況の反映中にエラーが発生しました: {str(e)}'  
-    return error_dict
+    """議事録の一貫性チェック"""
+    return check_consistency_with_config(row, 'consistency_meeting_minutes')
 
 def update_consistency_check_status(overall_checklist_df, checklist_file_path, club_reception_df, latest_reception_data_date):
     import os
@@ -246,35 +140,34 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
         
         # 各一貫性チェック関数を実行して結果を統合
         try:
-            consistency_results = []
+            all_consistency_errors = {}
             
             # 活動種目の一貫性チェック
             disciplines_result = check_consistency_disciplines(target_row)
-            if not disciplines_result:
-                consistency_results.append("「活動種目」OK")
-            else:
-                consistency_results.append("「活動種目」エラーあり")
+            if disciplines_result:
+                all_consistency_errors.update(disciplines_result)
             
             # 会議録の一貫性チェック
             meeting_minutes_result = check_consistency_meeting_minutes(target_row)
-            if not meeting_minutes_result:
-                consistency_results.append("「会議録」OK")
-            else:
-                consistency_results.append("「会議録」エラーあり")
+            if meeting_minutes_result:
+                all_consistency_errors.update(meeting_minutes_result)
             
             # 会員情報と議決権の一貫性チェック
             member_voting_result = check_consistency_members_and_voting_rights(target_row)
-            if not member_voting_result:
-                consistency_results.append("「会員情報と議決権」OK")
-            else:
-                consistency_results.append("「会員情報と議決権」エラーあり")
+            if member_voting_result:
+                all_consistency_errors.update(member_voting_result)
             
-            # 統合結果を書類間チェック結果に設定
-            consistency_result_summary = ",".join(consistency_results)
+            # 統合されたエラー辞書を文字列として書類間チェック結果に設定
+            if all_consistency_errors:
+                consistency_result_summary = str(all_consistency_errors)
+            else:
+                consistency_result_summary = "チェック済み"
+            
             overall_checklist_df.loc[index, '書類間チェック結果'] = consistency_result_summary
             overall_checklist_df.loc[index, '書類間チェック更新日時'] = update_datetime
             
             logging.info(f"クラブ名: {club_name} の一貫性チェックが完了しました")
+            logging.debug(f"一貫性チェック結果: {consistency_result_summary}")
             
         except Exception as e:
             logging.error(f"クラブ '{club_name}' の一貫性チェック中にエラーが発生しました: {e}")

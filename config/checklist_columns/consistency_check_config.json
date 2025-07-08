@@ -1,0 +1,20 @@
+{
+    "consistency_disciplines": {
+        "config_file": "consistency_checklist_disciplines_columns.json",
+        "check_columns": ["チェック項目_活動種目"],
+        "error_prefix": "e_c_d",
+        "display_name": "活動種目"
+    },
+    "consistency_meeting_minutes": {
+        "config_file": "consistency_checklist_meeting_minutes_columns.json",
+        "check_columns": ["チェック項目_一貫性_議決権"],
+        "error_prefix": "e_c_mt",
+        "display_name": "会議録"
+    },
+    "consistency_members_and_voting_rights": {
+        "config_file": "consistency_checklist_members_and_voting_rights_columns.json",
+        "check_columns": ["チェック項目_会員", "チェック項目_議決権保有者"],
+        "error_prefix": "e_c_m",
+        "display_name": "会員情報と議決権"
+    }
+}
