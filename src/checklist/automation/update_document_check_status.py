@@ -89,102 +89,81 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
         
         # 各書類チェック関数を実行して結果を統合
         try:
-            check_results = []
+            # 全ての書類チェック結果を集約する辞書
+            all_document_errors = {}
             
             # 書類01: クラブ基本情報
             doc1_result = check_document_1(target_row)
-            if not doc1_result:
-                check_results.append("「書類01_クラブ基本情報」OK")
-            else:
-                check_results.append("「書類01_クラブ基本情報」エラーあり")
+            if doc1_result:
+                all_document_errors.update(doc1_result)
             
             # 書類02_1: 役員名簿
             doc2_1_result = check_document_2_1(target_row)
-            if not doc2_1_result:
-                check_results.append("「書類02_1_役員名簿」OK")
-            else:
-                check_results.append("「書類02_1_役員名簿」エラーあり")
+            if doc2_1_result:
+                all_document_errors.update(doc2_1_result)
             
             # 書類02_2: コーチ名簿
             doc2_2_result = check_document_2_2(target_row)
-            if not doc2_2_result:
-                check_results.append("「書類02_2_コーチ名簿」OK")
-            else:
-                check_results.append("「書類02_2_コーチ名簿」エラーあり")
+            if doc2_2_result:
+                all_document_errors.update(doc2_2_result)
             
             # 書類03: 会員名簿
             doc3_result = check_document_3(target_row)
-            if not doc3_result:
-                check_results.append("「書類03_会員名簿」OK")
-            else:
-                check_results.append("「書類03_会員名簿」エラーあり")
+            if doc3_result:
+                all_document_errors.update(doc3_result)
             
             # 書類04: 規約
             doc4_result = check_document_4(target_row)
-            if not doc4_result:
-                check_results.append("「書類04_規約」OK")
-            else:
-                check_results.append("「書類04_規約」エラーあり")
+            if doc4_result:
+                all_document_errors.update(doc4_result)
             
             # 書類05: 事業計画書
             doc5_plan_result = check_document_5_plan(target_row)
-            if not doc5_plan_result:
-                check_results.append("「書類05_事業計画書」OK")
-            else:
-                check_results.append("「書類05_事業計画書」エラーあり")
+            if doc5_plan_result:
+                all_document_errors.update(doc5_plan_result)
             
             # 書類05: 予算書
             doc5_budget_result = check_document_5_budget(target_row)
-            if not doc5_budget_result:
-                check_results.append("「書類05_予算書」OK")
-            else:
-                check_results.append("「書類05_予算書」エラーあり")
+            if doc5_budget_result:
+                all_document_errors.update(doc5_budget_result)
             
             # 書類06: 事業報告書
             doc6_report_result = check_document_6_report(target_row)
-            if not doc6_report_result:
-                check_results.append("「書類06_事業報告書」OK")
-            else:
-                check_results.append("「書類06_事業報告書」エラーあり")
+            if doc6_report_result:
+                all_document_errors.update(doc6_report_result)
             
             # 書類06: 財務諸表
             doc6_financial_result = check_document_6_financial_statements(target_row)
-            if not doc6_financial_result:
-                check_results.append("「書類06_財務諸表」OK")
-            else:
-                check_results.append("「書類06_財務諸表」エラーあり")
+            if doc6_financial_result:
+                all_document_errors.update(doc6_financial_result)
             
             # 書類07: チェックリスト
             doc7_result = check_document_7(target_row)
-            if not doc7_result:
-                check_results.append("「書類07_チェックリスト」OK")
-            else:
-                check_results.append("「書類07_チェックリスト」エラーあり")
+            if doc7_result:
+                all_document_errors.update(doc7_result)
             
             # 書類08: 一覧表
             doc8_result = check_document_8(target_row)
-            if not doc8_result:
-                check_results.append("「書類08_一覧表」OK")
-            else:
-                check_results.append("「書類08_一覧表」エラーあり")
+            if doc8_result:
+                all_document_errors.update(doc8_result)
             
             # 書類09: 承認印申請書
             doc9_result = check_document_9(target_row)
-            if not doc9_result:
-                check_results.append("「書類09_承認印申請書」OK")
-            else:
-                check_results.append("「書類09_承認印申請書」エラーあり")
+            if doc9_result:
+                all_document_errors.update(doc9_result)
             
             # 書類10: 説明書
             doc10_result = check_document_10(target_row)
-            if not doc10_result:
-                check_results.append("「書類10_説明書」OK")
-            else:
-                check_results.append("「書類10_説明書」エラーあり")
+            if doc10_result:
+                all_document_errors.update(doc10_result)
             
-            # 統合結果を書類チェック結果に設定
-            check_result_summary = ",".join(check_results)
-            overall_checklist_df.loc[index, '書類チェック結果'] = check_result_summary
+            # 統合されたエラー辞書を文字列として書類チェック結果に設定
+            if all_document_errors:
+                # エラーがある場合は詳細なエラー辞書を文字列として保存
+                overall_checklist_df.loc[index, '書類チェック結果'] = str(all_document_errors)
+            else:
+                # エラーがない場合は「チェック済み」を設定
+                overall_checklist_df.loc[index, '書類チェック結果'] = "チェック済み"
             overall_checklist_df.loc[index, '書類チェック更新日時'] = update_datetime
             
             logging.info(f"クラブ名: {club_name} の書類チェックが完了しました")
