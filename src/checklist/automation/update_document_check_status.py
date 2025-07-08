@@ -73,22 +73,10 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
             logging.warning(f"統合データに該当クラブのデータが見つかりません: {club_name}, {apried_date_str}")
             continue
         
-        # 書類チェックが既に実行済みかを確認（総合チェックリストで判断）
-        document_columns = [
-            '書類01_クラブ基本情報', '書類02_1_役員名簿', '書類02_2_コーチ名簿', '書類03_会員名簿',
-            '書類04_規約', '書類05_事業計画書', '書類05_予算書', '書類06_事業報告書',
-            '書類06_財務諸表', '書類07_チェックリスト', '書類08_一覧表', '書類09_承認印申請書', '書類10_説明書'
-        ]
-        
-        # いずれかの書類チェック列に日時が入っていればスキップ
-        document_check_done = any(
-            pd.notna(overall_checklist_df.loc[index, col + '_更新日時']) and 
-            overall_checklist_df.loc[index, col + '_更新日時'] != ''
-            for col in document_columns if col + '_更新日時' in overall_checklist_df.columns
-        )
-        
-        if document_check_done:
-            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は書類チェック済みです。スキップします。")
+        # 書類チェックが既に実行済みかを確認（書類チェック結果で判断）
+        document_check_result = overall_checklist_df.loc[index, '書類チェック結果']
+        if pd.notna(document_check_result) and str(document_check_result).strip() not in ['', '未チェック']:
+            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は書類チェック済みです（結果: {document_check_result}）。スキップします。")
             continue
         else:
             logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は書類チェックを実行します。")
@@ -99,72 +87,105 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
         overall_checklist_df['クラブ名'] = overall_checklist_df['クラブ名'].astype(str).str.strip()
         overall_checklist_df['受付日時'] = overall_checklist_df['受付日時'].astype(str).str.strip()
         
-        # 各書類チェック関数を実行して結果を総合チェックリストに反映
+        # 各書類チェック関数を実行して結果を統合
         try:
+            check_results = []
+            
             # 書類01: クラブ基本情報
             doc1_result = check_document_1(target_row)
-            overall_checklist_df.loc[index, '書類01_クラブ基本情報'] = 'チェック済み' if doc1_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類01_クラブ基本情報_更新日時'] = update_datetime
+            if not doc1_result:
+                check_results.append("「書類01_クラブ基本情報」OK")
+            else:
+                check_results.append("「書類01_クラブ基本情報」エラーあり")
             
             # 書類02_1: 役員名簿
             doc2_1_result = check_document_2_1(target_row)
-            overall_checklist_df.loc[index, '書類02_1_役員名簿'] = 'チェック済み' if doc2_1_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類02_1_役員名簿_更新日時'] = update_datetime
+            if not doc2_1_result:
+                check_results.append("「書類02_1_役員名簿」OK")
+            else:
+                check_results.append("「書類02_1_役員名簿」エラーあり")
             
             # 書類02_2: コーチ名簿
             doc2_2_result = check_document_2_2(target_row)
-            overall_checklist_df.loc[index, '書類02_2_コーチ名簿'] = 'チェック済み' if doc2_2_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類02_2_コーチ名簿_更新日時'] = update_datetime
+            if not doc2_2_result:
+                check_results.append("「書類02_2_コーチ名簿」OK")
+            else:
+                check_results.append("「書類02_2_コーチ名簿」エラーあり")
             
             # 書類03: 会員名簿
             doc3_result = check_document_3(target_row)
-            overall_checklist_df.loc[index, '書類03_会員名簿'] = 'チェック済み' if doc3_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類03_会員名簿_更新日時'] = update_datetime
+            if not doc3_result:
+                check_results.append("「書類03_会員名簿」OK")
+            else:
+                check_results.append("「書類03_会員名簿」エラーあり")
             
             # 書類04: 規約
             doc4_result = check_document_4(target_row)
-            overall_checklist_df.loc[index, '書類04_規約'] = 'チェック済み' if doc4_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類04_規約_更新日時'] = update_datetime
+            if not doc4_result:
+                check_results.append("「書類04_規約」OK")
+            else:
+                check_results.append("「書類04_規約」エラーあり")
             
             # 書類05: 事業計画書
             doc5_plan_result = check_document_5_plan(target_row)
-            overall_checklist_df.loc[index, '書類05_事業計画書'] = 'チェック済み' if doc5_plan_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類05_事業計画書_更新日時'] = update_datetime
+            if not doc5_plan_result:
+                check_results.append("「書類05_事業計画書」OK")
+            else:
+                check_results.append("「書類05_事業計画書」エラーあり")
             
             # 書類05: 予算書
             doc5_budget_result = check_document_5_budget(target_row)
-            overall_checklist_df.loc[index, '書類05_予算書'] = 'チェック済み' if doc5_budget_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類05_予算書_更新日時'] = update_datetime
+            if not doc5_budget_result:
+                check_results.append("「書類05_予算書」OK")
+            else:
+                check_results.append("「書類05_予算書」エラーあり")
             
             # 書類06: 事業報告書
             doc6_report_result = check_document_6_report(target_row)
-            overall_checklist_df.loc[index, '書類06_事業報告書'] = 'チェック済み' if doc6_report_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類06_事業報告書_更新日時'] = update_datetime
+            if not doc6_report_result:
+                check_results.append("「書類06_事業報告書」OK")
+            else:
+                check_results.append("「書類06_事業報告書」エラーあり")
             
             # 書類06: 財務諸表
             doc6_financial_result = check_document_6_financial_statements(target_row)
-            overall_checklist_df.loc[index, '書類06_財務諸表'] = 'チェック済み' if doc6_financial_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類06_財務諸表_更新日時'] = update_datetime
+            if not doc6_financial_result:
+                check_results.append("「書類06_財務諸表」OK")
+            else:
+                check_results.append("「書類06_財務諸表」エラーあり")
             
             # 書類07: チェックリスト
             doc7_result = check_document_7(target_row)
-            overall_checklist_df.loc[index, '書類07_チェックリスト'] = 'チェック済み' if doc7_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類07_チェックリスト_更新日時'] = update_datetime
+            if not doc7_result:
+                check_results.append("「書類07_チェックリスト」OK")
+            else:
+                check_results.append("「書類07_チェックリスト」エラーあり")
             
             # 書類08: 一覧表
             doc8_result = check_document_8(target_row)
-            overall_checklist_df.loc[index, '書類08_一覧表'] = 'チェック済み' if doc8_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類08_一覧表_更新日時'] = update_datetime
+            if not doc8_result:
+                check_results.append("「書類08_一覧表」OK")
+            else:
+                check_results.append("「書類08_一覧表」エラーあり")
             
             # 書類09: 承認印申請書
             doc9_result = check_document_9(target_row)
-            overall_checklist_df.loc[index, '書類09_承認印申請書'] = 'チェック済み' if doc9_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類09_承認印申請書_更新日時'] = update_datetime
+            if not doc9_result:
+                check_results.append("「書類09_承認印申請書」OK")
+            else:
+                check_results.append("「書類09_承認印申請書」エラーあり")
             
             # 書類10: 説明書
             doc10_result = check_document_10(target_row)
-            overall_checklist_df.loc[index, '書類10_説明書'] = 'チェック済み' if doc10_result else 'エラーあり'
-            overall_checklist_df.loc[index, '書類10_説明書_更新日時'] = update_datetime
+            if not doc10_result:
+                check_results.append("「書類10_説明書」OK")
+            else:
+                check_results.append("「書類10_説明書」エラーあり")
+            
+            # 統合結果を書類チェック結果に設定
+            check_result_summary = ",".join(check_results)
+            overall_checklist_df.loc[index, '書類チェック結果'] = check_result_summary
+            overall_checklist_df.loc[index, '書類チェック更新日時'] = update_datetime
             
             logging.info(f"クラブ名: {club_name} の書類チェックが完了しました")
             

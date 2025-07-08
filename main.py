@@ -102,6 +102,3 @@ if __name__ == "__main__":
     except Exception as e:
         logging.critical(f"予期せぬ致命的なエラーが発生しました: {e}", exc_info=True)
         print(f"予期せぬ致命的なエラーが発生しました: {e}")
-
-# memo:
-# 変なカラムが出力されている

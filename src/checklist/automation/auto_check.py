@@ -70,9 +70,10 @@ def auto_check(club_reception_df, overall_checklist_df, latest_reception_data_da
             logging.warning(f"統合データに該当クラブのデータが見つかりません: {club_name}, {apried_date_str}")
             continue
         
-        # 自動チェックが既に実行済みかを確認（総合チェックリストで判断）
-        if pd.notna(overall_checklist_df.loc[index, '自動チェック更新日時']) and overall_checklist_df.loc[index, '自動チェック更新日時'] != '':
-            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は自動チェック済みです。スキップします。")
+        # 自動チェックが既に実行済みかを確認（自動チェック結果で判断）
+        auto_check_result = overall_checklist_df.loc[index, '自動チェック結果']
+        if pd.notna(auto_check_result) and str(auto_check_result).strip() not in ['', '未チェック']:
+            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は自動チェック済みです（結果: {auto_check_result}）。スキップします。")
             continue
         else:
             logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は自動チェックを実行します。")
@@ -89,7 +90,7 @@ def auto_check(club_reception_df, overall_checklist_df, latest_reception_data_da
         error_dict.update(check_club_location(target_row))
         error_dict.update(check_phone_number(target_row))
         error_dict.update(check_fax_number(target_row))
-        error_dict.update(check_reception_type(target_row, overall_checklist_df, club_name))
+        error_dict.update(check_reception_type(target_row, integrated_club_data, club_name))
         error_dict.update(check_standard_compliance(target_row))
         error_dict.update(check_number_of_members(target_row))
         error_dict.update(check_number_of_disciplines(target_row))
@@ -113,7 +114,8 @@ def auto_check(club_reception_df, overall_checklist_df, latest_reception_data_da
         logging.info(f"チェック結果: {error_dict}")
 
         # 総合チェックリストに結果を反映
-        overall_checklist_df.loc[index, '自動チェック結果'] = 'チェック済み' if not error_dict or 'info' in error_dict else 'エラーあり'
+        # error_dictの内容を文字列として出力
+        overall_checklist_df.loc[index, '自動チェック結果'] = str(error_dict)
         overall_checklist_df.loc[index, '自動チェック更新日時'] = datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d %H:%M:%S')
 
         logging.info(f"クラブ名: {club_name} の自動チェックが完了しました\n")

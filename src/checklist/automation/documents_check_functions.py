@@ -1,17 +1,8 @@
 import pandas as pd
 import logging
-from datetime import datetime, date
-from src.core.setting_paths import content_check_folder_path, application_statues_folder_path
 from src.folder_management.make_folders import setup_logging, create_folders
 
 def check_document_1(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
-
     error_dict = {}
     
     try:

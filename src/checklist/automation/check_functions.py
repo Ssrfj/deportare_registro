@@ -151,10 +151,15 @@ def check_reception_type(reception_row, reception_data_df, club_name):
         # まずクラブ名を正規化
         reception_data_df['クラブ名'] = reception_data_df['クラブ名'].astype(str).str.strip()
         club_name = str(club_name).strip()
+        
         # ここで抽出
         reception_data_match_row = reception_data_df[reception_data_df['クラブ名'] == club_name]
-        print("reception_data_match_row columns:", reception_data_match_row.columns.tolist())
-        print("reception_data_match_row head:", reception_data_match_row.head())
+        
+        if len(reception_data_match_row) == 0:
+            logging.warning(f"クラブ名 '{club_name}' が reception_data_df に見つかりませんでした")
+            error_dict['e_a_005-e'] = f'クラブ名 {club_name} が reception_data_df に見つかりませんでした'
+            return error_dict
+            
         # カラム名のバリエーションに対応
         r7_col = None
         for col in reception_data_match_row.columns:
@@ -162,7 +167,7 @@ def check_reception_type(reception_row, reception_data_df, club_name):
                 r7_col = col
                 break
         if r7_col is None:
-            print("R7年度登録クラブカラムが見つかりません:", reception_data_match_row.columns.tolist())
+            logging.error("R7年度登録クラブカラムが見つかりません")
             error_dict['e_a_005-d'] = 'R7年度登録クラブカラムが見つかりません'
             return error_dict
         # 以降は r7_col を使って参照
@@ -281,9 +286,16 @@ def check_number_of_members(reception_row):
 
         error_at_num_of_members_column = []
         for col in num_of_members_column:
-            # form_rowが空でないことと、値がNaNでないことを確認してから型をチェック
-            if not reception_row.empty and not pd.isna(reception_row[col].iloc[0]) and not isinstance(reception_row[col].iloc[0], (int, float)): # floatも許容する
-                error_at_num_of_members_column.append(col)
+            # 値が存在し、NaNでない場合にチェック
+            if not reception_row.empty and not pd.isna(reception_row[col].iloc[0]):
+                value = reception_row[col].iloc[0]
+                # 数値型（int, float）か、数値に変換可能な文字列かをチェック
+                if not isinstance(value, (int, float)):
+                    # 文字列の場合、数値に変換可能かチェック
+                    try:
+                        float(str(value))  # 文字列を数値に変換可能かテスト
+                    except (ValueError, TypeError):
+                        error_at_num_of_members_column.append(col)
         if error_at_num_of_members_column:
             error_dict['e_a_007-a'] = f'会員数の入力欄に数字ではないデータが入力されている:{error_at_num_of_members_column}'
         else:
@@ -291,9 +303,16 @@ def check_number_of_members(reception_row):
 
         error_at_num_of_annual_fee_members_column = []
         for col in num_of_annual_fee_members_column:
-             # form_rowが空でないことと、値がNaNでないことを確認してから型をチェック
-            if not reception_row.empty and not pd.isna(reception_row[col].iloc[0]) and not isinstance(reception_row[col].iloc[0], (int, float)): # floatも許容する
-                error_at_num_of_annual_fee_members_column.append(col)
+            # 値が存在し、NaNでない場合にチェック
+            if not reception_row.empty and not pd.isna(reception_row[col].iloc[0]):
+                value = reception_row[col].iloc[0]
+                # 数値型（int, float）か、数値に変換可能な文字列かをチェック
+                if not isinstance(value, (int, float)):
+                    # 文字列の場合、数値に変換可能かチェック
+                    try:
+                        float(str(value))  # 文字列を数値に変換可能かテスト
+                    except (ValueError, TypeError):
+                        error_at_num_of_annual_fee_members_column.append(col)
         if error_at_num_of_annual_fee_members_column:
             error_dict['e_a_007-b'] = f'年会費等を支払っている会員数の入力欄に数字ではないデータが入力されている:{error_at_num_of_annual_fee_members_column}'
         else:
@@ -466,8 +485,16 @@ def check_managers(reception_row):
           manager_num = 0
           for col in manager_column:
               value = reception_row[col].iloc[0]
-              if pd.isna(value) or not isinstance(value, (int, float)): # floatも許容する
+              # NaNの場合はエラー
+              if pd.isna(value):
                   error_at_manager_num.append(col)
+              # 数値型（int, float）か、数値に変換可能な文字列かをチェック
+              elif not isinstance(value, (int, float)):
+                  # 文字列の場合、数値に変換可能かチェック
+                  try:
+                      manager_num += float(str(value))  # 文字列を数値に変換可能かテスト
+                  except (ValueError, TypeError):
+                      error_at_manager_num.append(col)
               else:
                   manager_num += int(value)
 

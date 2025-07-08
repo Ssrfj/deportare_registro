@@ -1,18 +1,7 @@
 import pandas as pd
 import logging
-from datetime import datetime, date
-from src.core.setting_paths import content_check_folder_path, application_statues_folder_path, application_input_content_folder_path, clubs_details_data_folder_path
-from src.folder_management.make_folders import setup_logging, create_folders
-from src.core.utils import ensure_date_string
 
 def check_consistency_disciplines(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
-
     error_dict = {}
     
     try:
@@ -73,13 +62,6 @@ def check_consistency_disciplines(row):
     return error_dict
 
 def check_consistency_members_and_voting_rights(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
-
     error_dict = {}
     
     try:
@@ -141,13 +123,6 @@ def check_consistency_members_and_voting_rights(row):
     return error_dict
 
 def check_consistency_meeting_minutes(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
-
     error_dict = {}
     
     try:
@@ -212,17 +187,9 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
     import pandas as pd
     import logging
     from datetime import datetime, timezone, timedelta
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.setting_paths import overall_checklist_folder_path
     from src.core.utils import get_jst_now, ensure_date_string
     from src.core.load_latest_club_data import load_latest_club_reception_data, get_club_data_by_name_and_date
-    
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
 
     # 統合されたクラブ情報付き受付データを読み込み
     logging.info("統合されたクラブ情報付き受付データを読み込みます")
@@ -266,20 +233,10 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
             logging.warning(f"統合データに該当クラブのデータが見つかりません: {club_name}, {apried_date_str}")
             continue
         
-        # 一貫性チェックが既に実行済みかを確認（総合チェックリストで判断）
-        consistency_columns = [
-            '一貫性チェック_活動種目', '一貫性チェック_会議録', '一貫性チェック_会員情報と議決権'
-        ]
-        
-        # いずれかの一貫性チェック列に日時が入っていればスキップ
-        consistency_check_done = any(
-            pd.notna(overall_checklist_df.loc[index, col + '_更新日時']) and 
-            overall_checklist_df.loc[index, col + '_更新日時'] != ''
-            for col in consistency_columns if col + '_更新日時' in overall_checklist_df.columns
-        )
-        
-        if consistency_check_done:
-            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は一貫性チェック済みです。スキップします。")
+        # 一貫性チェックが既に実行済みかを確認（書類間チェック結果で判断）
+        consistency_check_result = overall_checklist_df.loc[index, '書類間チェック結果']
+        if pd.notna(consistency_check_result) and str(consistency_check_result).strip() not in ['', '未チェック']:
+            logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は一貫性チェック済みです（結果: {consistency_check_result}）。スキップします。")
             continue
         else:
             logging.info(f"クラブ '{club_name}' の申請日時'{apried_date_str}'の申請は一貫性チェックを実行します。")
@@ -287,22 +244,35 @@ def update_consistency_check_status(overall_checklist_df, checklist_file_path, c
         jst_now = datetime.now(timezone(timedelta(hours=9)))
         update_datetime = jst_now.strftime('%Y-%m-%d %H:%M:%S')
         
-        # 各一貫性チェック関数を実行して結果を総合チェックリストに反映
+        # 各一貫性チェック関数を実行して結果を統合
         try:
+            consistency_results = []
+            
             # 活動種目の一貫性チェック
             disciplines_result = check_consistency_disciplines(target_row)
-            overall_checklist_df.loc[index, '一貫性チェック_活動種目'] = 'チェック済み' if not disciplines_result else 'エラーあり'
-            overall_checklist_df.loc[index, '一貫性チェック_活動種目_更新日時'] = update_datetime
+            if not disciplines_result:
+                consistency_results.append("「活動種目」OK")
+            else:
+                consistency_results.append("「活動種目」エラーあり")
             
             # 会議録の一貫性チェック
             meeting_minutes_result = check_consistency_meeting_minutes(target_row)
-            overall_checklist_df.loc[index, '一貫性チェック_会議録'] = 'チェック済み' if not meeting_minutes_result else 'エラーあり'
-            overall_checklist_df.loc[index, '一貫性チェック_会議録_更新日時'] = update_datetime
+            if not meeting_minutes_result:
+                consistency_results.append("「会議録」OK")
+            else:
+                consistency_results.append("「会議録」エラーあり")
             
             # 会員情報と議決権の一貫性チェック
             member_voting_result = check_consistency_members_and_voting_rights(target_row)
-            overall_checklist_df.loc[index, '一貫性チェック_会員情報と議決権'] = 'チェック済み' if not member_voting_result else 'エラーあり'
-            overall_checklist_df.loc[index, '一貫性チェック_会員情報と議決権_更新日時'] = update_datetime
+            if not member_voting_result:
+                consistency_results.append("「会員情報と議決権」OK")
+            else:
+                consistency_results.append("「会員情報と議決権」エラーあり")
+            
+            # 統合結果を書類間チェック結果に設定
+            consistency_result_summary = ",".join(consistency_results)
+            overall_checklist_df.loc[index, '書類間チェック結果'] = consistency_result_summary
+            overall_checklist_df.loc[index, '書類間チェック更新日時'] = update_datetime
             
             logging.info(f"クラブ名: {club_name} の一貫性チェックが完了しました")
             
