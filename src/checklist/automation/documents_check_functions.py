@@ -1,8 +1,7 @@
-import pandas as pd
+﻿import pandas as pd
 import logging
 import json
 import os
-from src.folder_management.make_folders import setup_logging, create_folders
 
 def load_checklist_config(config_name):
     """設定ファイルからチェックリスト列を読み込む"""
@@ -361,12 +360,8 @@ def check_document_5_budget(row):
     return error_dict
 
 def check_document_5_plan(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     error_dict = {}
     
@@ -417,12 +412,8 @@ def check_document_5_plan(row):
     return error_dict
 
 def check_document_6_financial_statements(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     error_dict = {}
     
@@ -470,12 +461,8 @@ def check_document_6_financial_statements(row):
     return error_dict
 
 def check_document_6_report(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     error_dict = {}
 
@@ -523,12 +510,8 @@ def check_document_6_report(row):
     return error_dict
 
 def check_document_7(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     error_dict = {}
 
@@ -561,12 +544,8 @@ def check_document_7(row):
     return error_dict
 
 def check_document_8(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     error_dict = {}
 
@@ -617,12 +596,8 @@ def check_document_8(row):
     return error_dict
 
 def check_document_9(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     error_dict = {}
 
@@ -655,12 +630,8 @@ def check_document_9(row):
     return error_dict
 
 def check_document_10(row):
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     error_dict = {}
 
@@ -694,5 +665,6 @@ def check_document_10(row):
         logging.error(f"書類10（届出）のチェック状況の反映中にエラーが発生しました: {e}")
         error_dict['e_d_10_099'] = f'書類10（届出）のチェック状況の反映中にエラーが発生しました: {str(e)}'        
     return error_dict
+
 
 

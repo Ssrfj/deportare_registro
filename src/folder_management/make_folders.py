@@ -30,33 +30,6 @@ from src.core.setting_paths import (
     clubs_details_data_folder_path
 )
 
-def setup_logging():
-    """ロギングの設定"""
-    import os
-    
-    # ログフォルダの作成
-    if not os.path.exists(log_folder_path):
-        os.makedirs(log_folder_path)
-    
-    # 既存のハンドラーをクリア
-    logging.getLogger().handlers.clear()
-    
-    # UTF-8エンコーディングでファイルハンドラーを作成
-    log_file_path = os.path.join(log_folder_path, 'reception.log')
-    file_handler = logging.FileHandler(log_file_path, encoding='utf-8')
-    file_handler.setLevel(logging.INFO)
-    
-    # フォーマッターの設定
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    
-    # ロガーの設定
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    logger.addHandler(file_handler)
-    
-    logging.info("ロギングを設定しました")
-
 def create_folders():
     # 出力先のフォルダをなければ作成
     folders_to_create = [

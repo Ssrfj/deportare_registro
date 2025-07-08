@@ -1,17 +1,12 @@
-def make_document04_checklist(latest_reception_data_date):
+﻿def make_document04_checklist(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
     from src.core.setting_paths import content_check_folder_path, document04_checklist_folder_path, clubs_reception_data_path
     from src.core.utils import get_jst_now, ensure_date_string, get_config_file_path
-    from src.folder_management.make_folders import setup_logging, create_folders
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     # 受付データの日付を正規化
     latest_reception_data_date_str = ensure_date_string(latest_reception_data_date)

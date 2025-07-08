@@ -4,18 +4,10 @@ def make_chacklists(latest_reception_data_date):
     import logging
     from src.core.setting_paths import clubs_details_data_folder_path, application_statues_folder_path, clubs_reception_data_path
     from src.core.utils import get_jst_now
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.checklist.generators.make_overall_checklist import make_overall_checklist
     from src.checklist.generators.documents.make_documents_checklists import make_documents_checklists
     from src.checklist.consistency.make_consistency_checklists import make_consistency_checklists
     from src.data_processing.make_detailed_club_data import make_detailed_club_data
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
 
     # 1. 最新のクラブ情報付き受付データファイルを取得
     logging.info("最新のクラブ情報付き受付データファイルを取得します")

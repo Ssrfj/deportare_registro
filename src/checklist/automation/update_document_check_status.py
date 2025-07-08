@@ -1,9 +1,8 @@
-def update_document_check_status(overall_checklist_df, checklist_file_path, club_reception_df, latest_reception_data_date):
+﻿def update_document_check_status(overall_checklist_df, checklist_file_path, club_reception_df, latest_reception_data_date):
     import os
     import pandas as pd
     import logging
     from datetime import datetime, timezone, timedelta
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.setting_paths import overall_checklist_folder_path
     from src.core.utils import get_jst_now, ensure_date_string
     from src.core.load_latest_club_data import load_latest_club_reception_data, get_club_data_by_name_and_date
@@ -14,12 +13,7 @@ def update_document_check_status(overall_checklist_df, checklist_file_path, club
         check_document_7, check_document_8, check_document_9, check_document_10
     )
     
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    # ロギングとフォルダ設定は main.py で実行済み
 
     # 統合されたクラブ情報付き受付データを読み込み
     logging.info("統合されたクラブ情報付き受付データを読み込みます")

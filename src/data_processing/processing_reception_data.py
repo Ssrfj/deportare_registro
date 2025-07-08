@@ -6,15 +6,8 @@ def processing_reception_data():
         reception_data_folder_path,
         processed_reception_data_folder_path,
     )
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.utils import get_jst_now
     from src.data_processing.column_name_change import column_name_change
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
 
     # 1. 最新の申請データを探す
     logging.info("申請データを探しています")

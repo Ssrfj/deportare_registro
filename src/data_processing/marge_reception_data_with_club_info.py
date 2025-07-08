@@ -3,15 +3,8 @@ def marge_reception_data_with_club_info(latest_reception_data_date):
     import pandas as pd
     import logging
     from src.core.setting_paths import clubs_reception_data_path, processed_reception_data_folder_path
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.utils import get_jst_now, get_latest_club_info_file
 
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
     # 1. クラブ情報付き受付データのフォルダを作成
     if not os.path.exists(clubs_reception_data_path):
         os.makedirs(clubs_reception_data_path)

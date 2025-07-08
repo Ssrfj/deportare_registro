@@ -4,15 +4,6 @@ def make_overall_checklist(latest_reception_data_date):
     import logging
     from src.core.setting_paths import content_check_folder_path, settting_folder_path, overall_checklist_folder_path, clubs_reception_data_path
     from src.core.utils import get_jst_now, normalize_reception_date
-    from src.folder_management.make_folders import setup_logging, create_folders
-
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
 
     # 受付データの日付を正規化
     if not latest_reception_data_date:

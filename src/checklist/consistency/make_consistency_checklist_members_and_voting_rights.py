@@ -1,17 +1,12 @@
-def make_consistency_checklist_members_and_voting_rights(latest_reception_data_date):
+﻿def make_consistency_checklist_members_and_voting_rights(latest_reception_data_date):
     import os
     import pandas as pd
     import logging
     from src.core.setting_paths import consistency_checklist_members_and_voting_rights_folder_path, clubs_reception_data_path
     from src.core.utils import get_jst_now, get_config_file_path
-    from src.folder_management.make_folders import setup_logging, create_folders
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     # 1. 最新のクラブ情報付き受付データファイルを取得(クラブ情報付き受付データ_受付{latest_reception_data_date}_*.xlsxを使用)
     logging.info("最新のクラブ情報付き受付データファイルを取得します")

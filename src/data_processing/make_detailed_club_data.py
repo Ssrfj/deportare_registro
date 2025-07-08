@@ -2,15 +2,7 @@ def make_detailed_club_data(club_reception_df):
     import os
     import pandas as pd
     import logging
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.setting_paths import content_check_folder_path, clubs_details_data_folder_path
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
 
     # discipline_dfの読み込み
     discipline_file_path = os.path.join(os.getcwd(), 'config', 'reference_data', 'list_of_disciplines.xlsx')

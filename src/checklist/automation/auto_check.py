@@ -3,7 +3,6 @@ def auto_check(club_reception_df, overall_checklist_df, latest_reception_data_da
     import pandas as pd
     import logging
     from datetime import datetime, timezone, timedelta
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.core.setting_paths import overall_checklist_folder_path
     from src.core.utils import get_jst_now, ensure_date_string
     from src.core.load_latest_club_data import load_latest_club_reception_data, get_club_data_by_name_and_date
@@ -15,14 +14,6 @@ def auto_check(club_reception_df, overall_checklist_df, latest_reception_data_da
         check_budget_submission, check_business_report_submission, check_financial_statement_submission,
         check_checklist_submission, check_self_explanation_submission
     )
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
-
     # 統合されたクラブ情報付き受付データを読み込み
     logging.info("統合されたクラブ情報付き受付データを読み込みます")
     integrated_club_data = load_latest_club_reception_data()

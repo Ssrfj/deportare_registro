@@ -1,17 +1,12 @@
-def make_detailed_data_folders():
+﻿def make_detailed_data_folders():
     import os
     import pandas as pd
     import logging
     from src.core.setting_paths import application_statues_folder_path, clubs_reception_data_path, content_check_folder_path, clubs_details_data_folder_path
     from src.core.utils import get_jst_now
-    from src.folder_management.make_folders import setup_logging, create_folders
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
+    
+    # ロギングの設定    logging.info("ロギングを設定しました")
+    # フォルダの作成    logging.info("フォルダを作成しました")
 
     # 1. 最新のクラブ情報付き受付データのファイルを取得
     logging.info("最新のクラブ情報付き受付データのファイルを取得します")

@@ -5,7 +5,6 @@ def make_documents_checklists(latest_reception_data_date):
 
     from src.core.setting_paths import content_check_folder_path, clubs_reception_data_path
     from src.core.utils import get_jst_now
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.checklist.generators.documents.make_document01_checklist import make_document01_checklist
     from src.checklist.generators.documents.make_document02_1_checklist import make_document02_1_checklist
     from src.checklist.generators.documents.make_document02_2_checklist import make_document02_2_checklist
@@ -19,13 +18,6 @@ def make_documents_checklists(latest_reception_data_date):
     from src.checklist.generators.documents.make_document08_checklist import make_document08_checklist
     from src.checklist.generators.documents.make_document09_checklist import make_document09_checklist
     from src.checklist.generators.documents.make_document10_checklist import make_document10_checklist
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
 
     # latest_reception_data_dateが既にdatetimeオブジェクトの場合は文字列に変換
     if isinstance(latest_reception_data_date, pd.Timestamp) or hasattr(latest_reception_data_date, 'strftime'):

@@ -4,7 +4,6 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     import logging
     from src.core.setting_paths import content_check_folder_path, application_statues_folder_path, clubs_reception_data_path, overall_checklist_folder_path
     from src.core.utils import get_jst_now
-    from src.folder_management.make_folders import setup_logging, create_folders
     from src.checklist.generators.make_overall_checklist import make_overall_checklist
     from src.checklist.generators.documents.make_documents_checklists import make_documents_checklists
     from src.checklist.consistency.make_consistency_checklists import make_consistency_checklists
@@ -12,13 +11,6 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     from src.checklist.automation.auto_check import auto_check
     from src.checklist.automation.update_document_check_status import update_document_check_status
     from src.checklist.automation.update_consistency_check_status import update_consistency_check_status
-
-    # ロギングの設定
-    setup_logging()
-    logging.info("ロギングを設定しました")
-    # フォルダの作成
-    create_folders()
-    logging.info("フォルダを作成しました")
 
     # 1. 最新のクラブ情報付き受付データファイルを取得
     logging.info("最新のクラブ情報付き受付データファイルを取得します")
