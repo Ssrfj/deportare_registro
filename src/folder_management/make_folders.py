@@ -4,9 +4,7 @@ import logging
 from src.core.setting_paths import (
     output_main_folder_path,
     log_folder_path,
-    reception_data_folder_path,
     processed_reception_data_folder_path,
-    club_info_data_path,
     clubs_reception_data_path,
     application_statues_folder_path,
     content_check_folder_path,
@@ -35,9 +33,7 @@ def create_folders():
     folders_to_create = [
         output_main_folder_path,
         log_folder_path,
-        reception_data_folder_path,
         processed_reception_data_folder_path,
-        club_info_data_path,
         clubs_reception_data_path,
         application_statues_folder_path,
         content_check_folder_path,
