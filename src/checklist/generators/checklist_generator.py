@@ -57,7 +57,6 @@ def make_document1_checklist_for_human(checklist_status_df, applied_club_df):
             '申請_適合状況(3)⑥': row.get('申請_適合状況(3)⑥', ''),
             '申請_適合状況(3)⑦': row.get('申請_適合状況(3)⑦', ''),
             'チェック項目_適合状況': '',
-            'チェック者名_申請内容': '',
             '受付日時': row.get('受付日時', ''),
             'チェックリスト作成日時': jst_now.strftime('%Y-%m-%d %H:%M:%S'),
             'チェック項目_その他': '',

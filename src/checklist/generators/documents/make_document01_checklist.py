@@ -90,10 +90,10 @@
         document01_checklist_df.loc[index, '申請_設立日'] = row['申請_設立日']
         document01_checklist_df.loc[index, '申請_都道府県'] = row['申請_東京チェック']
         document01_checklist_df.loc[index, '地区名'] = row['地区名']
-        document01_checklist_df.loc[index, '区市町村名'] = row['申請_区市町村名']
+        document01_checklist_df.loc[index, '申請_区市町村名'] = row['申請_区市町村名']
         document01_checklist_df.loc[index, '申請_住所'] = row['申請_住所']
         document01_checklist_df.loc[index, '申請_建物名(任意)'] = row['申請_建物名(任意)']
-        document01_checklist_df.loc[index, '申請_担当者名'] = row['申請_申請担当者名']
+        document01_checklist_df.loc[index, '申請_申請担当者名'] = row['申請_申請担当者名']
         document01_checklist_df.loc[index, '申請_担当者役職名'] = row['申請_申請担当者役職']
         document01_checklist_df.loc[index, '申請_メールアドレス'] = row['申請_メールアドレス']
         document01_checklist_df.loc[index, '申請_電話番号'] = row['申請_TEL']
@@ -125,8 +125,8 @@
             document01_checklist_df.loc[index, col] = '未チェック'
         # チェック項目_その他の初期状態は空文字列
         document01_checklist_df.loc[index, 'チェック項目_その他'] = ''
-        # チェック者名の初期状態は「チェックが完了していません」
-        document01_checklist_df.loc[index, 'チェック者名_申請内容'] = 'チェックが完了していません'
+        # チェック者名_受付内容の初期状態は「チェックが完了していません」
+        document01_checklist_df.loc[index, 'チェック者名_受付内容'] = 'チェックが完了していません'
     logging.info("書類01のチェックリストのデータフレームを作成しました")
 
     # 5. 書類01のチェックリストのデータフレームを保存(ファイル名は「書類01チェックリスト_受付{latest_reception_data_date_str}_作成{YYYYMMDDHHMMSS}.xlsx」)
