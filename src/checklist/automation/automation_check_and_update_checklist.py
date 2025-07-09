@@ -70,7 +70,12 @@ def automation_check_and_update_checklist(latest_reception_data_date):
     overall_checklist_df = update_document_check_status(overall_checklist_df, overall_checklist_file_path, club_reception_df, latest_reception_data_date=latest_club_reception_date)
     logging.info("書類チェック状況の反映が完了しました")
 
-    # 作業memo（今後の作業）
+    # 5.5. 人間によるチェック結果を総合チェックリストに反映
+    logging.info("人間によるチェック結果を総合チェックリストに反映します")
+    from src.checklist.automation.update_human_check_status import update_human_check_status_to_overall_checklist
+    overall_checklist_df = update_human_check_status_to_overall_checklist(overall_checklist_df, overall_checklist_file_path, club_reception_df, latest_club_reception_date)
+    logging.info("人間によるチェック結果の反映が完了しました")
+
     # 6. 整合性チェック状況を総合チェックリストに反映
     logging.info("整合性チェック状況を総合チェックリストに反映します")
     update_consistency_check_status(overall_checklist_df, overall_checklist_file_path, club_reception_df, latest_club_reception_date)
