@@ -154,3 +154,36 @@ def normalize_reception_date(latest_reception_data_date):
         except Exception as e:
             logging.error(f"日付の正規化に失敗しました: {latest_reception_data_date}, エラー: {e}")
             return None
+
+def get_latest_checklist_file(club_name, reception_date, club_folder):
+    """
+    指定されたクラブフォルダから最新のチェックリストファイルを取得する。
+    
+    Args:
+        club_name (str): クラブ名
+        reception_date (str): 受付日時
+        club_folder (str): クラブフォルダのパス
+    
+    Returns:
+        str: 最新のチェックリストファイルのパス（見つからない場合はNone）
+    """
+    if not os.path.exists(club_folder):
+        logging.warning(f"クラブフォルダが存在しません: {club_folder}")
+        return None
+    
+    # チェックリストファイルのパターンを探す
+    checklist_files = [
+        f for f in os.listdir(club_folder)
+        if os.path.isfile(os.path.join(club_folder, f)) and
+        f.startswith(f'{club_name}_受付{reception_date}') and 
+        f.endswith('.xlsx') and
+        'チェックリスト' in f
+    ]
+    
+    if not checklist_files:
+        logging.warning(f"クラブ '{club_name}' のチェックリストファイルが見つかりません")
+        return None
+    
+    # 最新のファイルを返す（ファイル名でソート）
+    latest_file = sorted(checklist_files)[-1]
+    return os.path.join(club_folder, latest_file)

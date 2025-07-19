@@ -41,6 +41,30 @@ def main():
     make_chacklists(latest_reception_data_date)
     logging.info("チェックリストの作成が完了しました")
 
+    # 人間用のチェックリストを作成
+    logging.info("人間用のチェックリストを作成します")
+    from src.human_interface.make_and_write_documents_checklist_for_human import make_documents_checklist_for_human, write_checklist_by_human_check
+    from src.core.load_latest_club_data import load_latest_club_reception_data
+    from src.core.setting_paths import output_main_folder_path
+    
+    # 最新の受付データを読み込み
+    club_reception_df = load_latest_club_reception_data()
+    if club_reception_df is not None:
+        # 初期のチェックリスト作成状況を作成（空のDataFrame）
+        import pandas as pd
+        checklist_status_df = pd.DataFrame(columns=['クラブ名', '申請日時', 'チェックリスト作成日時'])
+        
+        # 人間用チェックリストを作成
+        checklist_status_df = make_documents_checklist_for_human(checklist_status_df, club_reception_df)
+        logging.info("人間用のチェックリストの作成が完了しました")
+        
+        # 人間によるチェック状況の確認・更新
+        logging.info("人間によるチェック状況の確認を実行します")
+        checklist_status_df = write_checklist_by_human_check(checklist_status_df, club_reception_df, output_main_folder_path)
+        logging.info("人間によるチェック状況の確認が完了しました")
+    else:
+        logging.error("受付データの読み込みに失敗しました")
+
     # チェックリストの更新・自動チェック
     automation_check_and_update_checklist(latest_reception_data_date)
     logging.info("チェックリストの更新・自動チェックが完了しました")
