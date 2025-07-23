@@ -43,7 +43,8 @@ deportare_registro/
 │   │       ├── check_functions.py
 │   │       └── documents_check_functions.py
 │   └── human_interface/      # 人間用インターフェース
-│       └── make_and_write_documents_checklist_for_human.py
+│       ├── make_and_write_documents_checklist_for_human.py
+│       └── email_draft_generator.py  # メール文面案生成
 ├── config/                   # 設定ファイル
 │   ├── checklist_columns/   # チェックリスト設定
 │   │   └── *.json
@@ -62,13 +63,18 @@ deportare_registro/
 - クラブごとのフォルダをスキャンし、提出書類を自動判定
 - Excelテンプレートに基づくセル内容の自動チェック
 - チェック結果の一覧（Excelファイル）を自動生成
+- **エラーがあるクラブに対する個別メール文面案の自動生成**
+  - テキストファイル（.txt）: 編集・バックアップ用
+  - EMLファイル（.eml）: メールアプリで直接開ける標準メール形式
+  - クラブ固有のエラー内容を含む個別対応メッセージ
 - ログ出力による処理状況の記録
 
 ## 必要な環境
 
-- Python 3.8 以上
+- Python 3.10 以上
 - pandas
 - openpyxl
+- email (標準ライブラリ - メール文面案生成用)
 - その他 requirements.txt に記載のライブラリ
 
 ## 使い方
@@ -89,14 +95,40 @@ deportare_registro/
     python main.py
     ```
 
-5. チェック結果は `SUMMARY_FILE` で指定したExcelファイルに出力されます。
+5. チェック結果は `output/R7_登録受付処理/` 配下に出力されます。
+
+6. エラーがあるクラブについては、メール文面案が自動生成されます。
+   - EMLファイルをダブルクリックしてメールアプリで開き、内容確認後送信可能
+   - 各クラブの固有エラーに応じた個別対応メッセージが生成されます
 
 ## ディレクトリ構成例
 
 - `main.py` : メイン処理
-- `utils/` : 各種ユーティリティ（ロガー、Excelチェック等）
+- `src/` : ソースコード（各種ユーティリティ、チェック機能、メール文面案生成等）
 - `config/` : 設定ファイル
-- `data/` : 入力・出力データ
+- `data/` : 入力データ
+- `output/` : 出力データ（チェックリスト、メール文面案等）
+
+## メール文面案生成機能
+
+### 概要
+チェック結果に基づいて、エラーがあるクラブに対して個別のメール文面案を自動生成します。
+
+### 生成されるファイル
+- **テキストファイル（.txt）**: 内容の確認・編集用
+- **EMLファイル（.eml）**: メールアプリで直接開ける標準形式
+
+### 対応エラー種類
+- 自動チェック結果（入力値エラー、必須項目未入力など）
+- 書類間整合性チェック結果（データの不一致）
+- 書類別チェック結果（各書類固有のエラー）
+
+### 対応メールアプリ
+- Windows Mail
+- Microsoft Outlook
+- Mozilla Thunderbird
+- Apple Mail
+- その他RFC822/MIME対応メールアプリ
 
 ## ライセンス
 
