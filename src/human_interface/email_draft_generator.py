@@ -9,6 +9,20 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Tuple, Optional
 import json
+import email.mime.text
+import email.mime.multipart
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import email.utils
+import threading
+import time
+
+try:
+    import win32com.client
+    OUTLOOK_AVAILABLE = True
+except ImportError:
+    OUTLOOK_AVAILABLE = False
+    logging.warning("pywin32がインストールされていません。Outlookファイル機能は無効です。")
 
 class EmailDraftGenerator:
     """メール文面案作成クラス"""
@@ -560,53 +574,235 @@ class EmailDraftGenerator:
             logging.error(f"チェックリスト結果からのエラー抽出中にエラーが発生しました: {e}")
             return [], {}
     
-    def save_email_draft(self, email_draft: str, club_name: str, output_folder: str) -> str:
+    def save_email_draft(self, email_draft: str, club_name: str, output_folder: str, create_eml_file: bool = True, create_outlook_file: bool = False) -> str:
         """
-        メール文面案をファイルに保存
+        メール文面案をファイルに保存（テキストファイル、EMLファイル、Outlookメールファイル）
         
         Args:
             email_draft: メール文面案
             club_name: クラブ名
             output_folder: 出力フォルダパス
+            create_eml_file: EMLファイルを作成するかどうか（デフォルト：True）
+            create_outlook_file: Outlookメールファイルを作成するかどうか（デフォルト：False）
             
         Returns:
             保存されたファイルのパス
         """
         try:
+            # クラブごとのフォルダを作成
+            club_folder = os.path.join(output_folder, f"{club_name}_メール文面案")
+            os.makedirs(club_folder, exist_ok=True)
+            
             # ファイル名の生成
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"メール文面案_{club_name}_{timestamp}.txt"
             
-            # 出力フォルダの作成
-            os.makedirs(output_folder, exist_ok=True)
+            # テキストファイルとして保存
+            txt_filename = f"メール文面案_{club_name}_{timestamp}.txt"
+            txt_file_path = os.path.join(club_folder, txt_filename)
             
-            # ファイルパスの生成
-            file_path = os.path.join(output_folder, filename)
-            
-            # ファイルに保存
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(txt_file_path, 'w', encoding='utf-8') as f:
                 f.write(email_draft)
             
-            logging.info(f"メール文面案を保存しました: {file_path}")
-            return file_path
+            # 件名と本文を分離
+            lines = email_draft.split('\n')
+            subject = "令和8年度登録認証制度　登録申請内容について"  # デフォルト件名
+            body = email_draft
+            
+            # 件名行を探す
+            for line in lines:
+                if line.startswith('件名：'):
+                    subject = line.replace('件名：', '').strip()
+                    # 件名以降を本文とする
+                    subject_index = email_draft.find(line)
+                    if subject_index != -1:
+                        body = email_draft[subject_index + len(line):].strip()
+                    break
+            
+            # EMLファイルとして保存（オプション）
+            if create_eml_file:
+                eml_filename = f"メール文面案_{club_name}_{timestamp}.eml"
+                eml_file_path = os.path.join(club_folder, eml_filename)
+                
+                try:
+                    # 受信者メールアドレスの設定（必要に応じて変更）
+                    recipient_email = f"{club_name}@example.com"
+                    self._create_eml_file(subject, body, recipient_email, eml_file_path)
+                    logging.info(f"EMLファイルを保存しました: {eml_file_path}")
+                except Exception as eml_error:
+                    logging.warning(f"EMLファイルの作成に失敗しました: {eml_error}")
+            
+            # Outlookメールファイルとして保存（オプション）
+            if create_outlook_file:
+                msg_filename = f"メール文面案_{club_name}_{timestamp}.msg"
+                msg_file_path = os.path.join(club_folder, msg_filename)
+                
+                try:
+                    self._create_outlook_mail_file(email_draft, msg_file_path)
+                    logging.info(f"Outlookメールファイルを保存しました: {msg_file_path}")
+                except Exception as outlook_error:
+                    logging.warning(f"Outlookメールファイルの作成に失敗しました。テキストファイルのみ保存されます: {outlook_error}")
+                    # Outlookの作成に失敗してもプログラムは継続
+            else:
+                logging.info("Outlookメールファイルの作成はスキップされました（create_outlook_file=False）")
+            
+            logging.info(f"テキストファイルを保存しました: {txt_file_path}")
+            return txt_file_path
             
         except Exception as e:
             logging.error(f"メール文面案の保存中にエラーが発生しました: {e}")
             return None
     
-    def generate_bulk_email_drafts(self, checklist_df: pd.DataFrame, output_folder: str) -> Dict[str, str]:
+    def _create_eml_file(self, subject: str, body: str, recipient_email: str, eml_file_path: str):
+        """
+        標準的なEMLファイルを作成（多くのメールアプリで開ける）
+        
+        Args:
+            subject: メール件名
+            body: メール本文
+            recipient_email: 受信者メールアドレス
+            eml_file_path: 保存するEMLファイルのパス
+        """
+        try:
+            # MIMEメッセージを作成
+            msg = MIMEText(body, 'plain', 'utf-8')
+            msg['Subject'] = subject
+            msg['From'] = 'sports-association@example.com'  # 送信者アドレス（適宜変更）
+            msg['To'] = recipient_email if recipient_email else 'club@example.com'
+            msg['Date'] = email.utils.formatdate(localtime=True)
+            
+            # EMLファイルとして保存
+            with open(eml_file_path, 'w', encoding='utf-8') as f:
+                f.write(msg.as_string())
+                
+            logging.info(f"EMLファイルを作成しました: {eml_file_path}")
+            
+        except Exception as e:
+            logging.error(f"EMLファイルの作成中にエラーが発生しました: {e}")
+            raise
+    
+    def _create_outlook_mail_file(self, email_content: str, file_path: str, timeout_seconds: int = 10):
+        """
+        Outlookメールファイル（.msg）を作成
+        
+        Args:
+            email_content: メール内容
+            file_path: 保存先ファイルパス
+            timeout_seconds: タイムアウト時間（秒）
+        """
+        import threading
+        import time
+        
+        result = {'success': False, 'error': None}
+        
+        def create_outlook_file():
+            try:
+                logging.info(f"Outlookメールファイル作成開始: {file_path}")
+                
+                # Outlookアプリケーションを起動
+                try:
+                    outlook = win32com.client.Dispatch("Outlook.Application")
+                    logging.info("Outlookアプリケーションに接続しました")
+                except Exception as e:
+                    result['error'] = f"Outlookアプリケーションへの接続に失敗: {e}"
+                    return
+                
+                # 新しいメールアイテムを作成
+                try:
+                    mail_item = outlook.CreateItem(0)  # 0 = olMailItem
+                    logging.info("メールアイテムを作成しました")
+                except Exception as e:
+                    result['error'] = f"メールアイテムの作成に失敗: {e}"
+                    return
+                
+                # メール内容を解析
+                lines = email_content.split('\n')
+                subject_line = lines[0] if lines else "件名：令和8年度登録認証制度　登録申請内容について"
+                
+                # 件名を設定
+                try:
+                    if subject_line.startswith('件名：'):
+                        mail_item.Subject = subject_line[3:]  # "件名："を除去
+                    else:
+                        mail_item.Subject = "令和8年度登録認証制度　登録申請内容について"
+                    logging.info(f"件名を設定しました: {mail_item.Subject}")
+                except Exception as e:
+                    result['error'] = f"件名の設定に失敗: {e}"
+                    return
+                
+                # 本文を設定（件名行を除く）
+                try:
+                    body_content = '\n'.join(lines[1:]) if len(lines) > 1 else email_content
+                    mail_item.Body = body_content
+                    logging.info("本文を設定しました")
+                except Exception as e:
+                    result['error'] = f"本文の設定に失敗: {e}"
+                    return
+                
+                # メールファイルとして保存
+                try:
+                    # パスを正規化
+                    normalized_path = os.path.normpath(file_path)
+                    mail_item.SaveAs(normalized_path, 3)  # 3 = olMSG format
+                    logging.info(f"メールファイルを保存しました: {normalized_path}")
+                    result['success'] = True
+                except Exception as e:
+                    result['error'] = f"メールファイルの保存に失敗: {e}"
+                    return
+                
+                # Outlookオブジェクトを解放
+                try:
+                    mail_item = None
+                    outlook = None
+                    logging.info("Outlookオブジェクトを解放しました")
+                except Exception as e:
+                    logging.warning(f"Outlookオブジェクトの解放で警告: {e}")
+                
+            except Exception as e:
+                result['error'] = f"予期しないエラー: {e}"
+        
+        # 別スレッドでOutlook処理を実行
+        thread = threading.Thread(target=create_outlook_file)
+        thread.daemon = True
+        thread.start()
+        
+        # タイムアウトまで待機
+        thread.join(timeout=timeout_seconds)
+        
+        if thread.is_alive():
+            # タイムアウトした場合
+            logging.error(f"Outlookメールファイル作成がタイムアウトしました（{timeout_seconds}秒）")
+            raise Exception(f"Outlook処理がタイムアウトしました（{timeout_seconds}秒）")
+        
+        if not result['success']:
+            if result['error']:
+                logging.error(f"Outlookメールファイルの作成中にエラーが発生しました: {result['error']}")
+                raise Exception(result['error'])
+            else:
+                logging.error("Outlookメールファイルの作成が不明な理由で失敗しました")
+                raise Exception("不明なエラー")
+    
+    def generate_bulk_email_drafts(self, checklist_df: pd.DataFrame, output_folder: str, create_eml_files: bool = True, create_outlook_files: bool = False) -> Dict[str, str]:
         """
         総合チェックリストから複数クラブのメール文面案を一括生成
         
         Args:
             checklist_df: 総合チェックリストのDataFrame
             output_folder: 出力フォルダパス
+            create_eml_files: EMLファイルを作成するかどうか（デフォルト：True）
+            create_outlook_files: Outlookメールファイルを作成するかどうか（デフォルト：False）
             
         Returns:
             クラブ名をキーとした生成されたファイルパスの辞書
         """
         try:
             generated_files = {}
+            
+            # メイン出力フォルダを作成
+            main_output_folder = os.path.join(output_folder, "メール文面案")
+            os.makedirs(main_output_folder, exist_ok=True)
+            
+            logging.info(f"EMLファイル作成: {'有効' if create_eml_files else '無効'}")
+            logging.info(f"Outlookメールファイル作成: {'有効' if create_outlook_files else '無効'}")
             
             for index, row in checklist_df.iterrows():
                 club_name = str(row.get('クラブ名', 'Unknown')).strip()
@@ -638,8 +834,8 @@ class EmailDraftGenerator:
                     )
                     
                     if email_draft:
-                        # ファイルに保存
-                        file_path = self.save_email_draft(email_draft, club_name, output_folder)
+                        # ファイルに保存（クラブごとのフォルダに）
+                        file_path = self.save_email_draft(email_draft, club_name, main_output_folder, create_eml_files, create_outlook_files)
                         if file_path:
                             generated_files[club_name] = file_path
                 

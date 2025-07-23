@@ -42,10 +42,12 @@ def make_email_templates(latest_reception_data_date):
         # メール文面案生成器を初期化
         email_generator = EmailDraftGenerator()
         
-        # 一括でメール文面案を生成
+        # 一括でメール文面案を生成（EMLファイル有効、Outlookメールファイルは無効）
         generated_files = email_generator.generate_bulk_email_drafts(
             checklist_df=checklist_df,
-            output_folder=email_drafts_folder_path
+            output_folder=email_drafts_folder_path,
+            create_eml_files=True,  # EMLファイル作成を有効（メールアプリで開ける）
+            create_outlook_files=False  # Outlookファイル作成を無効にして安定性を向上
         )
         
         if generated_files:
