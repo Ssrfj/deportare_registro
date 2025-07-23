@@ -25,7 +25,8 @@ from src.core.setting_paths import (
     consistency_checklist_members_and_voting_rights_folder_path,
     consistency_checklist_disciplines_folder_path,
     consistency_checklist_meeting_minutes_folder_path,
-    clubs_details_data_folder_path
+    clubs_details_data_folder_path,
+    email_drafts_folder_path
 )
 
 def create_folders():
@@ -54,7 +55,8 @@ def create_folders():
         consistency_checklist_members_and_voting_rights_folder_path,
         consistency_checklist_disciplines_folder_path,
         consistency_checklist_meeting_minutes_folder_path,
-        clubs_details_data_folder_path
+        clubs_details_data_folder_path,
+        email_drafts_folder_path
     ]
     for folder in folders_to_create:
         if not os.path.exists(folder):

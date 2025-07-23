@@ -18,8 +18,15 @@ def update_human_check_status_to_overall_checklist(overall_checklist_df, checkli
     from src.core.setting_paths import overall_checklist_folder_path
     from src.core.utils import get_jst_now, ensure_date_string
     from src.core.load_latest_club_data import load_latest_club_reception_data, get_club_data_by_name_and_date
+    from src.checklist.persistence.check_status_manager import CheckStatusManager
     
     logging.info("人間によるチェック結果を総合チェックリストに反映を開始します")
+    
+    # チェック状況管理システムを初期化
+    status_manager = CheckStatusManager()
+    
+    # 保存済みのチェック完了情報を現在のチェックリストに復元
+    overall_checklist_df = status_manager.merge_with_current_checklist(overall_checklist_df)
     
     # 統合されたクラブ情報付き受付データを読み込み
     logging.info("統合されたクラブ情報付き受付データを読み込みます")
@@ -84,6 +91,20 @@ def update_human_check_status_to_overall_checklist(overall_checklist_df, checkli
         except Exception as e:
             logging.warning(f"受付日時の変換に失敗しました: {apried_date_str}, エラー: {e}")
             continue
+        
+        # 既にチェック済みかどうかを確認
+        status_df = status_manager.load_check_status()
+        existing_check = status_df[
+            (status_df['クラブ名'] == club_name) & 
+            (status_df['受付日時'] == apried_date_str)
+        ]
+        
+        if not existing_check.empty:
+            check_result = existing_check.iloc[0]['書類チェック結果']
+            completion_flag = status_manager.determine_completion_flag(check_result)
+            if completion_flag:
+                logging.info(f"クラブ名: {club_name} は既にチェック完了済みのためスキップします")
+                continue
             
         # 処理開始のメッセージを表示
         logging.info(f"クラブ名: {club_name} の人間によるチェック結果の反映を開始します")
@@ -180,19 +201,41 @@ def update_human_check_status_to_overall_checklist(overall_checklist_df, checkli
                                         if pd.isna(contact_person) or str(contact_person).strip() == '':
                                             input_issues.append("申請担当者名が未入力")
                                         
-                                        # 結果をまとめる
+                                        # 結果をまとめる（簡潔な形式）
                                         if doc_key not in human_check_found_docs:
-                                            result_parts = [f"チェック者: {checker_name}"]
+                                            # チェック状況を判定
+                                            has_unchecked = any("未チェック" in item for item in check_items)
+                                            has_errors = any("異常あり" in item for item in check_items) or input_issues
                                             
-                                            if check_items:
-                                                result_parts.append("項目状況: " + ", ".join(check_items))
-                                            
-                                            if input_issues:
-                                                result_parts.append("入力問題: " + ", ".join(input_issues))
+                                            # ステータスを決定
+                                            if has_errors:
+                                                # エラーがある項目を抽出
+                                                error_items = []
+                                                for item in check_items:
+                                                    if "異常あり" in item:
+                                                        error_items.append(item.split(":")[0])
+                                                # 入力問題も追加
+                                                for issue in input_issues:
+                                                    if "クラブ名不一致" in issue:
+                                                        error_items.append("クラブ名")
+                                                    elif "申請種別が未入力" in issue:
+                                                        error_items.append("申請種別")
+                                                    elif "申請担当者名が未入力" in issue:
+                                                        error_items.append("申請担当者名")
                                                 
-                                            detailed_check_results.append(f"{doc_key}: {'; '.join(result_parts)}")
+                                                if error_items:
+                                                    status = f"エラー有{{{','.join(error_items)}}}"
+                                                else:
+                                                    status = "エラー有"
+                                            elif has_unchecked:
+                                                status = "未チェック"
+                                            else:
+                                                status = "済"
+                                            
+                                            # 結果フォーマット: 書類X:ステータス:チェック者名
+                                            detailed_check_results.append(f"{doc_key}:{status}:{checker_name}")
                                             human_check_found_docs.add(doc_key)
-                                            logging.info(f"クラブ '{club_name}' で {doc_key} の詳細チェック結果を記録しました")
+                                            logging.info(f"クラブ '{club_name}' で {doc_key} の簡潔チェック結果を記録しました: {status}")
                                         
                                         # ファイルの最終更新時間を取得
                                         file_stat = os.stat(file_path)
@@ -235,12 +278,24 @@ def update_human_check_status_to_overall_checklist(overall_checklist_df, checkli
             jst_now = datetime.now(timezone(timedelta(hours=9)))
             update_datetime = jst_now.strftime('%Y-%m-%d %H:%M:%S')
             
-            # 人間によるチェック結果をまとめる
-            human_check_result = "; ".join(human_check_results)
+            # 人間によるチェック結果をまとめる（簡潔な形式）
+            human_check_result = ",".join(human_check_results)
             
             # 総合チェックリストの書類チェック結果を更新
             overall_checklist_df.loc[index, '書類チェック結果'] = human_check_result
             overall_checklist_df.loc[index, '書類チェック更新日時'] = update_datetime
+            
+            # チェック状況管理システムに保存
+            checker_name = "複数チェック者" if len(human_check_results) > 1 else "チェック者不明"
+            # 最初の結果からチェック者名を取得
+            if human_check_results:
+                first_result = human_check_results[0]
+                if ":" in first_result:
+                    parts = first_result.split(":")
+                    if len(parts) >= 3:
+                        checker_name = parts[2]
+            
+            status_manager.update_check_status(club_name, apried_date_str, human_check_result, checker_name)
             
             logging.info(f"クラブ名: {club_name} の人間によるチェック結果を総合チェックリストに反映しました")
             
@@ -258,6 +313,14 @@ def update_human_check_status_to_overall_checklist(overall_checklist_df, checkli
     overall_checklist_file_path = os.path.join(overall_checklist_folder_path, overall_checklist_file_name)
     overall_checklist_df.to_excel(overall_checklist_file_path, index=False)
     logging.info(f"総合チェックリストのファイルを保存しました: {overall_checklist_file_path}")
+    
+    # チェック状況管理システムの状態を保存
+    try:
+        status_manager.save_check_status()
+        logging.info("チェック状況管理システムの状態を保存しました")
+    except Exception as e:
+        logging.error(f"チェック状況管理システムの保存中にエラーが発生しました: {e}")
+    
     logging.info("人間によるチェック結果の反映が完了しました")
     
     return overall_checklist_df

@@ -62,3 +62,7 @@ consistency_checklist_meeting_minutes_folder_path = os.path.join(content_check_f
 # 書類チェック・一貫性チェックに使うクラブごとの詳細データ保存フォルダ
 clubs_details_data_folder_name = 'クラブごとの詳細データ'
 clubs_details_data_folder_path = os.path.join(content_check_folder_path, clubs_details_data_folder_name)
+
+# メール文面案フォルダ
+email_drafts_folder_name = 'メール文面案'
+email_drafts_folder_path = os.path.join(output_main_folder_path, email_drafts_folder_name)
