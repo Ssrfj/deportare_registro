@@ -7,58 +7,9 @@ from src.data_processing.marge_reception_data_with_club_info import marge_recept
 from src.data_processing.reception_statues import reception_statues
 from src.checklist.generators.make_chacklists import make_chacklists
 from src.checklist.automation.automation_check_and_update_checklist import automation_check_and_update_checklist
-from src.human_interface.email_draft_generator import EmailDraftGenerator
-from src.core.setting_paths import email_drafts_folder_path
+from src.human_interface.make_email_templates import make_email_templates
 import pandas as pd
 import os
-
-def make_email_templates(latest_reception_data_date):
-    """
-    チェック状況に応じたメールの文面案を作成
-    """
-    try:
-        # 最新の総合チェックリストファイルを探す
-        overall_checklist_folder = f"output/R7_登録受付処理/受付内容チェック/総合チェックリスト"
-        
-        if not os.path.exists(overall_checklist_folder):
-            logging.warning(f"総合チェックリストフォルダが見つかりません: {overall_checklist_folder}")
-            return
-        
-        # 最新の総合チェックリストファイルを取得
-        checklist_files = [f for f in os.listdir(overall_checklist_folder) if f.endswith('.xlsx')]
-        if not checklist_files:
-            logging.warning("総合チェックリストファイルが見つかりません")
-            return
-        
-        # 最新ファイルを選択
-        latest_checklist_file = max(checklist_files)
-        checklist_path = os.path.join(overall_checklist_folder, latest_checklist_file)
-        
-        logging.info(f"総合チェックリストを読み込み中: {checklist_path}")
-        
-        # 総合チェックリストを読み込み
-        checklist_df = pd.read_excel(checklist_path)
-        
-        # メール文面案生成器を初期化
-        email_generator = EmailDraftGenerator()
-        
-        # 一括でメール文面案を生成（EMLファイル有効、Outlookメールファイルは無効）
-        generated_files = email_generator.generate_bulk_email_drafts(
-            checklist_df=checklist_df,
-            output_folder=email_drafts_folder_path,
-            create_eml_files=True,  # EMLファイル作成を有効（メールアプリで開ける）
-            create_outlook_files=False  # Outlookファイル作成を無効にして安定性を向上
-        )
-        
-        if generated_files:
-            logging.info(f"メール文面案を生成しました（{len(generated_files)}件）:")
-            for club_name, file_path in generated_files.items():
-                logging.info(f"  - {club_name}: {file_path}")
-        else:
-            logging.info("エラーのあるクラブが見つからないため、メール文面案は生成されませんでした")
-        
-    except Exception as e:
-        logging.error(f"メール文面案作成中にエラーが発生しました: {e}")
 
 
 # メインの処理
@@ -124,8 +75,14 @@ def main():
 
     # チェック状況に応じたメールの文面案の作成
     logging.info("チェック状況に応じたメールの文面案を作成します")
-    make_email_templates(latest_reception_data_date)
-    logging.info("チェック状況に応じたメールの文面案の作成が完了しました")
+    email_result = make_email_templates(latest_reception_data_date)
+    if email_result is not None:
+        if email_result:
+            logging.info(f"メール文面案の作成が完了しました（{len(email_result)}件生成）")
+        else:
+            logging.info("メール文面案の作成が完了しました（生成対象なし）")
+    else:
+        logging.warning("メール文面案の作成でエラーが発生しました")
 
     # 今後の作業memo
     # チェック結果をPDFで出力
